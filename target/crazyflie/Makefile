@@ -9,6 +9,7 @@
 # enable the app-layer. See app-config in this directory for example.
 
 TARGET ?=
+UDEV_PATH := /etc/udev/rules.d
 
 #
 # We want to execute the main Makefile for the firmware project,
@@ -37,9 +38,12 @@ clean_setup:
 	rm -rf ./.venv
 	rm -rf ./.cache
 
-setup: clean_setup
+setup: $(UDEV_PATH) clean_setup 
 	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git lib/crazyflie-firmware;
 	@cd ./lib/crazyflie-firmware/ && make  cf2_defconfig
+
+	@echo "copying udev rules in " $(UDEV_PATH)
+	@sudo cp ./99-bitcraze.rules $(UDEV_PATH)
 
 	@python -m venv .venv
 	@.venv/bin/pip install cfclient
