@@ -1,2 +1,2 @@
-obj-y += led_cycle.o
+obj-y += ac_find.o
 obj-y += ap_find/
