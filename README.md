@@ -13,7 +13,7 @@ he's free to do that. In the **src** directory there is the source code for the 
 
 Each target has its owm build and flash system and for this reason there is no common one.
 Here a list of the current supported targets with links to documentation of each of them.
->> Linux is only used for emulation and testing of the library
+> Linux is only used for emulation and testing of the library
 
 | Target    | Documentation                         |
 |-----------|---------------------------------------|

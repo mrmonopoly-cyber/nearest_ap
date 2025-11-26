@@ -42,7 +42,7 @@ The command will:
 
 # Build
 
->> To build you first need to do the [Setup](#Setup)
+> To build you first need to do the [Setup](#Setup)
 
 To build the firmware for the drone to the following command:
 ```sh
@@ -51,7 +51,7 @@ make
 
 # Flash
 
->> To build you first need to do the [Build](#Build)
+> To build you first need to do the [Build](#Build)
 
 To flash the firmware for the drone to the following command:
 ```sh
