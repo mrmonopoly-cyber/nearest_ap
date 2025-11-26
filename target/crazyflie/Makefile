@@ -39,7 +39,7 @@ clean_setup:
 
 setup: clean_setup
 	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git lib/crazyflie-firmware;
-	@cd ./lib/crazyflie-firmware/ && make cf21bl_defconfig
+	@cd ./lib/crazyflie-firmware/ && make  cf2_defconfig
 
 	@python -m venv .venv
 	@.venv/bin/pip install cfclient
