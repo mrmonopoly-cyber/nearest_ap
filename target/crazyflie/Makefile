@@ -10,7 +10,9 @@
 
 TARGET ?=
 UDEV_PATH := /etc/udev/rules.d
+UDEV_FILE := 99-bitcraze.rules
 CC_INCLUDE_PATH := $(shell echo | arm-none-eabi-gcc -E -Wp,-v - 2>&1 | grep -v ignoring | grep -v "#" | grep -v "End of search list." | uniq)
+IN_PLUGDEV := $(shell groups $$USER | grep plugdev)
 
 #
 # We want to execute the main Makefile for the firmware project,
@@ -29,6 +31,7 @@ NO_INCLUDE_TARGETS := setup clean_setup
 ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_INCLUDE_TARGETS)),)
 -include $(CRAZYFLIE_BASE)/tools/make/oot.mk
 endif
+
 
 clangd_setup:
 	@echo "cleaning old setup"
@@ -51,25 +54,40 @@ clangd_setup:
 	@sed -i 's/\"-fconserve-stack\",//g' compile_commands.json
 	@sed -i 's/\"-mfp16-format=ieee\",//g' compile_commands.json
 
-clean_setup:
+
+ifdef IN_PLUGDEV
+	@echo "removing group plugdev from $$USER"
+remove_plug_udev_group:
+		@sudo gpasswd -d $$USER plugdev
+else
+remove_plug_udev_group:
+endif
+
+clean_setup: remove_plug_udev_group
 	rm -rf ./lib/crazyflie-firmware
 	rm -rf ./build*
 	rm -rf ./.venv
 	rm -rf ./.cache
 	rm -rf ./.clangd
+	@echo "removing udev rules"
+	@sudo rm -f $(UDEV_PATH)/$(UDEV_FILE)
 
 setup: $(UDEV_PATH) clean_setup 
+	@echo "cloning basic firmware of crazyflie"
 	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git lib/crazyflie-firmware;
 	@cd ./lib/crazyflie-firmware/ && make  cf2_defconfig
 
+	@echo "adding $$USER to the plugdev group"
+	@sudo sudo usermod -a -G plugdev $$USER
 	@echo "copying udev rules in " $(UDEV_PATH)
-	@sudo cp ./99-bitcraze.rules $(UDEV_PATH)
+	@sudo cp $(UDEV_FILE) $(UDEV_PATH)
 
+	@echo "creating python virtual env in .venv"
 	@python -m venv .venv
+	@echo "installing cfclient in .venv"
 	@.venv/bin/pip install cfclient
+	@echo "installing cflib in .venv"
 	@.venv/bin/pip install cflib
 
 	make clangd_setup
 	@echo you have to execute the following command: "source ./.venv/bin/activate"
-
-
