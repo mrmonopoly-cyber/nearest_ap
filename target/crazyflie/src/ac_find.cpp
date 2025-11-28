@@ -23,10 +23,13 @@
  */
 
 
-#include <string.h>
+#include <vector>
 #include <stdint.h>
 #include <stdbool.h>
 
+
+extern "C"
+{
 #include "app.h"
 
 #include "FreeRTOS.h"
@@ -36,6 +39,8 @@
 
 #include "log.h"
 #include "param.h"
+
+}
 
 #include "ap_find/lib.h"
 
