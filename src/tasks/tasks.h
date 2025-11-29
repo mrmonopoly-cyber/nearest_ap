@@ -5,7 +5,7 @@
 class Task
 {
   public:
-    enum TaskError 
+    enum class TaskError 
     {
       Ok,
       Error,
