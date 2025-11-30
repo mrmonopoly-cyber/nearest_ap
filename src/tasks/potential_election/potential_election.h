@@ -1,12 +1,13 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 
 #include "../base_task.h"
 #include "../../internal/internal.h"
 
 namespace nearest_ap {
-  template<typename BusMex, uint32_t default_num_nodes>
+  template<typename BusMex, uint32_t default_num_nodes, uint32_t tollerance>
     class PotentialElectionTask : public BaseTask<BusMex>
   {
     public:
@@ -14,6 +15,7 @@ namespace nearest_ap {
       using TaskError = typename BaseTask<BusMex>::TaskError;
       using SendMex = typename BaseTask<BusMex>::SendMex;
       using VoteInfo = VoteInfo<default_num_nodes>;
+      using LocalPotentialInfo = LocalPotentialInfo<tollerance>;
 
       explicit PotentialElectionTask() noexcept;
 

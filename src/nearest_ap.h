@@ -8,14 +8,17 @@
 #include "internal/internal.h"
 
 namespace nearest_ap {
-  template<typename BusMex, uint32_t initial_num_nodes=4>
+  template<typename BusMex, uint32_t initial_num_nodes=4, uint32_t tollerance=0>
   class Node
   {
     public:
+      using Tasks = Tasks<BusMex, initial_num_nodes, tollerance>;
+      using Internal = Internal<initial_num_nodes, tollerance>;
+
       using SendMex = typename BaseTask<BusMex>::SendMex;
       using RecvMex = typename BaseTask<BusMex>::RecvMex;
-      using TaskSpawn = typename Tasks<BusMex, initial_num_nodes>::TaskSpawn;
-      using DebugPrint = typename Tasks<BusMex, initial_num_nodes>::DebugPrint;
+      using TaskSpawn = typename Tasks::TaskSpawn;
+      using DebugPrint = typename Tasks::DebugPrint;
 
       Node() = delete;
 
@@ -33,7 +36,7 @@ namespace nearest_ap {
       void async_start(void);
 
     private:
-      Internal<initial_num_nodes> m_internal;
-      Tasks<BusMex, initial_num_nodes> m_tasks;
+      Internal m_internal;
+      Tasks m_tasks;
   };
 }

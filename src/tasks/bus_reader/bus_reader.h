@@ -2,9 +2,10 @@
 
 #include "../base_task.h"
 #include "../../internal/internal.h"
+#include <cstdint>
 
 namespace nearest_ap {
-  template<typename BusMex, uint32_t default_num_nodes>
+  template<typename BusMex, uint32_t default_num_nodes, uint32_t tollerance>
     class BusReaderTask : public BaseTask<BusMex>
   {
     public:
@@ -12,6 +13,7 @@ namespace nearest_ap {
       using SendMex = typename BaseTask<BusMex>::SendMex;
       using RecvMex = typename BaseTask<BusMex>::SendMex;
       using VoteInfo = VoteInfo<default_num_nodes>;
+      using LocalPotentialInfo = LocalPotentialInfo<tollerance>;
 
       explicit BusReaderTask() noexcept;
       BusReaderTask(
@@ -27,6 +29,6 @@ namespace nearest_ap {
       SendMex m_send_f = [](BusMex&){return BaseTask<BusMex>::BusStatus::Inactive;};
       RecvMex m_recv_f = [](){while(true){}};
       VoteInfo& m_vote_info;
-      const LocalPotentialInfo& m_local_potential_info;
+      LocalPotentialInfo& m_local_potential_info;
   };
 };
