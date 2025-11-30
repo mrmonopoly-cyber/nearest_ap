@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "../base_task.h"
-#include "../../internal/potential_info/potential_info.h"
+#include "../../internal/internal.h"
 
 template<typename BusMex>
 class PotentialElectionTask : public BaseTask<BusMex>
@@ -19,12 +19,15 @@ class PotentialElectionTask : public BaseTask<BusMex>
     PotentialElectionTask(
         const SendMex send_f,
         const ComputePotF pot_f,
-        const LocalPotentialInfo& pot_info) noexcept;
+        LocalPotentialInfo& pot_info,
+        VoteInfo& vote_info
+        ) noexcept;
 
     TaskError run(void) override;
 
   private:
     SendMex m_send_f=[](BusMex&){return BaseTask<BusMex>::BusStatus::Inactive;};
     ComputePotF m_compute_local_potential = [](){return 0;};
-    LocalPotentialInfo& pot_info;
+    LocalPotentialInfo& m_pot_info;
+    VoteInfo& m_vote_info;
 };

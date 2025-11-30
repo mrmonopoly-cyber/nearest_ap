@@ -2,8 +2,9 @@
 
 #include <functional>
 
-#include "tasks/tasks.h"
 #include "internal/potential_info/potential_info.h"
+#include "tasks/tasks.h"
+#include "internal/internal.h"
 
 namespace nearest_ap {
 
@@ -43,8 +44,7 @@ namespace nearest_ap {
       TaskSpawn m_task_spawn;
       DebugPrint m_debug_print = [](SpawnTaskReturn){};
 
-      PotentialElectionTask<BusMex> m_pot_task;
-      ElectionTask<BusMex> m_election_task;
-      BusReaderTask<BusMex> m_bus_reader_task;
+      Internal m_internal;
+      Tasks<BusMex> m_tasks;
   };
 }
