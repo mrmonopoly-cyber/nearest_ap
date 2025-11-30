@@ -15,8 +15,6 @@ UDEV_FILE := 99-bitcraze.rules
 CC_INCLUDE_PATH := $(shell echo | arm-none-eabi-gcc -E -Wp,-v - 2>&1 | grep -v ignoring | grep -v "#" | grep -v "End of search list." | uniq)
 # CXX_INCLUDE_PATH := $(shell echo | arm-none-eabi-g++ --print-sysroot)
 CXX_PATH := $(shell whereis arm-none-eabi-g++ | cut -d' ' -f2)
-IN_PLUGDEV := $(shell groups $$USER | grep plugdev)
-
 #
 # We want to execute the main Makefile for the firmware project,
 # it will handle the build for us.
@@ -36,14 +34,6 @@ OOT_USES_CXX := 1
 include $(CRAZYFLIE_BASE)/tools/make/oot.mk
 endif
 
-ifdef IN_PLUGDEV
-remove_plug_udev_group:
-	echo "removing group plugdev from $$USER"
-	sudo gpasswd -d $$USER plugdev
-else
-remove_plug_udev_group:
-endif
-
 clangd_update_compile_command:
 	sed -i 's/\"-fno-var-tracking-assignments\",//g' compile_commands.json
 	sed -i 's/\"-fconserve-stack\",//g' compile_commands.json
@@ -61,7 +51,7 @@ clangd_setup:
 	source .venv/bin/activate && intercept-build make
 	make clangd_update_compile_command
 
-clean_setup: remove_plug_udev_group
+clean_setup:
 	rm -rf ./lib/crazyflie-firmware
 	rm -rf ./build*
 	rm -rf ./.venv
@@ -76,10 +66,11 @@ setup: $(UDEV_PATH) clean_setup
 	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git lib/crazyflie-firmware;
 	cd ./lib/crazyflie-firmware/ && make  cf2_defconfig
 
-	@echo "adding $$USER to the plugdev group"
-	sudo sudo usermod -a -G plugdev $$USER
 	@echo "copying udev rules in " $(UDEV_PATH)
 	sudo cp $(UDEV_FILE) $(UDEV_PATH)
+	@echo "refreshing udev rules"
+	sudo udevadm control --reload
+	sudo udevadm trigger
 
 	@echo "creating python virtual env in .venv"
 	python -m venv .venv
@@ -91,7 +82,6 @@ setup: $(UDEV_PATH) clean_setup
 	source .venv/bin/activate && pip install cflib
 	@echo "installing in scan-build .venv"
 	source .venv/bin/activate && pip install scan-build
-
 
 	make clangd_setup
 	@echo you have to execute the following command: "source ./.venv/bin/activate"
