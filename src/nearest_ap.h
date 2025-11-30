@@ -8,23 +8,14 @@
 #include "internal/internal.h"
 
 namespace nearest_ap {
-
-
-  enum class SpawnTaskReturn
-  {
-    Ok,
-    Error,
-  };
-
-
   template<typename BusMex, uint32_t initial_num_nodes=4>
   class Node
   {
     public:
-      using DebugPrint = std::function<void(SpawnTaskReturn)>;
-      using TaskSpawn = std::function<SpawnTaskReturn(BaseTask<BusMex>&)>;
       using SendMex = typename BaseTask<BusMex>::SendMex;
       using RecvMex = typename BaseTask<BusMex>::RecvMex;
+      using TaskSpawn = typename Tasks<BusMex, initial_num_nodes>::TaskSpawn;
+      using DebugPrint = typename Tasks<BusMex, initial_num_nodes>::DebugPrint;
 
       Node() = delete;
 
@@ -42,9 +33,6 @@ namespace nearest_ap {
       void async_start(void);
 
     private:
-      TaskSpawn m_task_spawn;
-      DebugPrint m_debug_print = [](SpawnTaskReturn){};
-
       Internal<initial_num_nodes> m_internal;
       Tasks<BusMex, initial_num_nodes> m_tasks;
   };
