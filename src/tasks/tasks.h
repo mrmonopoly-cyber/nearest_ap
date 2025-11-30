@@ -6,12 +6,12 @@
 
 #include "base_task.h"
 
-template<typename BusMex>
+template<typename BusMex, uint32_t default_num_nodes>
 struct Tasks
 {
-      PotentialElectionTask<BusMex> m_pot_task;
-      LeaderAliveTask<BusMex> m_election_task;
-      BusReaderTask<BusMex> m_bus_reader_task;
+      PotentialElectionTask<BusMex, default_num_nodes> m_pot_task;
+      LeaderAliveTask<BusMex, default_num_nodes> m_election_task;
+      BusReaderTask<BusMex, default_num_nodes> m_bus_reader_task;
 
       Tasks() = delete;
 };

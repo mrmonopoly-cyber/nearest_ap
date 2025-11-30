@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <functional>
 
 #include "internal/potential_info/potential_info.h"
@@ -16,7 +17,7 @@ namespace nearest_ap {
   };
 
 
-  template<typename BusMex, int num_nodes>
+  template<typename BusMex, uint32_t initial_num_nodes=4>
   class Node
   {
     public:
@@ -44,7 +45,7 @@ namespace nearest_ap {
       TaskSpawn m_task_spawn;
       DebugPrint m_debug_print = [](SpawnTaskReturn){};
 
-      Internal m_internal;
-      Tasks<BusMex> m_tasks;
+      Internal<initial_num_nodes> m_internal;
+      Tasks<BusMex, initial_num_nodes> m_tasks;
   };
 }

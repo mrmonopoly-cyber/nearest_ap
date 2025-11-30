@@ -1,13 +1,14 @@
 #include "../base_task.h"
 #include "../../internal/internal.h"
 
-template<typename BusMex>
+template<typename BusMex, uint32_t default_num_nodes>
 class BusReaderTask : public BaseTask<BusMex>
 {
   public:
     using TaskError = typename BaseTask<BusMex>::TaskError;
     using SendMex = typename BaseTask<BusMex>::SendMex;
     using RecvMex = typename BaseTask<BusMex>::SendMex;
+    using VoteInfo = VoteInfo<default_num_nodes>;
 
     explicit BusReaderTask() noexcept;
     BusReaderTask(
