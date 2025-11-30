@@ -1,16 +1,7 @@
 #pragma once
 
-#include <functional>
+#include "leader_alive/leader_alive.h"
+#include "bus_reader/bus_reader.h"
+#include "potential_election/potential_election.h"
 
-class Task
-{
-  public:
-    enum class TaskError 
-    {
-      Ok,
-      Error,
-    };
-    Task() = delete;
-
-    virtual TaskError run(void) = 0;
-};
+#include "base_task.h"

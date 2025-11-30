@@ -1,2 +1,0 @@
-obj-y += nearest_ap.o
-obj-y += tasks
