@@ -30,9 +30,10 @@ namespace nearest_ap {
     class BusReaderTask : public BaseTask<mex_size>
   {
     public:
-      using TaskError = typename BaseTask<mex_size>::TaskError;
-      using SendMex = typename BaseTask<mex_size>::SendMex;
-      using RecvMex = typename BaseTask<mex_size>::SendMex;
+      using BaseTaskBusReader = BaseTask<mex_size>;
+      using TaskError = typename BaseTaskBusReader::TaskError;
+      using SendMex = typename BaseTaskBusReader::SendMex;
+      using RecvMex = typename BaseTaskBusReader::SendMex;
       using VoteInfo = VoteInfo<default_num_nodes>;
       using LocalPotentialInfo = LocalPotentialInfo<tollerance>;
 
@@ -44,11 +45,11 @@ namespace nearest_ap {
           VoteInfo& vote_info
           ) noexcept;
 
-      TaskError run(void) override;
+      TaskError run(void) noexcept override;
 
     private:
-      SendMex m_send_f = [](BaseTask<>::BusMex&){return BaseTask<mex_size>::BusStatus::Inactive;};
-      RecvMex m_recv_f = [](){while(true){}};
+      SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTaskBusReader::BusStatus::Inactive;};
+      RecvMex& m_recv_f = [](){while(true){}};
       VoteInfo& m_vote_info;
       LocalPotentialInfo& m_local_potential_info;
   };

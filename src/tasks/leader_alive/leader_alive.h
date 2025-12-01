@@ -16,21 +16,22 @@
 namespace nearest_ap {
   template<
     std::size_t mex_payload_size = BaseTask<>::m_payload_max_size,
-    uint32_t default_num_nodes=VoteInfo<>::m_default_num_candidates>
+    std::size_t default_num_nodes=VoteInfo<>::m_default_num_candidates>
     class LeaderAliveTask : BaseTask<mex_payload_size>
   {
     public:
-      using TaskError = typename BaseTask<mex_payload_size>::TaskError;
-      using SendMex = typename BaseTask<mex_payload_size>::SendMex;
+      using BaseTaskLeaderAlive = BaseTask<mex_payload_size>;
+      using TaskError = typename BaseTaskLeaderAlive::TaskError;
+      using SendMex = typename BaseTaskLeaderAlive::SendMex;
       using VoteInfo = VoteInfo<default_num_nodes>;
 
       explicit LeaderAliveTask() noexcept;
 
-      LeaderAliveTask(const SendMex send_f, const VoteInfo& vote_info) noexcept;
+      LeaderAliveTask(const SendMex& send_f, const VoteInfo& vote_info) noexcept;
 
-      TaskError run(void) override;
+      TaskError run(void) noexcept override;
     private:
-      SendMex m_send_f;
+      SendMex& m_send_f;
       const VoteInfo& m_vote_info;
   };
 };
