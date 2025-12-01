@@ -12,9 +12,12 @@ SHELL := /bin/bash
 TARGET ?=
 UDEV_PATH := /etc/udev/rules.d
 UDEV_FILE := 99-bitcraze.rules
+PROTOBUF_MESSAGE_PATH := ./src/ap_find/tasks/messages
+
 CC_INCLUDE_PATH := $(shell echo | arm-none-eabi-gcc -E -Wp,-v - 2>&1 | grep -v ignoring | grep -v "#" | grep -v "End of search list." | uniq)
 # CXX_INCLUDE_PATH := $(shell echo | arm-none-eabi-g++ --print-sysroot)
 CXX_PATH := $(shell whereis arm-none-eabi-g++ | cut -d' ' -f2)
+
 #
 # We want to execute the main Makefile for the firmware project,
 # it will handle the build for us.
@@ -27,12 +30,14 @@ CRAZYFLIE_BASE := lib/crazyflie-firmware/
 #
 OOT_CONFIG := $(PWD)/app-config
 
-NO_INCLUDE_TARGETS := setup clean_setup remove_plug_udev_group clangd_update_compile_command
+NO_INCLUDE_TARGETS := setup clean_setup protobuf_setup clangd_update_compile_command
 
 ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_INCLUDE_TARGETS)),)
 OOT_USES_CXX := 1
 include $(CRAZYFLIE_BASE)/tools/make/oot.mk
 endif
+
+include $(PROTOBUF_MESSAGE_PATH)/Makefile
 
 clangd_update_compile_command:
 	sed -i 's/\"-fno-var-tracking-assignments\",//g' compile_commands.json
@@ -44,7 +49,6 @@ clangd_update_compile_command:
 
 clangd_setup:
 	echo "cleaning old setup"
-	make clean
 	rm -f .clangd compile_commands.json
 
 	@echo generating compile_commands.json
@@ -60,6 +64,11 @@ clean_setup:
 	rm -rf ./compile_commands.json
 	@echo "removing udev rules"
 	sudo rm -f $(UDEV_PATH)/$(UDEV_FILE)
+	cd $(PROTOBUF_MESSAGE_PATH) && make clean_protobuf_messages 
+
+
+protobuf_setup:
+	cd $(PROTOBUF_MESSAGE_PATH) && make build_protobuf_messages
 
 setup: $(UDEV_PATH) clean_setup 
 	@echo "cloning basic firmware of crazyflie"
@@ -82,6 +91,8 @@ setup: $(UDEV_PATH) clean_setup
 	source .venv/bin/activate && pip install cflib
 	@echo "installing in scan-build .venv"
 	source .venv/bin/activate && pip install scan-build
+
+	make protobuf_setup
 
 	make clangd_setup
 	@echo you have to execute the following command: "source ./.venv/bin/activate"

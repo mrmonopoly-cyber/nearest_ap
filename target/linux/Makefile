@@ -5,6 +5,7 @@ CXX = g++
 # Directories
 BDIR := build
 SDIR := src
+PROTOBUF_MESSAGE_PATH := $(SDIR)/nearest_ap/tasks/messages
 
 # Compiler flags (optional, add as needed)
 CXX_FLAGS := -Wall -Wextra -std=c++17
@@ -15,11 +16,17 @@ DEPS_CXX = $(shell find $(SDIR) -follow -type f -name "*.cpp")
 # Generate object file paths by replacing .cpp with .o and using build directory
 OBJ_CXX = $(DEPS_CXX:$(SDIR)/%.cpp=$(BDIR)/%.o)
 
+include $(PROTOBUF_MESSAGE_PATH)/Makefile
+
 # Info for debugging
 $(info CXX sources: $(DEPS_CXX))
 
 # Default target
 all: build
+
+setup:
+	cd $(PROTOBUF_MESSAGE_PATH) && make build_protobuf_messages 
+
 
 # Build target
 build: $(OBJ_CXX)
@@ -34,3 +41,5 @@ $(BDIR)/%.o: $(SDIR)/%.cpp
 
 clean:
 	rm -rf build
+	cd $(PROTOBUF_MESSAGE_PATH) && make clean_protobuf_messages 
+

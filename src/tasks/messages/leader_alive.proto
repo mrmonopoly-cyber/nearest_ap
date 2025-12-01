@@ -1,0 +1,8 @@
+edition = "2023";
+
+package near_ap;
+
+message LeaderAlive{
+  uint32 id =1;
+  uint32 potential=2;
+};
