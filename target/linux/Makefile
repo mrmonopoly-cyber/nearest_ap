@@ -16,13 +16,14 @@ DEPS_CXX = $(shell find $(SDIR) -follow -type f -name "*.cpp")
 # Generate object file paths by replacing .cpp with .o and using build directory
 OBJ_CXX = $(DEPS_CXX:$(SDIR)/%.cpp=$(BDIR)/%.o)
 
-include $(PROTOBUF_MESSAGE_PATH)/Makefile
 
 # Info for debugging
 $(info CXX sources: $(DEPS_CXX))
 
 # Default target
 all: build
+
+include $(PROTOBUF_MESSAGE_PATH)/Makefile
 
 setup:
 	cd $(PROTOBUF_MESSAGE_PATH) && make build_protobuf_messages 

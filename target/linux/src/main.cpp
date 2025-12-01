@@ -1,16 +1,14 @@
 #include "nearest_ap/nearest_ap.h"
 
-struct BusMex{
-};
-
 int main(void)
 {
   using namespace nearest_ap;
 
-  auto send_f = [](BusMex&){return BaseTask<BusMex>::BusStatus::Inactive;};
-  auto recv_f = [](){return BusMex{};};
+  Node<>::SendMex send_f = [](BaseTask<>::BusMex&){return BaseTask<>::BusStatus::Inactive;};
+  Node<>::RecvMex recv_f = [](){return BaseTask<>::BusMex{};};
+  Node<>::TaskSpawn spawn_f = [](BaseTask<>&){return Tasks<>::SpawnTaskReturn::Error;};
 
-  Node<BusMex, 3> Drone{send_f, recv_f};
+  Node Drone1{send_f, recv_f, spawn_f};
 
   return 0;
 }
