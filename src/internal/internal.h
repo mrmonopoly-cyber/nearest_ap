@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include "candidate/candidate.h"
 #include "vote_info/vote_info.h"
@@ -13,7 +14,6 @@ namespace nearest_ap {
 
       VoteInfo<defualt_num_candidates> m_vote_info;
       LocalPotentialInfo<tollerance> m_local_potential_info;
-      Candidate m_self;
-      Candidate m_leader;
+      std::vector<Candidate> m_users;
     };
 };

@@ -1,5 +1,14 @@
 #pragma once
 
+//Copyright (c) 2025 Alberto Damo. All Rights Reserved.
+
+
+/*
+ * LeaderAliveTask: every L time:
+ *        IF vote.leader() THEN
+ *          SEND LeaderAlive(vote.user(), potential_info.potential())
+ */
+
 #include "../base_task.h"
 #include "../../internal/internal.h"
 #include <iterator>

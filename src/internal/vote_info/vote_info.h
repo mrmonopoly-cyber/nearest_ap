@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <vector>
 
 #include "../candidate/candidate.h"
 
@@ -28,5 +29,6 @@ namespace nearest_ap {
         uint32_t m_consent;
         uint32_t m_election_id;
         Candidate& m_user;
+        Candidate& m_leader;
     };
 };

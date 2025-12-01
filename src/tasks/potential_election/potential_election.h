@@ -1,5 +1,15 @@
 #pragma once
 
+//Copyright (c) 2025 Alberto Damo. All Rights Reserved.
+
+/*
+ * PotentialElectionTask: every K time:
+ *          update local potential = compute_potential();
+ *          IF leader potential + tollerance < local potential AND vote.no_new_election() THEN:
+ *              local round = vote.start_new_election();
+ *              SEND NewElection(round, local id, local potential);
+ */
+
 #include <cstdint>
 #include <functional>
 
