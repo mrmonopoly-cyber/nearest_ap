@@ -9,7 +9,9 @@
 #include "base_task.h"
 
 namespace nearest_ap {
-  template<typename BusMex, uint32_t default_num_nodes, uint32_t tollerance>
+  template<std::size_t payload_max_size = BaseTask<>::m_payload_max_size,
+    uint32_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
+    uint32_t tollerance = LocalPotentialInfo<>::m_tollerance>
     class Tasks
     {
       public:
@@ -19,19 +21,24 @@ namespace nearest_ap {
           Error,
         };
 
-        using DebugPrint = std::function<void(SpawnTaskReturn)>;
-        using TaskSpawn = std::function<SpawnTaskReturn(BaseTask<BusMex>&)>;
-
         Tasks() = delete;
 
         void start();
 
       private:
+        using DebugPrint = std::function<void(SpawnTaskReturn)>;
+        using TaskSpawn = std::function<SpawnTaskReturn(BaseTask<payload_max_size>&)>;
+
+        using PotentialElectionTask = PotentialElectionTask<payload_max_size, default_num_nodes, tollerance>;
+        using LeaderAliveTask =LeaderAliveTask<payload_max_size, default_num_nodes>;
+        using BusReaderTask = BusReaderTask<payload_max_size, default_num_nodes,tollerance>;
+
+
         const TaskSpawn m_task_spawn;
         const DebugPrint m_debug_print = [](SpawnTaskReturn){};
 
-        PotentialElectionTask<BusMex, default_num_nodes, tollerance> m_pot_task;
-        LeaderAliveTask<BusMex, default_num_nodes> m_election_task;
-        BusReaderTask<BusMex, default_num_nodes,tollerance> m_bus_reader_task;
+        PotentialElectionTask m_pot_task;
+        LeaderAliveTask m_election_task;
+        BusReaderTask m_bus_reader_task;
     };
 };

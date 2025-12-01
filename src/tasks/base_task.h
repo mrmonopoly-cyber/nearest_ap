@@ -1,11 +1,17 @@
 #pragma once
 
+#include <array>
+#include <cstddef>
 #include <functional>
+#include <iterator>
 
-template<typename BusMex>
+template<std::size_t payload_max_size = 8>
 class BaseTask
 {
   public:
+    static constexpr size_t m_payload_max_size = payload_max_size;
+    using BusMex = std::array<std::byte, payload_max_size>;
+
     enum class BusStatus
     {
       Ok,

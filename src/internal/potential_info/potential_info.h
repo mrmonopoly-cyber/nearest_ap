@@ -5,13 +5,13 @@
 #include <cstdint>
 namespace nearest_ap {
 
-  template <uint32_t tollerance>
+  template <uint32_t tollerance= 0, typename Potential = uint32_t>
   struct LocalPotentialInfo
   {
       class PotentialNode
       {
         public:
-          using Potential = uint32_t;
+          static constexpr uint32_t m_tollerance = tollerance;
 
           PotentialNode() = delete;
           PotentialNode(const Candidate& user);
@@ -25,6 +25,7 @@ namespace nearest_ap {
           Potential m_potential;
       };
 
+      static constexpr uint32_t m_tollerance = tollerance;
       PotentialNode m_local_node;
       PotentialNode m_leader;
   };

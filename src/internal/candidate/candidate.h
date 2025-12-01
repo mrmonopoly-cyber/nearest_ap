@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+
 namespace nearest_ap
 {
   class Candidate

@@ -2,14 +2,17 @@
 
 #include "../base_task.h"
 #include "../../internal/internal.h"
+#include <iterator>
 
 namespace nearest_ap {
-  template<typename BusMex, uint32_t default_num_nodes>
-    class LeaderAliveTask : BaseTask<BusMex>
+  template<
+    std::size_t mex_payload_size = BaseTask<>::m_payload_max_size,
+    uint32_t default_num_nodes=VoteInfo<>::m_default_num_candidates>
+    class LeaderAliveTask : BaseTask<mex_payload_size>
   {
     public:
-      using TaskError = typename BaseTask<BusMex>::TaskError;
-      using SendMex = typename BaseTask<BusMex>::SendMex;
+      using TaskError = typename BaseTask<mex_payload_size>::TaskError;
+      using SendMex = typename BaseTask<mex_payload_size>::SendMex;
       using VoteInfo = VoteInfo<default_num_nodes>;
 
       explicit LeaderAliveTask() noexcept;
