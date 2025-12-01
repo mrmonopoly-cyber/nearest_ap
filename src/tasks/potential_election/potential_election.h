@@ -23,12 +23,12 @@ namespace nearest_ap {
     class PotentialElectionTask : public BaseTask<payload_max_size>
   {
     public:
-      using BaseTaskPotEl = BaseTask<payload_max_size>;
+      using BaseTask_t = BaseTask<payload_max_size>;
       using ComputePotF = std::function<int()>;
-      using TaskError = typename BaseTaskPotEl::TaskError;
-      using SendMex = typename BaseTaskPotEl::SendMex;
-      using VoteInfo = VoteInfo<default_num_nodes>;
-      using LocalPotentialInfo = LocalPotentialInfo<tollerance>;
+      using TaskError = typename BaseTask_t::TaskError;
+      using SendMex = typename BaseTask_t::SendMex;
+      using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
+      using VoteInfo_t = VoteInfo<default_num_nodes>;
 
       explicit PotentialElectionTask() noexcept;
 
@@ -36,16 +36,16 @@ namespace nearest_ap {
       PotentialElectionTask(
           const SendMex& send_f,
           const ComputePotF pot_f,
-          LocalPotentialInfo& pot_info,
-          VoteInfo& vote_info
+          LocalPotentialInfo_t& pot_info,
+          VoteInfo_t& vote_info
           ) noexcept;
 
       TaskError run(void) override;
 
     private:
-      SendMex& m_send_f=[](BaseTask<>::BusMex&){return BaseTaskPotEl::BusStatus::Inactive;};
+      SendMex& m_send_f=[](BaseTask<>::BusMex&){return BaseTask_t::BusStatus::Inactive;};
       ComputePotF m_compute_local_potential = [](){return 0;};
-      LocalPotentialInfo& m_pot_info;
-      VoteInfo& m_vote_info;
+      LocalPotentialInfo_t& m_pot_info;
+      VoteInfo_t& m_vote_info;
   };
 };

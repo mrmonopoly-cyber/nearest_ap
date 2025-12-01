@@ -30,27 +30,27 @@ namespace nearest_ap {
     class BusReaderTask : public BaseTask<mex_size>
   {
     public:
-      using BaseTaskBusReader = BaseTask<mex_size>;
-      using TaskError = typename BaseTaskBusReader::TaskError;
-      using SendMex = typename BaseTaskBusReader::SendMex;
-      using RecvMex = typename BaseTaskBusReader::SendMex;
-      using VoteInfo = VoteInfo<default_num_nodes>;
-      using LocalPotentialInfo = LocalPotentialInfo<tollerance>;
+      using BaseTask_t = BaseTask<mex_size>;
+      using TaskError = typename BaseTask_t::TaskError;
+      using SendMex = typename BaseTask_t::SendMex;
+      using RecvMex = typename BaseTask_t::SendMex;
+      using VoteInfo_t = VoteInfo<default_num_nodes>;
+      using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
 
       explicit BusReaderTask() noexcept;
       BusReaderTask(
-          const SendMex send_f,
-          const RecvMex recv_f,
-          const LocalPotentialInfo& local_potential,
-          VoteInfo& vote_info
+          const SendMex& send_f,
+          const RecvMex& recv_f,
+          const LocalPotentialInfo_t& local_potential,
+          VoteInfo_t& vote_info
           ) noexcept;
 
       TaskError run(void) noexcept override;
 
     private:
-      SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTaskBusReader::BusStatus::Inactive;};
+      SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTask_t::BusStatus::Inactive;};
       RecvMex& m_recv_f = [](){while(true){}};
-      VoteInfo& m_vote_info;
-      LocalPotentialInfo& m_local_potential_info;
+      VoteInfo_t& m_vote_info;
+      LocalPotentialInfo_t & m_local_potential_info;
   };
 };

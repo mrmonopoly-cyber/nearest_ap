@@ -19,30 +19,28 @@ namespace nearest_ap {
           Error,
         };
 
-        using BaseTaskTasks = BaseTask<payload_max_size>;
+        using BaseTask_t = BaseTask<payload_max_size>;
+        using PotentialElectionTask_t = PotentialElectionTask<payload_max_size, default_num_nodes, tollerance>;
+        using LeaderAliveTask_t = LeaderAliveTask<payload_max_size, default_num_nodes>;
+        using BusReaderTask_t = BusReaderTask<payload_max_size, default_num_nodes,tollerance>;
 
-        using SendMex = typename BaseTaskTasks::SendMex;
-        using RecvMex = typename BaseTaskTasks::SendMex;
+        using SendMex = typename BaseTask_t::SendMex;
+        using RecvMex = typename BaseTask_t::RecvMex;
         using DebugPrint = std::function<void(SpawnTaskReturn)>;
         using TaskSpawn = std::function<SpawnTaskReturn(BaseTask<payload_max_size>&)>;
-
 
         Tasks() = delete;
 
         void start() noexcept;
 
       private:
-        using PotentialElectionTask = PotentialElectionTask<payload_max_size, default_num_nodes, tollerance>;
-        using LeaderAliveTask =LeaderAliveTask<payload_max_size, default_num_nodes>;
-        using BusReaderTask = BusReaderTask<payload_max_size, default_num_nodes,tollerance>;
-
         const TaskSpawn m_task_spawn;
         const DebugPrint m_debug_print = [](SpawnTaskReturn){};
-        const SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTaskTasks::BusStatus::Inactive;};
+        const SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTask_t::BusStatus::Inactive;};
         const RecvMex& m_recv_f = [](){while(true){}};
 
-        PotentialElectionTask m_pot_task;
-        LeaderAliveTask m_election_task;
-        BusReaderTask m_bus_reader_task;
+        PotentialElectionTask_t m_pot_task;
+        LeaderAliveTask_t m_election_task;
+        BusReaderTask_t m_bus_reader_task;
     };
 };

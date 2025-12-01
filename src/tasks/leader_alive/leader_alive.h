@@ -20,18 +20,18 @@ namespace nearest_ap {
     class LeaderAliveTask : BaseTask<mex_payload_size>
   {
     public:
-      using BaseTaskLeaderAlive = BaseTask<mex_payload_size>;
-      using TaskError = typename BaseTaskLeaderAlive::TaskError;
-      using SendMex = typename BaseTaskLeaderAlive::SendMex;
-      using VoteInfo = VoteInfo<default_num_nodes>;
+      using BaseTaskLeader_t = BaseTask<mex_payload_size>;
+      using TaskError = typename BaseTaskLeader_t::TaskError;
+      using SendMex = typename BaseTaskLeader_t::SendMex;
+      using VoteInfo_t = VoteInfo<default_num_nodes>;
 
       explicit LeaderAliveTask() noexcept;
 
-      LeaderAliveTask(const SendMex& send_f, const VoteInfo& vote_info) noexcept;
+      LeaderAliveTask(const SendMex& send_f, const VoteInfo_t& vote_info) noexcept;
 
       TaskError run(void) noexcept override;
     private:
       SendMex& m_send_f;
-      const VoteInfo& m_vote_info;
+      const VoteInfo_t& m_vote_info;
   };
 };
