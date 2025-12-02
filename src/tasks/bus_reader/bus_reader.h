@@ -19,29 +19,25 @@
  */
 
 #include "../base_task.h"
+
 #include "../../internal/internal.h"
+#include "../bus/bus.h"
 
 namespace nearest_ap {
   template<
     typename AddressType,
-    std::size_t mex_size = BaseTask<AddressType>::m_payload_max_size,
+    std::size_t mex_size = Bus<AddressType>::m_payload_max_size,
     std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
     std::size_t tollerance = LocalPotentialInfo<>::m_tollerance >
-    class BusReaderTask : public BaseTask<AddressType,mex_size>
+    class BusReaderTask : public BaseTask_t
   {
     public:
-      using BaseTask_t = BaseTask<AddressType,mex_size>;
-
-      using BusMex_t = typename BaseTask_t::BusMex;
-      using SendMex_t = typename BaseTask_t::SendMex_t;
-      using RecvMex_t = typename BaseTask_t::SendMex_t;
+      using Bus_t = Bus<AddressType, mex_size>;
       using VoteInfo_t = VoteInfo<default_num_nodes>;
       using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
 
       explicit BusReaderTask() noexcept;
       BusReaderTask(
-          const SendMex_t& send_f,
-          const RecvMex_t& recv_f,
           const LocalPotentialInfo_t& local_potential,
           VoteInfo_t& vote_info
           ) noexcept;
@@ -49,8 +45,7 @@ namespace nearest_ap {
       TaskError_t run(void) noexcept override;
 
     private:
-      SendMex_t& m_send_f = [](BusMex_t&){return BaseTask_t::BusStatus::Inactive;};
-      RecvMex_t& m_recv_f = [](){while(true){}};
+      Bus_t& m_bus;
       VoteInfo_t& m_vote_info;
       LocalPotentialInfo_t & m_local_potential_info;
   };
