@@ -1,18 +1,18 @@
 #pragma once
 
-#include <cstdint>
+#include <cstddef>
 
 namespace nearest_ap
 {
-  class Candidate
+  class Candidate_t
   {
     public:
-      using Id = uint32_t;
+      using Id = std::size_t;
 
-      Candidate(const Id id) noexcept;
+      Candidate_t(const Id id) noexcept;
       
-      bool same(const Candidate& candidate);
-      bool operator==(const Candidate& candidate) noexcept;
+      bool same(const Candidate_t& candidate);
+      bool operator==(const Candidate_t& candidate) noexcept;
 
     private:
       const Id m_name = 0;

@@ -1,31 +1,34 @@
 #pragma once
 
+#include <cstddef>
+
 #include "../candidate/candidate.h"
 
-#include <cstdint>
 namespace nearest_ap {
 
-  template <uint32_t tollerance= 0, typename Potential = uint32_t>
+  template <
+    std::size_t tollerance = 0,
+    typename Potential = std::size_t >
   struct LocalPotentialInfo
   {
       class PotentialNode
       {
         public:
-          static constexpr uint32_t m_tollerance = tollerance;
+          static constexpr std::size_t m_tollerance = tollerance;
 
           PotentialNode() = delete;
-          PotentialNode(const Candidate& user);
+          PotentialNode(const Candidate_t& user);
 
           bool is_stronger(Potential potential) const noexcept;
           void update(const Potential pot) noexcept;
-          const Candidate& name() const noexcept;
+          const Candidate_t& name() const noexcept;
 
         private:
-          const Candidate& m_user;
+          const Candidate_t& m_user;
           Potential m_potential;
       };
 
-      static constexpr uint32_t m_tollerance = tollerance;
+      static constexpr std::size_t m_tollerance = tollerance;
       PotentialNode m_local_node;
       PotentialNode m_leader;
   };

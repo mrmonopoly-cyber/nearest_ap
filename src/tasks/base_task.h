@@ -1,9 +1,7 @@
 #pragma once
 
 #include <array>
-#include <cstddef>
 #include <functional>
-#include <iterator>
 
 namespace nearest_ap {
   enum class BusStatus_t

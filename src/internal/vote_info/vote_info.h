@@ -1,34 +1,29 @@
 #pragma once
 
-#include <array>
-#include <cstddef>
-#include <cstdint>
-#include <vector>
-
 #include "../candidate/candidate.h"
 
 namespace nearest_ap {
-  template <uint32_t default_num_candidates = 5>
+  template <std::size_t default_num_candidates = 5>
     class VoteInfo
     {
       public:
-        static constexpr uint32_t m_default_num_candidates = default_num_candidates;
+        static constexpr std::size_t m_default_num_candidates = default_num_candidates;
         VoteInfo() = delete;
 
-        explicit VoteInfo(const Candidate& m_user) noexcept;
+        explicit VoteInfo(const Candidate_t& m_user) noexcept;
 
-        VoteInfo(const uint32_t num_candidates) noexcept;
+        VoteInfo(const std::size_t num_candidates) noexcept;
         void reset() noexcept;
         void support() noexcept;
         bool election_status() noexcept;
         bool is_leader() const noexcept;
 
       private:
-        static constexpr uint32_t m_election_req_mex_size = 5; //INFO: for now. In the future it will be the sizeof the serialized Protobuf object
-        uint32_t m_num_candidates = default_num_candidates;
-        uint32_t m_consent;
-        uint32_t m_election_id;
-        Candidate& m_user;
-        Candidate& m_leader;
+        static constexpr std::size_t m_election_req_mex_size = 5; //INFO: for now. In the future it will be the sizeof the serialized Protobuf object
+        std::size_t m_num_candidates = default_num_candidates;
+        std::size_t m_consent;
+        std::size_t m_election_id;
+        Candidate_t& m_user;
+        Candidate_t& m_leader;
     };
 };

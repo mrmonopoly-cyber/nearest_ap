@@ -11,13 +11,12 @@
 
 #include "../base_task.h"
 #include "../../internal/internal.h"
-#include <iterator>
 
 namespace nearest_ap {
   template<
     typename AddressType,
     std::size_t mex_payload_size = BaseTask<AddressType>::m_payload_max_size,
-    std::size_t default_num_nodes=VoteInfo<>::m_default_num_candidates>
+    std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates>
     class LeaderAliveTask : BaseTask<AddressType, mex_payload_size>
   {
     public:

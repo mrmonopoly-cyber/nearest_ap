@@ -25,8 +25,8 @@ namespace nearest_ap {
   template<
     typename AddressType,
     std::size_t mex_size = BaseTask<AddressType>::m_payload_max_size,
-    std::uint32_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
-    std::uint32_t tollerance = LocalPotentialInfo<>::m_tollerance >
+    std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
+    std::size_t tollerance = LocalPotentialInfo<>::m_tollerance >
     class BusReaderTask : public BaseTask<AddressType,mex_size>
   {
     public:
