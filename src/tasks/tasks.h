@@ -7,37 +7,41 @@
 #include "base_task.h"
 
 namespace nearest_ap {
-  template<std::size_t payload_max_size = BaseTask<>::m_payload_max_size,
+  enum class SpawnTaskReturn
+  {
+    Ok,
+    Error,
+  };
+
+  template<
+    typename AddressType,
+    std::size_t payload_max_size = BaseTask<AddressType>::m_payload_max_size,
     std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
     std::size_t tollerance = LocalPotentialInfo<>::m_tollerance>
     class Tasks
     {
       public:
-        enum class SpawnTaskReturn
-        {
-          Ok,
-          Error,
-        };
 
-        using BaseTask_t = BaseTask<payload_max_size>;
-        using PotentialElectionTask_t = PotentialElectionTask<payload_max_size, default_num_nodes, tollerance>;
-        using LeaderAliveTask_t = LeaderAliveTask<payload_max_size, default_num_nodes>;
-        using BusReaderTask_t = BusReaderTask<payload_max_size, default_num_nodes,tollerance>;
+        using BaseTask_t = BaseTask<AddressType, payload_max_size>;
+        using PotentialElectionTask_t = PotentialElectionTask<AddressType, payload_max_size, default_num_nodes, tollerance>;
+        using LeaderAliveTask_t = LeaderAliveTask<AddressType, payload_max_size, default_num_nodes>;
+        using BusReaderTask_t = BusReaderTask<AddressType, payload_max_size, default_num_nodes,tollerance>;
 
-        using SendMex = typename BaseTask_t::SendMex;
-        using RecvMex = typename BaseTask_t::RecvMex;
-        using DebugPrint = std::function<void(SpawnTaskReturn)>;
-        using TaskSpawn = std::function<SpawnTaskReturn(BaseTask<payload_max_size>&)>;
+        using BusMex_t = typename BaseTask_t::BusMex;
+        using SendMex_t = typename BaseTask_t::SendMex_t;
+        using RecvMex_t = typename BaseTask_t::RecvMex_t;
+        using DebugPrint_t = std::function<void(SpawnTaskReturn)>;
+        using TaskSpawn_t = std::function<SpawnTaskReturn(BaseTask_t&)>;
 
         Tasks() = delete;
 
         void start() noexcept;
 
       private:
-        const TaskSpawn m_task_spawn;
-        const DebugPrint m_debug_print = [](SpawnTaskReturn){};
-        const SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTask_t::BusStatus::Inactive;};
-        const RecvMex& m_recv_f = [](){while(true){}};
+        const TaskSpawn_t m_task_spawn;
+        const DebugPrint_t m_debug_print = [](SpawnTaskReturn){};
+        const SendMex_t& m_send_f = [](BusMex_t&){return BaseTask_t::BusStatus::Inactive;};
+        const RecvMex_t& m_recv_f = [](){while(true){}};
 
         PotentialElectionTask_t m_pot_task;
         LeaderAliveTask_t m_election_task;

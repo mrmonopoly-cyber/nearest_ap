@@ -11,44 +11,45 @@
 
 namespace nearest_ap {
   template<
-    std::size_t mex_size = BaseTask<>::m_payload_max_size,
+    typename AddressType,
+    std::size_t mex_size = BaseTask<AddressType>::m_payload_max_size,
     std::uint32_t initial_num_nodes=VoteInfo<>::m_default_num_candidates,
     std::uint32_t tollerance=LocalPotentialInfo<>::m_tollerance>
   class Node
   {
     public:
-      using Tasks_t = Tasks<mex_size, initial_num_nodes, tollerance>;
+      using Tasks_t = Tasks<AddressType, mex_size, initial_num_nodes, tollerance>;
 
-      using SendMex = typename BaseTask<mex_size>::SendMex;
-      using RecvMex = typename BaseTask<mex_size>::RecvMex;
-      using TaskSpawn = typename Tasks_t::TaskSpawn;
-      using DebugPrint = typename Tasks_t::DebugPrint;
+      using SendMex_t = typename Tasks_t::SendMex_t;
+      using RecvMex_t = typename Tasks_t::RecvMex_t;
+      using TaskSpawn_t = typename Tasks_t::TaskSpawn_t;
+      using DebugPrint_t = typename Tasks_t::DebugPrint_t;
 
       Node() = delete;
 
       explicit Node(
-          const SendMex send_f,
-          const RecvMex recv_f,
-          const TaskSpawn task_spawn_f) noexcept;
+          const SendMex_t send_f,
+          const RecvMex_t recv_f,
+          const TaskSpawn_t task_spawn_f) noexcept;
 
       explicit Node(
-          const SendMex send_f,
-          const RecvMex recv_f,
-          const TaskSpawn task_spawn_f,
-          const DebugPrint debug_print_f) noexcept;
-
-      explicit Node(
-          const Candidate::Id id,
-          const SendMex send_f,
-          const RecvMex recv_f,
-          const TaskSpawn task_spawn_f) noexcept;
+          const SendMex_t send_f,
+          const RecvMex_t recv_f,
+          const TaskSpawn_t task_spawn_f,
+          const DebugPrint_t debug_print_f) noexcept;
 
       explicit Node(
           const Candidate::Id id,
-          const SendMex send_f,
-          const RecvMex recv_f,
-          const TaskSpawn task_spawn_f,
-          const DebugPrint debug_print_f) noexcept;
+          const SendMex_t send_f,
+          const RecvMex_t recv_f,
+          const TaskSpawn_t task_spawn_f) noexcept;
+
+      explicit Node(
+          const Candidate::Id id,
+          const SendMex_t send_f,
+          const RecvMex_t recv_f,
+          const TaskSpawn_t task_spawn_f,
+          const DebugPrint_t debug_print_f) noexcept;
 
       void async_start(void);
       void update_id(Candidate::Id id);

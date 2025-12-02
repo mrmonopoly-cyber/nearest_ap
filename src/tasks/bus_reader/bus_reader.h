@@ -20,36 +20,37 @@
 
 #include "../base_task.h"
 #include "../../internal/internal.h"
-#include <cstddef>
-#include <cstdint>
 
 namespace nearest_ap {
-  template<std::size_t mex_size = BaseTask<>::m_payload_max_size,
-    uint32_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
-    uint32_t tollerance = LocalPotentialInfo<>::m_tollerance>
-    class BusReaderTask : public BaseTask<mex_size>
+  template<
+    typename AddressType,
+    std::size_t mex_size = BaseTask<AddressType>::m_payload_max_size,
+    std::uint32_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
+    std::uint32_t tollerance = LocalPotentialInfo<>::m_tollerance >
+    class BusReaderTask : public BaseTask<AddressType,mex_size>
   {
     public:
-      using BaseTask_t = BaseTask<mex_size>;
-      using TaskError = typename BaseTask_t::TaskError;
-      using SendMex = typename BaseTask_t::SendMex;
-      using RecvMex = typename BaseTask_t::SendMex;
+      using BaseTask_t = BaseTask<AddressType,mex_size>;
+
+      using BusMex_t = typename BaseTask_t::BusMex;
+      using SendMex_t = typename BaseTask_t::SendMex_t;
+      using RecvMex_t = typename BaseTask_t::SendMex_t;
       using VoteInfo_t = VoteInfo<default_num_nodes>;
       using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
 
       explicit BusReaderTask() noexcept;
       BusReaderTask(
-          const SendMex& send_f,
-          const RecvMex& recv_f,
+          const SendMex_t& send_f,
+          const RecvMex_t& recv_f,
           const LocalPotentialInfo_t& local_potential,
           VoteInfo_t& vote_info
           ) noexcept;
 
-      TaskError run(void) noexcept override;
+      TaskError_t run(void) noexcept override;
 
     private:
-      SendMex& m_send_f = [](BaseTask<>::BusMex&){return BaseTask_t::BusStatus::Inactive;};
-      RecvMex& m_recv_f = [](){while(true){}};
+      SendMex_t& m_send_f = [](BusMex_t&){return BaseTask_t::BusStatus::Inactive;};
+      RecvMex_t& m_recv_f = [](){while(true){}};
       VoteInfo_t& m_vote_info;
       LocalPotentialInfo_t & m_local_potential_info;
   };
