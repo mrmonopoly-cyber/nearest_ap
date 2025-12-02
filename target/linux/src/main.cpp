@@ -8,7 +8,7 @@ int main(void)
 
   class BusLinux_t : public Node_t::Bus_t
   {
-      Msg Read() noexcept override
+      Msg Read() const noexcept override
       {
         return Msg{};
       }
@@ -21,8 +21,9 @@ int main(void)
 
   Node_t::TaskSpawn_t spawn_f = [](BaseTask_t&){return SpawnTaskReturn::Error;};
   BusLinux_t bus;
+  Node_t::ComputePotF pot_f = [](){return 0;};
 
-  Node_t Drone1{bus,spawn_f};
+  Node_t Drone1{bus,spawn_f, pot_f};
 
   return 0;
 }

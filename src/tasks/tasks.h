@@ -6,41 +6,51 @@
 #include "bus_reader/bus_reader.h"
 #include "potential_election/potential_election.h"
 
-namespace nearest_ap {
+namespace nearest_ap
+{
   enum class SpawnTaskReturn
   {
     Ok,
     Error,
   };
+  
+  template<typename AddressType, std::size_t mex_size = Bus<AddressType>::m_payload_max_size>
+  class Tasks
+  {
+    public:
+      using Bus_t = Bus<AddressType, mex_size>;
+      using Vector_t = std::vector<Candidate_t>;
+      using PotentialElectionTask_t = PotentialElectionTask<AddressType, mex_size>;
+      using LeaderAliveTask_t = LeaderAliveTask<AddressType, mex_size>;
+      using BusReaderTask_t = BusReaderTask<AddressType, mex_size>;
 
-  template<
-    typename AddressType,
-    std::size_t payload_max_size = Bus<AddressType>::m_payload_max_size,
-    std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
-    std::size_t tollerance = LocalPotentialInfo<>::m_tollerance >
-    class Tasks
-    {
-      public:
+      using ComputePotF = typename PotentialElectionTask_t::ComputePotF;
+      using BusMex_t = typename Bus_t::Msg;
+      using DebugPrint_t = std::function<void(SpawnTaskReturn)>;
+      using TaskSpawn_t = std::function<SpawnTaskReturn(BaseTask_t&)>;
 
-        using PotentialElectionTask_t = PotentialElectionTask<AddressType, payload_max_size, default_num_nodes, tollerance>;
-        using LeaderAliveTask_t = LeaderAliveTask<AddressType, payload_max_size, default_num_nodes>;
-        using BusReaderTask_t = BusReaderTask<AddressType, payload_max_size, default_num_nodes,tollerance>;
-        using Bus_t = Bus<AddressType, payload_max_size>;
+      Tasks() = delete;
 
-        using DebugPrint_t = std::function<void(SpawnTaskReturn)>;
-        using TaskSpawn_t = std::function<SpawnTaskReturn(BaseTask_t&)>;
+      Tasks(
+          Bus_t& bus,
+          const TaskSpawn_t& task_spawn,
+          const ComputePotF& compute_pot,
+          LocalPotentialInfo_t& pot_info,
+          VoteInfo_t& vote_info) noexcept:
+        m_task_spawn(task_spawn),
+        m_pot_election_task{bus, compute_pot, pot_info, vote_info},
+        m_alive_task{bus, vote_info},
+        m_bus_reader_task{bus, vote_info, pot_info}
+        {
+        }
 
-        Tasks() = delete;
+      SpawnTaskReturn spawn_tasks() noexcept;
 
-        void start() noexcept;
-
-      private:
-        const TaskSpawn_t m_task_spawn;
-        const DebugPrint_t m_debug_print = [](SpawnTaskReturn){};
-
-        Bus_t& m_bus;
-        PotentialElectionTask_t m_pot_task;
-        LeaderAliveTask_t m_election_task;
-        BusReaderTask_t m_bus_reader_task;
-    };
+    private:
+      const TaskSpawn_t m_task_spawn;
+      const DebugPrint_t m_debug_print = [](SpawnTaskReturn){};
+      PotentialElectionTask_t m_pot_election_task;
+      LeaderAliveTask_t m_alive_task;
+      BusReaderTask_t m_bus_reader_task;
+  };
 };

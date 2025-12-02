@@ -17,35 +17,38 @@
 #include "../../internal/internal.h"
 
 namespace nearest_ap {
-  template<
-    typename AddressType,
-    std::size_t payload_max_size = Bus<AddressType>::m_payload_max_size,
-    std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
-    std::size_t tollerance = LocalPotentialInfo<>::m_tollerance>
+  template<typename AddressType, std::size_t payload_max_size = Bus<AddressType>::m_payload_max_size >
     class PotentialElectionTask : public BaseTask_t
   {
     public:
-      using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
-      using VoteInfo_t = VoteInfo<default_num_nodes>;
       using Bus_t = Bus<AddressType, payload_max_size>;
 
       using ComputePotF = std::function<int()>;
 
-      explicit PotentialElectionTask() noexcept;
+      explicit PotentialElectionTask() = delete;
 
-      PotentialElectionTask(Bus_t& bus) noexcept;
       PotentialElectionTask(
           const Bus_t& bus,
-          const ComputePotF pot_f,
+          const ComputePotF& pot_f,
           LocalPotentialInfo_t& pot_info,
           VoteInfo_t& vote_info
-          ) noexcept;
+          ) noexcept :
+        m_bus(bus),
+        m_compute_local_potential(pot_f),
+        m_pot_info(pot_info),
+        m_vote_info(vote_info)
+        {
+        }
 
-      TaskError_t run(void) override;
+      TaskError_t run(void)override
+      {
+        return TaskError_t::Error;
+      }
+
 
     private:
-      Bus_t& m_bus;
-      ComputePotF m_compute_local_potential = [](){return 0;};
+      const Bus_t& m_bus;
+      const ComputePotF& m_compute_local_potential;
       LocalPotentialInfo_t& m_pot_info;
       VoteInfo_t& m_vote_info;
   };

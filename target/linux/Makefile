@@ -21,7 +21,7 @@ OBJ_CXX = $(DEPS_CXX:$(SDIR)/%.cpp=$(BDIR)/%.o)
 $(info CXX sources: $(DEPS_CXX))
 
 # Default target
-all: build
+all: clean build
 
 include $(PROTOBUF_MESSAGE_PATH)/Makefile
 

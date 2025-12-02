@@ -24,25 +24,29 @@
 #include "../bus/bus.h"
 
 namespace nearest_ap {
-  template<
-    typename AddressType,
-    std::size_t mex_size = Bus<AddressType>::m_payload_max_size,
-    std::size_t default_num_nodes = VoteInfo<>::m_default_num_candidates,
-    std::size_t tollerance = LocalPotentialInfo<>::m_tollerance >
+  template<typename AddressType, std::size_t mex_size = Bus<AddressType>::m_payload_max_size >
     class BusReaderTask : public BaseTask_t
   {
     public:
       using Bus_t = Bus<AddressType, mex_size>;
-      using VoteInfo_t = VoteInfo<default_num_nodes>;
-      using LocalPotentialInfo_t = LocalPotentialInfo<tollerance>;
 
-      explicit BusReaderTask() noexcept;
+      explicit BusReaderTask() = delete;
+
       BusReaderTask(
-          const LocalPotentialInfo_t& local_potential,
-          VoteInfo_t& vote_info
-          ) noexcept;
+          Bus_t& bus,
+          VoteInfo_t& vote_info,
+          LocalPotentialInfo_t& local_potential
+          ) noexcept:
+        m_bus(bus),
+        m_vote_info(vote_info),
+        m_local_potential_info(local_potential)
+        {
+        }
 
-      TaskError_t run(void) noexcept override;
+      TaskError_t run(void) noexcept override
+      {
+        return TaskError_t::Error;
+      }
 
     private:
       Bus_t& m_bus;

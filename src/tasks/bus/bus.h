@@ -24,7 +24,7 @@ namespace nearest_ap {
 
       static constexpr size_t m_payload_max_size = payload_max_size;
 
-      virtual Msg Read() noexcept =0;
+      virtual Msg Read() const noexcept =0;
       virtual BusStatus_t Write(const Msg&) noexcept =0;
   };
 }

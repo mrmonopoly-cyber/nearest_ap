@@ -3,27 +3,42 @@
 #include "../candidate/candidate.h"
 
 namespace nearest_ap {
-  template <std::size_t default_num_candidates = 5>
-    class VoteInfo
+    class VoteInfo_t
     {
       public:
-        static constexpr std::size_t m_default_num_candidates = default_num_candidates;
-        VoteInfo() = delete;
+        VoteInfo_t() = delete;
+        explicit VoteInfo_t(const Candidate_t& user, Candidate_t& leader) noexcept :
+          m_consent(0),
+          m_round(0),
+          m_user(user),
+          m_leader(leader)
+          {}
 
-        explicit VoteInfo(const Candidate_t& m_user) noexcept;
+        void reset() noexcept
+        {
+          m_consent =0;
+        }
 
-        VoteInfo(const std::size_t num_candidates) noexcept;
-        void reset() noexcept;
-        void support() noexcept;
-        bool election_status() noexcept;
-        bool is_leader() const noexcept;
+        void support() noexcept
+        {
+          m_consent++;
+        }
+
+        bool election_winner() noexcept
+        {
+          return m_consent > (m_num_candidates/2);
+        }
+
+        bool is_leader() const noexcept
+        {
+          return m_user == m_leader;
+        }
 
       private:
-        static constexpr std::size_t m_election_req_mex_size = 5; //INFO: for now. In the future it will be the sizeof the serialized Protobuf object
-        std::size_t m_num_candidates = default_num_candidates;
-        std::size_t m_consent;
-        std::size_t m_election_id;
-        Candidate_t& m_user;
+        std::size_t m_num_candidates = 1;
+        std::size_t m_consent=0;
+        std::size_t m_round=0;
+        const Candidate_t& m_user;
         Candidate_t& m_leader;
     };
 };
