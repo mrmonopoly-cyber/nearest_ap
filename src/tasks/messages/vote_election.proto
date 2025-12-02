@@ -1,8 +1,0 @@
-edition = "2023";
-
-package near_ap;
-
-message VoteElection{
-  uint32 round=1;
-  uint32 id=2;
-};

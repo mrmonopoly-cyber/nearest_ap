@@ -6,4 +6,9 @@ message NewElection{
   uint32 round=1;
   uint32 id=2;
   uint32 potential=3;
+}
+
+message VoteRespone{
+  uint32 round=1;
+  uint32 id=2;
 };
