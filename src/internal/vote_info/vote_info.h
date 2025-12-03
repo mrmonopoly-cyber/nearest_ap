@@ -1,13 +1,14 @@
 #pragma once
 
-#include "../candidate/candidate.h"
+#include <cstddef>
 
 namespace nearest_ap {
-    class VoteInfo_t
+  template<typename AddressType>
+    class VoteInfo
     {
       public:
-        VoteInfo_t() = delete;
-        explicit VoteInfo_t(const Candidate_t& user, Candidate_t& leader) noexcept :
+        VoteInfo() = delete;
+        explicit VoteInfo(const AddressType& user, AddressType& leader) noexcept :
           m_consent(0),
           m_round(0),
           m_user(user),
@@ -38,7 +39,7 @@ namespace nearest_ap {
         std::size_t m_num_candidates = 1;
         std::size_t m_consent=0;
         std::size_t m_round=0;
-        const Candidate_t& m_user;
-        Candidate_t& m_leader;
+        const AddressType& m_user;
+        AddressType& m_leader;
     };
 };

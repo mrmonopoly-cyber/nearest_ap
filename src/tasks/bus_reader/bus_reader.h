@@ -29,6 +29,8 @@ namespace nearest_ap {
   {
     public:
       using Bus_t = Bus<AddressType, mex_size>;
+      using VoteInfo_t = VoteInfo<AddressType>;
+      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
 
       explicit BusReaderTask() = delete;
 

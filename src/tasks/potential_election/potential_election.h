@@ -22,6 +22,8 @@ namespace nearest_ap {
   {
     public:
       using Bus_t = Bus<AddressType, payload_max_size>;
+      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
+      using VoteInfo_t = VoteInfo<AddressType>;
 
       using ComputePotF = std::function<int()>;
 

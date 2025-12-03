@@ -19,6 +19,7 @@ namespace nearest_ap {
   {
     public:
       using Bus_t = Bus<AddressType, mex_payload_size>;
+      using VoteInfo_t = VoteInfo<AddressType>;
 
       explicit LeaderAliveTask() noexcept;
 

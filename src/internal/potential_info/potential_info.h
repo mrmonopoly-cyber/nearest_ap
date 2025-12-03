@@ -2,16 +2,17 @@
 
 #include <cstddef>
 
-#include "../candidate/candidate.h"
-
 namespace nearest_ap {
 
-  struct LocalPotentialInfo_t
+  template<typename AddressType>
+  struct LocalPotentialInfo
   {
     class PotentialNode
     {
       public:
         using Potential = std::size_t;
+        using Candidate_t = AddressType;
+
         PotentialNode() = delete;
         PotentialNode(const Candidate_t& user) :
           m_user(user),

@@ -19,10 +19,12 @@ namespace nearest_ap
   {
     public:
       using Bus_t = Bus<AddressType, mex_size>;
-      using Vector_t = std::vector<Candidate_t>;
+      using Vector_t = std::vector<AddressType>;
       using PotentialElectionTask_t = PotentialElectionTask<AddressType, mex_size>;
       using LeaderAliveTask_t = LeaderAliveTask<AddressType, mex_size>;
       using BusReaderTask_t = BusReaderTask<AddressType, mex_size>;
+      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
+      using VoteInfo_t = VoteInfo<AddressType>;
 
       using ComputePotF = typename PotentialElectionTask_t::ComputePotF;
       using BusMex_t = typename Bus_t::Msg;
