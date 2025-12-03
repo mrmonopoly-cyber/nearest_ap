@@ -1,2 +1,5 @@
 *.o
 *.o.cmd
+.cache
+compile_commands.json
+*.cache

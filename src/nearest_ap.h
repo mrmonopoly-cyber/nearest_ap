@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tasks/base_task.h"
 #include "tasks/tasks.h"
 #include "internal/internal.h"
 
@@ -23,6 +24,7 @@ namespace nearest_ap {
 
       explicit Node(
           Bus_t& bus,
+          const WaitFun_f& wait_f,
           const TaskSpawn_t& task_spawn_f,
           const ComputePotF& compute_pot_f) noexcept :
         m_internal
@@ -38,6 +40,7 @@ namespace nearest_ap {
         m_tasks
         {
           bus,
+          wait_f,
           task_spawn_f,
           compute_pot_f,
           m_internal.m_local_potential_info,
@@ -62,8 +65,14 @@ namespace nearest_ap {
           const TaskSpawn_t task_spawn_f,
           const DebugPrint_t debug_print_f) noexcept;
 
-      void async_start(void);
-      void update_id(AddressType id);
+      void async_start(void)
+      {
+        m_tasks.spawn_tasks();
+      }
+      void update_id(AddressType id)
+      {
+        m_internal.m_current_user = id;
+      }
 
     private:
       Internal_t m_internal;

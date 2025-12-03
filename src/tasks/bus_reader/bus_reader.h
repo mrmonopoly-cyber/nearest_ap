@@ -45,9 +45,8 @@ namespace nearest_ap {
         {
         }
 
-      TaskError_t run(void) noexcept override
+      void run(void) noexcept override
       {
-        return TaskError_t::Error;
       }
 
     private:

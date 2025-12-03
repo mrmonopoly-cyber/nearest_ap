@@ -35,6 +35,11 @@ namespace nearest_ap {
           return m_user == m_leader;
         }
 
+        const AddressType& get_user() const noexcept
+        {
+          return m_user;
+        }
+
       private:
         std::size_t m_num_candidates = 1;
         std::size_t m_consent=0;

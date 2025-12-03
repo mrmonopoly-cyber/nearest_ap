@@ -42,9 +42,8 @@ namespace nearest_ap {
         {
         }
 
-      TaskError_t run(void)override
+      void run(void)override
       {
-        return TaskError_t::Error;
       }
 
 

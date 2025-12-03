@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <array>
 
+#include <pb.h>
+
 namespace nearest_ap {
   enum class BusStatus_t
   {
@@ -18,8 +20,8 @@ namespace nearest_ap {
     public:
       struct Msg
       {
-        AddressType id;
-        std::array<std::byte, payload_max_size> payload; 
+        AddressType m_id;
+        std::array<pb_byte_t, payload_max_size> m_payload; 
       };
 
       static constexpr size_t m_payload_max_size = payload_max_size;

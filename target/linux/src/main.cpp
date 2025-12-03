@@ -1,4 +1,7 @@
 #include "nearest_ap/nearest_ap.h"
+#include <chrono>
+#include <thread>
+#include <unistd.h>
 
 
 int main(void)
@@ -22,8 +25,11 @@ int main(void)
   Node_t::TaskSpawn_t spawn_f = [](BaseTask_t&){return SpawnTaskReturn::Error;};
   BusLinux_t bus;
   Node_t::ComputePotF pot_f = [](){return 0;};
+  WaitFun_f wait_f = [](Millis_t time){
+    std::this_thread::sleep_for(std::chrono::milliseconds{time});
+  };
 
-  Node_t Drone1{bus,spawn_f, pot_f};
+  Node_t Drone1{bus,wait_f, spawn_f, pot_f};
 
   return 0;
 }

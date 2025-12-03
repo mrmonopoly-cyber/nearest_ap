@@ -1,5 +1,6 @@
 #pragma once
 
+#include "base_task.h"
 #include "bus/bus.h"
 
 #include "leader_alive/leader_alive.h"
@@ -27,7 +28,7 @@ namespace nearest_ap
       using VoteInfo_t = VoteInfo<AddressType>;
 
       using ComputePotF = typename PotentialElectionTask_t::ComputePotF;
-      using BusMex_t = typename Bus_t::Msg;
+      using BusMsg_t = typename Bus_t::Msg;
       using DebugPrint_t = std::function<void(SpawnTaskReturn)>;
       using TaskSpawn_t = std::function<SpawnTaskReturn(BaseTask_t&)>;
 
@@ -35,20 +36,32 @@ namespace nearest_ap
 
       Tasks(
           Bus_t& bus,
+          const WaitFun_f& wait_fun,
           const TaskSpawn_t& task_spawn,
           const ComputePotF& compute_pot,
           LocalPotentialInfo_t& pot_info,
           VoteInfo_t& vote_info) noexcept:
+        m_wait_fun(wait_fun),
         m_task_spawn(task_spawn),
         m_pot_election_task{bus, compute_pot, pot_info, vote_info},
-        m_alive_task{bus, vote_info},
+        m_alive_task{m_wait_fun, bus, pot_info, vote_info},
         m_bus_reader_task{bus, vote_info, pot_info}
         {
         }
 
-      SpawnTaskReturn spawn_tasks() noexcept;
+      SpawnTaskReturn spawn_tasks() noexcept
+      {
+        if(
+            (m_task_spawn(m_bus_reader_task)==SpawnTaskReturn::Error) ||
+            (m_task_spawn(m_alive_task)==SpawnTaskReturn::Error) ||
+            (m_task_spawn(m_pot_election_task)==SpawnTaskReturn::Error))
+        {
+          return SpawnTaskReturn::Error;
+        }
+      }
 
     private:
+      const WaitFun_f m_wait_fun;
       const TaskSpawn_t m_task_spawn;
       const DebugPrint_t m_debug_print = [](SpawnTaskReturn){};
       PotentialElectionTask_t m_pot_election_task;
