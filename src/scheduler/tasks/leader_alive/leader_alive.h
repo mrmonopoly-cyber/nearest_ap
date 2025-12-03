@@ -15,8 +15,8 @@
 #include "../../bus/bus.h"
 #include "../../../internal/internal.h"
 extern "C"{
-#include "../messages/out/leader_alive.pb.h"
-#include "../messages/nanopb_src/pb_encode.h"
+#include "../../messages/out/leader_alive.pb.h"
+#include "../../messages/nanopb_src/pb_encode.h"
 }
 
 namespace nearest_ap {
