@@ -18,7 +18,7 @@ namespace nearest_ap {
   class Bus
   {
     public:
-      struct Msg
+      struct Msg_t
       {
         AddressType m_id;
         std::array<pb_byte_t, payload_max_size> m_payload; 
@@ -26,7 +26,7 @@ namespace nearest_ap {
 
       static constexpr size_t m_payload_max_size = payload_max_size;
 
-      virtual Msg Read() const noexcept =0;
-      virtual BusStatus_t Write(const Msg&) noexcept =0;
+      virtual Msg_t Read() const noexcept =0;
+      virtual BusStatus_t Write(const Msg_t&) noexcept =0;
   };
 }

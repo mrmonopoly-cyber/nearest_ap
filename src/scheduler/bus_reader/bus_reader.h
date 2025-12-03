@@ -19,29 +19,25 @@
  */
 
 #include "../base_task.h"
+#include "../../scheduler/scheduler.h"
 
 #include "../../internal/internal.h"
 #include "../bus/bus.h"
 
 namespace nearest_ap {
-  template<typename AddressType, std::size_t mex_size = Bus<AddressType>::m_payload_max_size >
+  template<typename AddressType, typename BusType >
     class BusReaderTask : public BaseTask_t
   {
     public:
-      using Bus_t = Bus<AddressType, mex_size>;
-      using VoteInfo_t = VoteInfo<AddressType>;
-      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
+      using Internal_t = Internal<AddressType>;
 
       explicit BusReaderTask() = delete;
 
       BusReaderTask(
-          Bus_t& bus,
-          VoteInfo_t& vote_info,
-          LocalPotentialInfo_t& local_potential
-          ) noexcept:
+          BusType& bus,
+          Internal_t& internal) noexcept:
         m_bus(bus),
-        m_vote_info(vote_info),
-        m_local_potential_info(local_potential)
+        m_internal(internal)
         {
         }
 
@@ -50,8 +46,7 @@ namespace nearest_ap {
       }
 
     private:
-      Bus_t& m_bus;
-      VoteInfo_t& m_vote_info;
-      LocalPotentialInfo_t & m_local_potential_info;
+      BusType& m_bus;
+      Internal_t& m_internal;
   };
 };

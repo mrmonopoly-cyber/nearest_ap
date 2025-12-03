@@ -5,7 +5,7 @@ CXX = g++
 # Directories
 BDIR := build
 SDIR := src
-PROTOBUF_MESSAGE_PATH := $(SDIR)/nearest_ap/tasks/messages
+PROTOBUF_MESSAGE_PATH := $(SDIR)/nearest_ap/scheduler/messages
 
 # Compiler flags (optional, add as needed)
 CC_FLAGS := -Wall -Wextra 

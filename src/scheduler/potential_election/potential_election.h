@@ -17,28 +17,23 @@
 #include "../../internal/internal.h"
 
 namespace nearest_ap {
-  template<typename AddressType, std::size_t payload_max_size = Bus<AddressType>::m_payload_max_size >
+  template<typename AddressType, typename BusType >
     class PotentialElectionTask : public BaseTask_t
   {
     public:
-      using Bus_t = Bus<AddressType, payload_max_size>;
-      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
-      using VoteInfo_t = VoteInfo<AddressType>;
+      using Internal_t = Internal<AddressType>;
 
       using ComputePotF = std::function<int()>;
 
       explicit PotentialElectionTask() = delete;
 
       PotentialElectionTask(
-          const Bus_t& bus,
+          const BusType& bus,
           const ComputePotF& pot_f,
-          LocalPotentialInfo_t& pot_info,
-          VoteInfo_t& vote_info
-          ) noexcept :
+          Internal_t& internal) noexcept :
         m_bus(bus),
         m_compute_local_potential(pot_f),
-        m_pot_info(pot_info),
-        m_vote_info(vote_info)
+        m_internal(internal)
         {
         }
 
@@ -46,11 +41,9 @@ namespace nearest_ap {
       {
       }
 
-
     private:
-      const Bus_t& m_bus;
+      const BusType& m_bus;
       const ComputePotF& m_compute_local_potential;
-      LocalPotentialInfo_t& m_pot_info;
-      VoteInfo_t& m_vote_info;
+      Internal_t& m_internal;
   };
 };

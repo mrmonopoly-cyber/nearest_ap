@@ -1,35 +1,68 @@
-#include "nearest_ap/nearest_ap.h"
-#include <chrono>
-#include <thread>
 #include <unistd.h>
+#include <iostream>
 
+#include "nearest_ap/nearest_ap.h"
+
+using namespace nearest_ap;
+
+class BusLinux_t : public Bus<std::size_t>
+{
+  public:
+    BusLinux_t()
+    {
+      std::cout << "bus creation" << std::endl;
+    }
+
+    BusLinux_t(const BusLinux_t&) = delete;
+    BusLinux_t operator=(const BusLinux_t&) = delete;
+
+    BusLinux_t(BusLinux_t&&) = default;
+    BusLinux_t& operator=(BusLinux_t&&) = default;
+
+    Msg_t Read() const noexcept override
+    {
+      return Msg_t{};
+    }
+
+    BusStatus_t Write(const Msg_t&) noexcept override
+    {
+      return BusStatus_t::Inactive;
+    }
+};
+
+class SpawnerLinux_t : public Spawner_t
+{
+  public:
+    SpawnerLinux_t()
+    {
+      std::cout << "Spawner creation " << std::endl;
+    }
+
+    SpawnerLinux_t(const SpawnerLinux_t& ) =delete;
+    SpawnerLinux_t operator=(const SpawnerLinux_t& ) =delete;
+
+    SpawnerLinux_t(SpawnerLinux_t&& ) = default;
+    SpawnerLinux_t& operator=(SpawnerLinux_t&& ) = default;
+
+    void attach_timer_to_task(const BaseTask_t&, Millis_t) override
+    {
+    }
+    void start_task(const BaseTask_t&) override
+    {
+    }
+    void suspend_task(const BaseTask_t&) override
+    {
+    }
+    void resume_task(const BaseTask_t&) override
+    {
+    }
+};
 
 int main(void)
 {
-  using namespace nearest_ap;
-  using Node_t = nearest_ap::Node<std::size_t>;
+  using Node_t = Node<std::size_t, BusLinux_t, SpawnerLinux_t>;
 
-  class BusLinux_t : public Node_t::Bus_t
-  {
-      Msg Read() const noexcept override
-      {
-        return Msg{};
-      }
-
-      BusStatus_t Write(const Msg&) noexcept override
-      {
-        return BusStatus_t::Inactive;
-      }
-  };
-
-  Node_t::TaskSpawn_t spawn_f = [](BaseTask_t&){return SpawnTaskReturn::Error;};
-  BusLinux_t bus;
-  Node_t::ComputePotF pot_f = [](){return 0;};
-  WaitFun_f wait_f = [](Millis_t time){
-    std::this_thread::sleep_for(std::chrono::milliseconds{time});
-  };
-
-  Node_t Drone1{bus,wait_f, spawn_f, pot_f};
+  Node_t Drone1{SpawnerLinux_t{},BusLinux_t{}, [](){return 0;}};
 
   return 0;
 }

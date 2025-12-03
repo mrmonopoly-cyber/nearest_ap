@@ -1,13 +1,10 @@
 #pragma once
 
-#include <array>
-#include <functional>
-#include <ctime>
+#include <cstddef>
 
 namespace nearest_ap {
 
   using Millis_t = std::size_t;
-  using WaitFun_f = std::function<void(Millis_t)>;
 
   class BaseTask_t
   {
