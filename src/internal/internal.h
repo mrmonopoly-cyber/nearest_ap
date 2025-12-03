@@ -8,7 +8,7 @@ namespace nearest_ap
   template<typename AddressType>
   struct Internal
   {
-    AddressType m_current_user;
+    const AddressType m_current_user;
     VoteInfo<AddressType> m_vote_info;
     LocalPotentialInfo<AddressType> m_local_potential_info;
   };

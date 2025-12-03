@@ -1,14 +1,15 @@
 #pragma once
 
-#include "base_task.h"
+#include "tasks/base_task.h"
 
 namespace nearest_ap 
 {
   class Spawner_t
   {
-    virtual void attach_timer_to_task(const BaseTask_t&, Millis_t) =0;
-    virtual void start_task(const BaseTask_t&) =0;
-    virtual void suspend_task(const BaseTask_t&) =0;
-    virtual void resume_task(const BaseTask_t&) =0;
+    public:
+      virtual void attach_timer_to_task(const BaseTask_t&, Millis_t) =0;
+      virtual void start_task(const BaseTask_t&) =0;
+      virtual void suspend_task(const BaseTask_t&) =0;
+      virtual void resume_task(const BaseTask_t&) =0;
   };
 };

@@ -62,7 +62,9 @@ int main(void)
 {
   using Node_t = Node<std::size_t, BusLinux_t, SpawnerLinux_t>;
 
-  Node_t Drone1{SpawnerLinux_t{},BusLinux_t{}, [](){return 0;}};
+  Node_t drone{SpawnerLinux_t{},BusLinux_t{}, [](){return 0;}};
+
+  drone.async_start();
 
   return 0;
 }

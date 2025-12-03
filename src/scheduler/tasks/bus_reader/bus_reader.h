@@ -19,10 +19,9 @@
  */
 
 #include "../base_task.h"
-#include "../../scheduler/scheduler.h"
 
-#include "../../internal/internal.h"
-#include "../bus/bus.h"
+#include "../../../internal/internal.h"
+#include "../../bus/bus.h"
 
 namespace nearest_ap {
   template<typename AddressType, typename BusType >

@@ -25,7 +25,7 @@ namespace nearest_ap {
         m_internal
         {
           .m_current_user{},
-          .m_vote_info{m_internal.m_current_user,m_internal. m_current_user},
+          .m_vote_info{m_internal.m_current_user, m_internal.m_current_user},
           .m_local_potential_info
           {
             .m_local_node = m_internal.m_current_user,

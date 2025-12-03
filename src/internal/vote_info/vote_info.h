@@ -8,7 +8,7 @@ namespace nearest_ap {
     {
       public:
         VoteInfo() = delete;
-        explicit VoteInfo(const AddressType& user, AddressType& leader) noexcept :
+        explicit VoteInfo(const AddressType& user, const AddressType& leader) noexcept :
           m_consent(0),
           m_round(0),
           m_user(user),
@@ -45,6 +45,6 @@ namespace nearest_ap {
         std::size_t m_consent=0;
         std::size_t m_round=0;
         const AddressType& m_user;
-        AddressType& m_leader;
+        const AddressType& m_leader;
     };
 };

@@ -1,11 +1,8 @@
 #pragma once
 
-#include "base_task.h"
 #include "spawner.h"
-
-#include "leader_alive/leader_alive.h"
-#include "bus_reader/bus_reader.h"
-#include "potential_election/potential_election.h"
+#include "tasks/tasks.h"
+#include "../internal/internal.h"
 
 
 namespace nearest_ap
@@ -14,8 +11,6 @@ namespace nearest_ap
   class Scheduler
   {
     public:
-      using Vector_t = std::vector<AddressType>;
-
       using Internal_t = Internal<AddressType>;
 
       using PotentialElectionTask_t = PotentialElectionTask<AddressType, BusType>;
@@ -42,6 +37,8 @@ namespace nearest_ap
 
       void spawn_tasks() noexcept
       {
+        m_spawner.attach_timer_to_task(m_pot_election_task, Millis_t{200});
+        m_spawner.start_task(m_bus_reader_task);
       }
 
     private:
