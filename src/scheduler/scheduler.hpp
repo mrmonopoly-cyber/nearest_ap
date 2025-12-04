@@ -1,8 +1,8 @@
 #pragma once
 
-#include "spawner/spawner.h"
-#include "tasks/tasks.h"
-#include "../internal/internal.h"
+#include "spawner/spawner.hpp"
+#include "tasks/tasks.hpp"
+#include "../internal/internal.hpp"
 
 namespace nearest_ap
 {

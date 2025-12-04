@@ -18,10 +18,10 @@
  *              vote.increment();
  */
 
-#include "../base_task.h"
+#include "../base_task.hpp"
 
-#include "../../../internal/internal.h"
-#include "../../bus/bus.h"
+#include "../../../internal/internal.hpp"
+#include "../../bus/bus.hpp"
 
 namespace nearest_ap {
   template<typename AddressType, typename BusType >

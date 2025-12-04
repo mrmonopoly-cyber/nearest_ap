@@ -1,7 +1,7 @@
 #pragma once
 
-#include "scheduler/scheduler.h"
-#include "internal/internal.h"
+#include "scheduler/scheduler.hpp"
+#include "internal/internal.hpp"
 
 namespace nearest_ap {
 

@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "nearest_ap/nearest_ap.h"
+#include "nearest_ap/nearest_ap.hpp"
 
 using namespace nearest_ap;
 

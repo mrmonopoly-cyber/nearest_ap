@@ -32,7 +32,7 @@ CXX_PATH := $(shell whereis arm-none-eabi-g++ | cut -d' ' -f2)
 # to oot-config and that would be the default.
 #
 EXTRA_CFLAGS += -I$(PROTOBUF_MESSAGE_PATH)/nanopb_src
-EXTRA_CFLAGS += -I$(LDIR)project_deps/
+EXTRA_CFLAGS += -I$(LDIR)/project_deps
 
 OOT_CONFIG := $(PWD)/app-config
 

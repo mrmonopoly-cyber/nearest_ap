@@ -3,7 +3,7 @@
 #include <vector>
 #include <cstdint>
 
-#include "vote_info/vote_info.h"
+#include "vote_info/vote_info.hpp"
 
 namespace nearest_ap 
 {

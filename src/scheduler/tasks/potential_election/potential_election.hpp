@@ -12,9 +12,9 @@
 
 #include <functional>
 
-#include "../base_task.h"
-#include "../../bus/bus.h"
-#include "../../../internal/internal.h"
+#include "../base_task.hpp"
+#include "../../bus/bus.hpp"
+#include "../../../internal/internal.hpp"
 
 namespace nearest_ap {
   template<typename AddressType, typename BusType >

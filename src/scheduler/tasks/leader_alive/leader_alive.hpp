@@ -11,11 +11,10 @@
 
 #include <cstdint>
 
-#include "../base_task.h"
-#include "../../bus/bus.h"
-#include "../../../internal/internal.h"
-#include "../../messages/out/leader_alive.pb.h"
-#include "../../messages/nanopb_src/pb_encode.h"
+#include "../base_task.hpp"
+#include "../../bus/bus.hpp"
+#include "../../../internal/internal.hpp"
+#include "project_deps.h"
 
 namespace nearest_ap {
   template< typename AddressType, typename BusType >

@@ -6,7 +6,7 @@ CXX = g++
 BDIR := build
 SDIR := src
 LDIR := lib
-PROTOBUF_MESSAGE_PATH := $(LDIR)/project_deps/messages
+PROTOBUF_MESSAGE_PATH := $(LDIR)/messages
 
 # Compiler flags (optional, add as needed)
 CC_FLAGS := -Wall -Wextra 
@@ -31,7 +31,9 @@ OBJ_C += $(DEPS_C:%.c=$(BDIR)/%.o)
 OBJ := $(OBJ_C) $(OBJ_CXX)
 
 CC_INCLUDE :=
-CC_INCLUDE += -I$(LDIR)/project_deps/messages/nanopb_src
+CC_INCLUDE += -I$(LDIR)/messages/nanopb_src \
+							-I$(LDIR)
+
 
 CXX_INCLUDE :=
 CXX_INCLUDE += $(CC_INCLUDE)
