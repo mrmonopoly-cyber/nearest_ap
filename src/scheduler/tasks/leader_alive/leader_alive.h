@@ -45,14 +45,14 @@ namespace nearest_ap {
         ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
         while(1)
         {
-          if (m_internal.m_vote_info.is_leader())
+          if (m_internal.is_leader())
           {
             near_ap_LeaderHeartbit heartbit =
             {
               .has_id = true,
-              .id = static_cast<std::uint32_t>(m_internal.m_vote_info.get_user()),
+              .id = static_cast<std::uint32_t>(m_internal.user_id()),
               .has_potential = true,
-              .potential = m_internal.m_local_potential_info.m_local_node.potential(),
+              .potential = m_internal.user_potential(),
             };
 
             if (pb_encode(&ostream, near_ap_LeaderHeartbit_fields, &heartbit))

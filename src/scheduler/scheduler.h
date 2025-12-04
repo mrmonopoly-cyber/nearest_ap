@@ -25,7 +25,7 @@ namespace nearest_ap
       Scheduler(
           SpawnerType&& spawner,
           BusType&& bus,
-          const ComputePotF&& compute_pot,
+          ComputePotF&& compute_pot,
           Internal_t& internal) noexcept:
         m_spawner{std::move(spawner)},
         m_bus {std::move(bus)},

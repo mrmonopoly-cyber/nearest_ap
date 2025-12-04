@@ -10,7 +10,6 @@ namespace nearest_ap {
   {
     public:
       using Scheduler_t = Scheduler<AddressType, BusType, SpawnerType>;
-      using LocalPotentialInfo_t = LocalPotentialInfo<AddressType>;
       using Internal_t = Internal<AddressType>;
       using VoteInfo_t = VoteInfo<AddressType>;
 
@@ -21,24 +20,9 @@ namespace nearest_ap {
       explicit Node(
           SpawnerType&& spawner,
           BusType&& bus,
-          const ComputePotF&& compute_pot_f) noexcept :
-        m_internal
-        {
-          .m_current_user{},
-          .m_vote_info{m_internal.m_current_user, m_internal.m_current_user},
-          .m_local_potential_info
-          {
-            .m_local_node = m_internal.m_current_user,
-            .m_leader = m_internal.m_current_user
-          }
-        },
-        m_scheduler
-        {
-          std::move(spawner),
-          std::move(bus),
-          std::move(compute_pot_f),
-          m_internal,
-        }
+          ComputePotF&& compute_pot_f) noexcept :
+        m_internal(),
+        m_scheduler(std::move(spawner), std::move(bus), std::move(compute_pot_f), m_internal)
         {
         }
 
@@ -46,6 +30,7 @@ namespace nearest_ap {
       {
         m_scheduler.spawn_tasks();
       }
+
       void update_id(AddressType id)
       {
         m_internal.m_current_user = id;
