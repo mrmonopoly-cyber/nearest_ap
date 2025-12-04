@@ -12,13 +12,14 @@
 
 #include <functional>
 
-#include "../base_task.hpp"
-#include "../../bus/bus.hpp"
-#include "../../../internal/internal.hpp"
+#include "../../event_queue/event_queue.hpp"
+#include "../user_task.hpp"
+#include "../../../bus/bus.hpp"
+#include "../../../../internal/internal.hpp"
 
 namespace nearest_ap {
   template<typename AddressType, typename BusType >
-    class PotentialElectionTask : public BaseTask_t
+    class PotentialElectionTask : public UserTask_t
   {
     public:
       using Internal_t = Internal<AddressType>;
@@ -28,9 +29,11 @@ namespace nearest_ap {
       explicit PotentialElectionTask() = delete;
 
       PotentialElectionTask(
+          EventWriter& pipe,
           const BusType& bus,
           const ComputePotF& pot_f,
           Internal_t& internal) noexcept :
+        UserTask_t(pipe),
         m_bus(bus),
         m_compute_local_potential(pot_f),
         m_internal(internal)

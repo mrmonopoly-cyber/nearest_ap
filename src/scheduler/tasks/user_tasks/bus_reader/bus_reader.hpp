@@ -18,14 +18,14 @@
  *              vote.increment();
  */
 
-#include "../base_task.hpp"
+#include "../user_task.hpp"
 
-#include "../../../internal/internal.hpp"
-#include "../../bus/bus.hpp"
+#include "../../../../internal/internal.hpp"
+#include "../../../bus/bus.hpp"
 
 namespace nearest_ap {
   template<typename AddressType, typename BusType >
-    class BusReaderTask : public BaseTask_t
+    class BusReaderTask : public UserTask_t
   {
     public:
       using Internal_t = Internal<AddressType>;
@@ -33,8 +33,10 @@ namespace nearest_ap {
       explicit BusReaderTask() = delete;
 
       BusReaderTask(
+          EventWriter& m_pipe,
           BusType& bus,
           Internal_t& internal) noexcept:
+        UserTask_t(m_pipe),
         m_bus(bus),
         m_internal(internal)
         {

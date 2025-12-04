@@ -47,13 +47,13 @@ class SpawnerLinux_t : public Spawner_t
     void attach_timer_to_task(const BaseTask_t&, Millis_t) override
     {
     }
-    void start_task(const BaseTask_t&) override
+    void start_task(BaseTask_t*) override
     {
     }
-    void suspend_task(const BaseTask_t&) override
+    void suspend_task(BaseTask_t*) override
     {
     }
-    void resume_task(const BaseTask_t&) override
+    void resume_task(BaseTask_t*) override
     {
     }
 };

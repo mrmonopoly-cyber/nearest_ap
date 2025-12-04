@@ -11,14 +11,15 @@
 
 #include <cstdint>
 
-#include "../base_task.hpp"
-#include "../../bus/bus.hpp"
-#include "../../../internal/internal.hpp"
+#include "../user_task.hpp"
+#include "../../event_queue/event_queue.hpp"
+#include "../../../bus/bus.hpp"
+#include "../../../../internal/internal.hpp"
 #include "project_deps.h"
 
 namespace nearest_ap {
   template< typename AddressType, typename BusType >
-    class LeaderAliveTask : BaseTask_t
+    class LeaderAliveTask : public UserTask_t
   {
     public:
       using Msg_t = typename BusType::Bus::Msg_t;
@@ -27,8 +28,10 @@ namespace nearest_ap {
       explicit LeaderAliveTask() noexcept;
 
       LeaderAliveTask(
+          EventWriter& pipe,
           BusType& bus,
           const Internal_t& internal) :
+        UserTask_t(pipe),
         m_bus(bus),
         m_internal(internal)
         {
