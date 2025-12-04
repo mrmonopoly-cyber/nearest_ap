@@ -1,1 +1,2 @@
 obj-y += src/
+obj-y += lib/project_deps/messages/

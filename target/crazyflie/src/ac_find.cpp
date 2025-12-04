@@ -42,8 +42,6 @@ extern "C"
 
 }
 
-#include "ap_find/lib.h"
-
 void appMain()
 {
   DEBUG_PRINT("Starting Drone\n");

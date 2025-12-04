@@ -8,29 +8,39 @@
 # variable you can provide a custom configuration. It is important that you
 # enable the app-layer. See app-config in this directory for example.
 
+SDIR := $(PWD)/src
+LDIR := $(PWD)/lib
+
 SHELL := /bin/bash
-TARGET ?=
+
 UDEV_PATH := /etc/udev/rules.d
 UDEV_FILE := 99-bitcraze.rules
-PROTOBUF_MESSAGE_PATH := ./src/ap_find/tasks/messages
+
+CRAZYFLIE_BASE := $(LDIR)/crazyflie-firmware
+PROTOBUF_MESSAGE_PATH := $(LDIR)/project_deps/messages
 
 CC_INCLUDE_PATH := $(shell echo | arm-none-eabi-gcc -E -Wp,-v - 2>&1 | grep -v ignoring | grep -v "#" | grep -v "End of search list." | uniq)
-# CXX_INCLUDE_PATH := $(shell echo | arm-none-eabi-g++ --print-sysroot)
 CXX_PATH := $(shell whereis arm-none-eabi-g++ | cut -d' ' -f2)
 
 #
 # We want to execute the main Makefile for the firmware project,
 # it will handle the build for us.
 #
-CRAZYFLIE_BASE := lib/crazyflie-firmware/
 
 #
 # We override the default OOT_CONFIG here, we could also name our config
 # to oot-config and that would be the default.
 #
+EXTRA_CFLAGS += -I$(PROTOBUF_MESSAGE_PATH)/nanopb_src
+EXTRA_CFLAGS += -I$(LDIR)project_deps/
+
 OOT_CONFIG := $(PWD)/app-config
 
-NO_INCLUDE_TARGETS := setup clean_setup protobuf_setup clangd_update_compile_command
+NO_INCLUDE_TARGETS := setup \
+											clean \
+											clean_setup \
+											protobuf_setup \
+											clangd_update_compile_command
 
 ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_INCLUDE_TARGETS)),)
 OOT_USES_CXX := 1
@@ -56,7 +66,7 @@ clangd_setup:
 	make clangd_update_compile_command
 
 clean_setup:
-	rm -rf ./lib/crazyflie-firmware
+	rm -rf $(CRAZYFLIE_BASE)
 	rm -rf ./build*
 	rm -rf ./.venv
 	rm -rf ./.cache
@@ -64,16 +74,16 @@ clean_setup:
 	rm -rf ./compile_commands.json
 	@echo "removing udev rules"
 	sudo rm -f $(UDEV_PATH)/$(UDEV_FILE)
-	cd $(PROTOBUF_MESSAGE_PATH) && make clean_protobuf_messages 
+	make -C $(PROTOBUF_MESSAGE_PATH) clean_protobuf_messages
 
 
 protobuf_setup:
-	cd $(PROTOBUF_MESSAGE_PATH) && make build_protobuf_messages
+	make -C $(PROTOBUF_MESSAGE_PATH) build_protobuf_messages
 
 setup: $(UDEV_PATH) clean_setup 
 	@echo "cloning basic firmware of crazyflie"
-	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git lib/crazyflie-firmware;
-	cd ./lib/crazyflie-firmware/ && make  cf2_defconfig
+	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git $(CRAZYFLIE_BASE);
+	make -C $(CRAZYFLIE_BASE) cf2_defconfig
 
 	@echo "copying udev rules in " $(UDEV_PATH)
 	sudo cp $(UDEV_FILE) $(UDEV_PATH)
@@ -99,6 +109,6 @@ setup: $(UDEV_PATH) clean_setup
 
 clean_here:
 	rm -rf *.o
-	rm -rf src/*.o
+	rm -rf $(SDIR)/*.o
 
 clean: clean_here

@@ -1,2 +1,1 @@
 obj-y += ac_find.o
-obj-y += ap_find/

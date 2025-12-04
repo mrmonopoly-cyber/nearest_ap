@@ -1,0 +1,2 @@
+obj-y += out/leader_alive.pb.o
+obj-y += out/new_election.pb.o

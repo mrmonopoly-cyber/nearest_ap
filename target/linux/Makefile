@@ -5,24 +5,36 @@ CXX = g++
 # Directories
 BDIR := build
 SDIR := src
-PROTOBUF_MESSAGE_PATH := $(SDIR)/nearest_ap/scheduler/messages
+LDIR := lib
+PROTOBUF_MESSAGE_PATH := $(LDIR)/project_deps/messages
 
 # Compiler flags (optional, add as needed)
 CC_FLAGS := -Wall -Wextra 
 CXX_FLAGS := $(CC_FLAGS) -std=c++17
 
 # Find all .cpp files in the src directory
-DEPS_CXX = $(shell find $(SDIR) -follow -type f -name "*.cpp")
+DEPS_CXX :=
+DEPS_CXX += $(shell find $(SDIR) -follow -type f -name "*.cpp")
+DEPS_CXX += $(shell find $(LDIR) -follow -type f -name "*.cpp")
+
+DEPS_C :=
 DEPS_C += $(shell find $(SDIR) -follow -type f -name "*.c")
+DEPS_C += $(shell find $(LDIR) -follow -type f -name "*.c")
 
 # Generate object file paths by replacing .cpp with .o and using build directory
-OBJ_CXX = $(DEPS_CXX:$(SDIR)/%.cpp=$(BDIR)/%.o)
-OBJ_C += $(DEPS_C:$(SDIR)/%.c=$(BDIR)/%.o)
+OBJ_CXX :=
+OBJ_CXX += $(DEPS_CXX:%.cpp=$(BDIR)/%.o)
+
+OBJ_C += 
+OBJ_C += $(DEPS_C:%.c=$(BDIR)/%.o)
 
 OBJ := $(OBJ_C) $(OBJ_CXX)
 
-CC_INCLUDE := -I$(PROTOBUF_MESSAGE_PATH)/nanopb_src
-CXX_INCLUDE := $(CC_INCLUDE)
+CC_INCLUDE :=
+CC_INCLUDE += -I$(LDIR)/project_deps/messages/nanopb_src
+
+CXX_INCLUDE :=
+CXX_INCLUDE += $(CC_INCLUDE)
 
 # Info for debugging
 $(info CXX sources: $(DEPS_CXX))
@@ -43,13 +55,13 @@ build: $(OBJ)
 	$(CXX) $(CXX_INCLUDE) $(CXX_FLAGS) $(OBJ) -o main
 
 # Rule to compile each .cpp file into an object (.o)
-$(BDIR)/%.o: $(SDIR)/%.cpp
+$(BDIR)/%.o: %.cpp
 	$(info cpp compiling $<)
 	@mkdir -p $(dir $@)  # Create the target directory for the object file
 	$(CXX) -c $(CXX_INCLUDE) $(CXX_FLAGS) -o $@ $<
 
 # Rule to compile each .c file into an object (.o)
-$(BDIR)/%.o: $(SDIR)/%.c
+$(BDIR)/%.o: %.c
 	$(info c compiling $<)
 	@mkdir -p $(dir $@)  # Create the target directory for the object file
 	$(CC) -c $(CC_INCLUDE) $(CC_FLAGS) -o $@ $<

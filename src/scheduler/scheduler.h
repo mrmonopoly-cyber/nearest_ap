@@ -4,7 +4,6 @@
 #include "tasks/tasks.h"
 #include "../internal/internal.h"
 
-
 namespace nearest_ap
 {
   template<typename AddressType, typename BusType, typename SpawnerType >
