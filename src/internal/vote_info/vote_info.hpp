@@ -1,12 +1,13 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 
 namespace nearest_ap {
     class VoteInfo_t
     {
       public:
-        using Round_t = std::size_t;
+        using Round_t = std::uint32_t;
 
         VoteInfo_t();
 

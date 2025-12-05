@@ -11,16 +11,16 @@ namespace nearest_ap {
     public:
       using Scheduler_t = Scheduler< BusType, SpawnerType>;
       using AddressType_t = Internal_t::AddressType_t;
-      using ComputePotF = typename Scheduler_t::ComputePotF;
+      using ComputePot_f = typename Scheduler_t::ComputePot_f;
 
       Node() = delete;
 
       explicit Node(
           SpawnerType&& spawner,
           BusType&& bus,
-          ComputePotF&& compute_pot_f) noexcept :
-        m_internal(),
-        m_scheduler(std::move(spawner), std::move(bus), std::move(compute_pot_f), m_internal)
+          ComputePot_f&& compute_pot_f) noexcept :
+        m_internal(std::move(compute_pot_f)),
+        m_scheduler(std::move(spawner), std::move(bus), m_internal)
         {
         }
 

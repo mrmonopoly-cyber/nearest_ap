@@ -1,5 +1,8 @@
 #pragma once
 
+//Copyright (c) 2025 Alberto Damo. All Rights Reserved.
+
+#include <functional>
 #include <vector>
 #include <cstdint>
 
@@ -13,15 +16,20 @@ namespace nearest_ap
       using AddressType_t = std::uint32_t;
       using Round_t = VoteInfo_t::Round_t;
       using Potential_t = std::uint32_t;
+      using ComputePot_f = std::function<int()>;
 
-      Internal_t() noexcept;
-      Internal_t(AddressType_t current_user) noexcept;
+      Internal_t() = delete;
+      Internal_t(const ComputePot_f&& compute_pot) noexcept;
+      Internal_t(const ComputePot_f&& compute_pot, const AddressType_t current_user) noexcept;
+      Internal_t(const ComputePot_f&& compute_pot, const AddressType_t&& current_user) noexcept;
 
-      void check_and_set_leader(const AddressType_t &new_leader, const Potential_t pot) noexcept;
+      void check_and_set_leader(const AddressType_t& new_leader, const Potential_t pot) noexcept;
 
       AddressType_t user_id() const noexcept;
 
+      void compute_user_potential() noexcept;
       Potential_t user_potential() const noexcept;
+      Potential_t leader_potential() const noexcept;
 
       Round_t round() const noexcept;
       void update_round(Round_t round) noexcept;
@@ -30,6 +38,7 @@ namespace nearest_ap
       bool is_leader(AddressType_t& user) const noexcept;
 
       void support() noexcept;
+      void new_election() noexcept;
 
     private:
       struct UserData_t
@@ -54,6 +63,7 @@ namespace nearest_ap
       };
 
       std::vector<AddressType_t> m_users;
+      const ComputePot_f m_compute_local_potential;
       UserData_t m_current_user;
       UserData_t m_leader;
 

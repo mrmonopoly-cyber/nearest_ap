@@ -15,7 +15,7 @@ namespace nearest_ap
         using BusReaderTask_t = BusReaderTask<BusType>;
         using EventTask_t = EventTask<BusType, SpawnerType>;
 
-        using ComputePotF = typename PotentialElectionTask_t::ComputePotF;
+        using ComputePot_f = typename Internal_t::ComputePot_f;
         using BusMsg_t = typename BusType::Msg_t;
 
 
@@ -24,12 +24,11 @@ namespace nearest_ap
         Scheduler(
             SpawnerType&& spawner,
             BusType&& bus,
-            ComputePotF&& compute_pot,
             Internal_t& internal) noexcept:
           m_spawner{std::move(spawner)},
           m_bus {std::move(bus)},
           m_event_queue(),
-          m_pot_election_task {m_event_queue, bus, std::move(compute_pot), internal},
+          m_pot_election_task {m_event_queue, bus, internal},
           m_alive_task {m_event_queue, bus, internal},
           m_bus_reader_task {m_event_queue, bus, internal},
           m_event_loop_task(m_event_queue, m_spawner, m_pot_election_task, m_alive_task, m_bus_reader_task)
