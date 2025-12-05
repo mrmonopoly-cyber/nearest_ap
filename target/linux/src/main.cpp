@@ -1,11 +1,12 @@
+#include <cstdint>
 #include <unistd.h>
 #include <iostream>
 
-#include "nearest_ap/nearest_ap.hpp"
+#include <nearest_ap/nearest_ap.hpp>
 
 using namespace nearest_ap;
 
-class BusLinux_t : public Bus<std::size_t>
+class BusLinux_t : public Bus<std::uint32_t>
 {
   public:
     BusLinux_t()
@@ -60,7 +61,7 @@ class SpawnerLinux_t : public Spawner_t
 
 int main(void)
 {
-  using Node_t = Node<std::size_t, BusLinux_t, SpawnerLinux_t>;
+  using Node_t = Node<BusLinux_t, SpawnerLinux_t>;
 
   Node_t drone{SpawnerLinux_t{},BusLinux_t{}, [](){return 0;}};
 

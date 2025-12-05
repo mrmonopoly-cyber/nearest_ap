@@ -1,18 +1,16 @@
 #pragma once
 
-#include "scheduler/scheduler.hpp"
-#include "internal/internal.hpp"
+#include <nearest_ap/scheduler/scheduler.hpp>
+#include <nearest_ap/internal/internal.hpp>
 
 namespace nearest_ap {
 
-  template<typename AddressType, typename BusType, typename SpawnerType >
+  template<typename BusType, typename SpawnerType >
   class Node
   {
     public:
-      using Scheduler_t = Scheduler<AddressType, BusType, SpawnerType>;
-      using Internal_t = Internal<AddressType>;
-      using VoteInfo_t = VoteInfo<AddressType>;
-
+      using Scheduler_t = Scheduler< BusType, SpawnerType>;
+      using AddressType_t = Internal_t::AddressType_t;
       using ComputePotF = typename Scheduler_t::ComputePotF;
 
       Node() = delete;
@@ -29,11 +27,6 @@ namespace nearest_ap {
       void async_start(void)
       {
         m_scheduler.spawn_tasks();
-      }
-
-      void update_id(AddressType id)
-      {
-        m_internal.m_current_user = id;
       }
 
     private:

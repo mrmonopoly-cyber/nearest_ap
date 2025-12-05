@@ -31,8 +31,9 @@ OBJ_C += $(DEPS_C:%.c=$(BDIR)/%.o)
 OBJ := $(OBJ_C) $(OBJ_CXX)
 
 CC_INCLUDE :=
-CC_INCLUDE += -I$(LDIR)/messages/nanopb_src \
-							-I$(LDIR)
+CC_INCLUDE += -I$(LDIR)/messages/nanopb_src
+CC_INCLUDE +=	-I$(SDIR)
+CC_INCLUDE +=	-I$(LDIR)
 
 
 CXX_INCLUDE :=

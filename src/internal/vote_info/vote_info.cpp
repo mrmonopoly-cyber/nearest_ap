@@ -1,0 +1,41 @@
+#include "vote_info.hpp"
+
+using namespace nearest_ap;
+
+using Round_t = VoteInfo_t::Round_t;
+
+VoteInfo_t::VoteInfo_t():
+  m_num_candidates(1),
+  m_consent(0),
+  m_round(0)
+  {}
+
+
+  void VoteInfo_t::start_new_election() noexcept
+{
+  m_consent =0;
+  m_round++;
+}
+
+void VoteInfo_t::support() noexcept
+{
+  if (m_consent < m_num_candidates)
+  {
+    m_consent++;
+  }
+}
+
+bool VoteInfo_t::won() const noexcept
+{
+  return m_consent > (m_num_candidates/2);
+}
+
+Round_t VoteInfo_t::round() const noexcept
+{
+  return m_round;
+}
+
+void VoteInfo_t::update_round(Round_t round) noexcept
+{
+  m_round = round;
+}

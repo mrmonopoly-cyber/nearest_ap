@@ -2,8 +2,8 @@
 
 #include <cstddef>
 
-#include "../base_task.hpp"
-#include "../event_queue/event_queue.hpp"
+#include <nearest_ap/scheduler/tasks/base_task.hpp>
+#include <nearest_ap/scheduler/tasks/event_queue/event_queue.hpp>
 
 namespace nearest_ap {
 

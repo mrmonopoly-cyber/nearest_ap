@@ -1,19 +1,19 @@
 #pragma once
 
-#include "../../base_task.hpp"
-#include "../../user_tasks/user_tasks.hpp"
-#include "../../spawner/spawner.hpp"
+#include <nearest_ap/scheduler/tasks/base_task.hpp>
+#include <nearest_ap/scheduler/tasks/user_tasks/user_tasks.hpp>
+#include <nearest_ap/scheduler/tasks/spawner/spawner.hpp>
 
 namespace nearest_ap
 {
-  template<typename AddressType, typename BusType, typename SpawnerType >
+  template<typename BusType, typename SpawnerType >
     class EventTask : public BaseTask_t
   {
     public:
-      using PotentialElectionTask_t = PotentialElectionTask<AddressType, BusType>;
-      using LeaderAliveTask_t = LeaderAliveTask<AddressType, BusType>;
-      using BusReaderTask_t = BusReaderTask<AddressType, BusType>;
-      using Internal_t = Internal<AddressType>;
+      using AddressType = Internal_t::AddressType_t;
+      using PotentialElectionTask_t = PotentialElectionTask<BusType>;
+      using LeaderAliveTask_t = LeaderAliveTask<BusType>;
+      using BusReaderTask_t = BusReaderTask<BusType>;
 
       EventTask() = delete;
       EventTask(const EventTask&) =delete;

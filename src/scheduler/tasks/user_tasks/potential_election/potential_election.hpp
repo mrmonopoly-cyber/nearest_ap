@@ -12,18 +12,16 @@
 
 #include <functional>
 
-#include "../../event_queue/event_queue.hpp"
-#include "../user_task.hpp"
-#include "../../../bus/bus.hpp"
-#include "../../../../internal/internal.hpp"
+#include <nearest_ap/internal/internal.hpp>
+#include <nearest_ap/scheduler/bus/bus.hpp>
+#include <nearest_ap/scheduler/tasks/user_tasks/user_task.hpp>
+#include <nearest_ap/scheduler/tasks/event_queue/event_queue.hpp>
 
 namespace nearest_ap {
-  template<typename AddressType, typename BusType >
+  template< typename BusType >
     class PotentialElectionTask : public UserTask_t
   {
     public:
-      using Internal_t = Internal<AddressType>;
-
       using ComputePotF = std::function<int()>;
 
       explicit PotentialElectionTask() = delete;

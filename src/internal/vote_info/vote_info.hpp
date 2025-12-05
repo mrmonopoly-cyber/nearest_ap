@@ -3,38 +3,25 @@
 #include <cstddef>
 
 namespace nearest_ap {
-  template<typename AddressType>
-    class VoteInfo
+    class VoteInfo_t
     {
       public:
-        VoteInfo() :
-          m_num_candidates(1),
-          m_consent(0),
-          m_round(0)
-      {}
+        using Round_t = std::size_t;
 
-        void start_new_election() noexcept
-        {
-          m_consent =0;
-          m_round++;
-        }
+        VoteInfo_t();
 
-        void support() noexcept
-        {
-          if (m_consent < m_num_candidates)
-          {
-            m_consent++;
-          }
-        }
+        void start_new_election() noexcept;
 
-        bool won() const noexcept
-        {
-          return m_consent > (m_num_candidates/2);
-        }
+        void support() noexcept;
+
+        bool won() const noexcept;
+
+        Round_t round() const noexcept;
+        void update_round(Round_t round) noexcept;
 
       private:
         std::size_t m_num_candidates = 1;
         std::size_t m_consent=0;
-        std::size_t m_round=0;
+        Round_t m_round=0;
     };
 };

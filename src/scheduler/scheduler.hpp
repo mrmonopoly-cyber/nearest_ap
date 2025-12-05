@@ -1,19 +1,19 @@
 #pragma once
 
 #include "tasks/tasks.hpp"
-#include "../internal/internal.hpp"
+#include <nearest_ap/internal/internal.hpp>
 
 namespace nearest_ap
 {
-  template<typename AddressType, typename BusType, typename SpawnerType >
+  template<typename BusType, typename SpawnerType >
     class Scheduler
     {
       public:
-        using PotentialElectionTask_t = PotentialElectionTask<AddressType, BusType>;
-        using LeaderAliveTask_t = LeaderAliveTask<AddressType, BusType>;
-        using BusReaderTask_t = BusReaderTask<AddressType, BusType>;
-        using Internal_t = Internal<AddressType>;
-        using EventTask_t = EventTask<AddressType, BusType, SpawnerType>;
+        using AddressType_t = Internal_t::AddressType_t;
+        using PotentialElectionTask_t = PotentialElectionTask<BusType>;
+        using LeaderAliveTask_t = LeaderAliveTask<BusType>;
+        using BusReaderTask_t = BusReaderTask<BusType>;
+        using EventTask_t = EventTask<BusType, SpawnerType>;
 
         using ComputePotF = typename PotentialElectionTask_t::ComputePotF;
         using BusMsg_t = typename BusType::Msg_t;

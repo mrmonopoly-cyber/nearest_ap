@@ -7,56 +7,44 @@
 
 namespace nearest_ap 
 {
-  template<typename AddressType>
-  class Internal
+  class Internal_t
   {
     public:
-      using VoteInfo_t = VoteInfo<AddressType>;
+      using AddressType_t = std::uint32_t;
+      using Round_t = VoteInfo_t::Round_t;
       using Potential_t = std::uint32_t;
 
-      Internal() noexcept:
-        m_users({AddressType{}}),
-        m_current_user(0,0),
-        m_leader(0,0),
-        m_vote_info()
-        {}
+      Internal_t() noexcept;
+      Internal_t(AddressType_t current_user) noexcept;
 
-      Internal(AddressType current_user) noexcept:
-        m_users({AddressType{current_user}}),
-        m_current_user(0,0),
-        m_leader(0,0),
-        m_vote_info()
-        {}
+      void check_and_set_leader(const AddressType_t &new_leader, const Potential_t pot) noexcept;
 
+      AddressType_t user_id() const noexcept;
 
-      const AddressType& user_id() const noexcept
-      {
-        return m_users[m_current_user.m_user_index];
-      }
+      Potential_t user_potential() const noexcept;
 
-      Potential_t user_potential() const noexcept
-      {
-        return m_current_user.m_potential;
-      }
+      Round_t round() const noexcept;
+      void update_round(Round_t round) noexcept;
 
-      bool is_leader() const noexcept
-      {
-        return m_current_user.m_user_index == m_leader.m_user_index;
-      }
+      bool is_leader() const noexcept;
+      bool is_leader(AddressType_t& user) const noexcept;
+
+      void support() noexcept;
 
     private:
-      struct UserData
+      struct UserData_t
       {
-        UserData() noexcept :
+        UserData_t() noexcept :
           m_user_index(0),
           m_potential(0)
           {}
 
-        UserData(std::size_t user_index) noexcept:
-          m_user_index(user_index)
+        UserData_t(std::size_t user_index) noexcept:
+          m_user_index(user_index),
+          m_potential(0)
           {}
 
-        UserData(std::size_t user_index, Potential_t potential) noexcept :
+        UserData_t(std::size_t user_index, Potential_t potential) noexcept :
           m_user_index(user_index),
           m_potential(potential)
           {}
@@ -65,9 +53,9 @@ namespace nearest_ap
         Potential_t m_potential=0;
       };
 
-      std::vector<AddressType> m_users;
-      UserData m_current_user;
-      UserData m_leader;
+      std::vector<AddressType_t> m_users;
+      UserData_t m_current_user;
+      UserData_t m_leader;
 
       VoteInfo_t m_vote_info;
   };

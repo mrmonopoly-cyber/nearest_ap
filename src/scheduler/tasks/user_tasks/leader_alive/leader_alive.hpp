@@ -11,19 +11,20 @@
 
 #include <cstdint>
 
-#include "../user_task.hpp"
-#include "../../event_queue/event_queue.hpp"
-#include "../../../bus/bus.hpp"
-#include "../../../../internal/internal.hpp"
-#include "project_deps.h"
+#include <nearest_ap/internal/internal.hpp>
+#include <nearest_ap/scheduler/bus/bus.hpp>
+#include <nearest_ap/scheduler/tasks/base_task.hpp>
+#include <nearest_ap/scheduler/tasks/user_tasks/user_task.hpp>
+#include <nearest_ap/scheduler/tasks/event_queue/event_queue.hpp>
+
+#include <project_deps.h>
 
 namespace nearest_ap {
-  template< typename AddressType, typename BusType >
+  template< typename BusType >
     class LeaderAliveTask : public UserTask_t
   {
     public:
       using Msg_t = typename BusType::Bus::Msg_t;
-      using Internal_t = Internal<AddressType>;
 
       explicit LeaderAliveTask() noexcept;
 
@@ -43,27 +44,24 @@ namespace nearest_ap {
         pb_ostream_t ostream{};
 
         ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
-        while(1)
+        if (m_internal.is_leader())
         {
-          if (m_internal.is_leader())
+          near_ap_LeaderHeartbit heartbit =
           {
-            near_ap_LeaderHeartbit heartbit =
-            {
-              .has_id = true,
-              .id = static_cast<std::uint32_t>(m_internal.user_id()),
-              .has_potential = true,
-              .potential = m_internal.user_potential(),
-            };
+            .has_id = true,
+            .id = static_cast<std::uint32_t>(m_internal.user_id()),
+            .has_potential = true,
+            .potential = m_internal.user_potential(),
+          };
 
-            if (pb_encode(&ostream, near_ap_LeaderHeartbit_fields, &heartbit))
+          if (pb_encode(&ostream, near_ap_LeaderHeartbit_fields, &heartbit))
+          {
+            BusStatus_t error = m_bus.Write(msg);
+            if (error != BusStatus_t::Ok)
             {
-              BusStatus_t error = m_bus.Write(msg);
-              if (error != BusStatus_t::Ok)
-              {
-                //TODO: manage failures in sending
-              }
-            }//TODO: manage failures in serialization
-          }
+              //TODO: manage failures in sending
+            }
+          }//TODO: manage failures in serialization
         }
       }
     private:
