@@ -1,0 +1,15 @@
+edition = "2023";
+
+package near_ap;
+
+enum MessageType{
+  NewElection = 0;
+  VoteRespone = 1;
+  LeaderHeartbit = 2;
+};
+
+
+message MessageIndex{
+  MessageType msg_type = 1;
+  repeated fixed64 data = 5;
+};

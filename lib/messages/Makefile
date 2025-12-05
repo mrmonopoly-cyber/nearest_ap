@@ -20,7 +20,7 @@ setup_protobuf:
 build_protobuf_messages:
 	$(info $(PWD) files: $(PROTO_FILES))
 	@mkdir -p $(ODIR)
-	$(PROTOC) $(PROTO_FILES) --output-dir=$(ODIR)
+	$(PROTOC) -v $(PROTO_FILES) --output-dir=$(ODIR)
 
 clean_protobuf_messages:
 	rm -rf $(ODIR)
