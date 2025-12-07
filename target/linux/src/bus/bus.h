@@ -7,7 +7,7 @@
 
 namespace nearest_ap
 {
-  class BusLinux_t : public Bus<std::uint32_t>
+  class BusLinux_t : public Bus_t
   {
     public:
       BusLinux_t();

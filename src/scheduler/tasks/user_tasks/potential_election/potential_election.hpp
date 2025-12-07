@@ -3,7 +3,7 @@
 //Copyright (c) 2025 Alberto Damo. All Rights Reserved.
 
 /*
- * PotentialElectionTask: every K time:
+ * PotentialElectionTask_t: every K time:
  *          update local potential = compute_potential();
  *          IF leader potential + tollerance < local potential AND vote.no_new_election() THEN:
  *              local round = vote.start_new_election();
@@ -18,17 +18,16 @@
 #include <project_deps.h>
 
 namespace nearest_ap {
-  template< typename BusType >
-    class PotentialElectionTask : public UserTask_t
+  class PotentialElectionTask_t : public UserTask_t
   {
     public:
-      using Msg_t = typename BusType::Bus::Msg_t;
+      using Msg_t = typename Bus_t::Msg_t;
 
-      explicit PotentialElectionTask() = delete;
+      explicit PotentialElectionTask_t() = delete;
 
-      PotentialElectionTask(
+      PotentialElectionTask_t(
           EventWriter& pipe,
-          BusType& bus,
+          Bus_t& bus,
           Internal_t& internal) noexcept :
         UserTask_t(pipe),
         m_bus(bus),
@@ -45,11 +44,11 @@ namespace nearest_ap {
           pb_ostream_t ostream{};
           near_ap_NewElection new_election{
             .has_round = true,
-            .round = m_internal.round(),
-            .has_id = true,
-            .id = m_internal.user_id(),
-            .has_potential = true,
-            .potential = m_internal.user_potential(),
+              .round = m_internal.round(),
+              .has_id = true,
+              .id = m_internal.user_id(),
+              .has_potential = true,
+              .potential = m_internal.user_potential(),
           };
 
           ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
@@ -68,7 +67,7 @@ namespace nearest_ap {
       }
 
     private:
-      BusType& m_bus;
+      Bus_t& m_bus;
       Internal_t& m_internal;
   };
 };

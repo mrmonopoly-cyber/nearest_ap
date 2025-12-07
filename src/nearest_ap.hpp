@@ -1,26 +1,31 @@
 #pragma once
 
+#include "scheduler/bus/bus.hpp"
 #include <nearest_ap/scheduler/scheduler.hpp>
 #include <nearest_ap/internal/internal.hpp>
+#include <utility>
 
 namespace nearest_ap {
 
-  template<typename BusType, typename SpawnerType >
+  template<typename SpawnerType >
   class Node
   {
     public:
-      using Scheduler_t = Scheduler< BusType, SpawnerType>;
-      using AddressType_t = Internal_t::AddressType_t;
+      using Scheduler_t = Scheduler<SpawnerType>;
+      using VirtualId_t = Internal_t::VirtualId_t;
       using ComputePot_f = typename Scheduler_t::ComputePot_f;
+      using LeaderTask_f = typename Scheduler_t::LeaderTaks_f;
 
       Node() = delete;
 
       explicit Node(
           SpawnerType&& spawner,
-          BusType&& bus,
-          ComputePot_f&& compute_pot_f) noexcept :
+          Bus_t& bus,
+          ComputePot_f&& compute_pot_f,
+          LeaderTask_f&& leader_task_f
+          ) noexcept :
         m_internal(std::move(compute_pot_f)),
-        m_scheduler(std::move(spawner), std::move(bus), m_internal)
+        m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
         {
         }
 

@@ -4,12 +4,13 @@
 
 
 /*
- * LeaderAliveTask: every L time:
+ * LeaderAliveTask_t: every L time:
  *        IF vote.leader() THEN
  *          SEND LeaderAlive(vote.user(), potential_info.potential())
  */
 
 #include <cstdint>
+#include <functional>
 
 #include <nearest_ap/internal/internal.hpp>
 #include <nearest_ap/scheduler/bus/bus.hpp>
@@ -20,23 +21,38 @@
 #include <project_deps.h>
 
 namespace nearest_ap {
-  template< typename BusType >
-    class LeaderAliveTask : public UserTask_t
+  class LeaderAliveTask_t : public UserTask_t
   {
     public:
-      using Msg_t = typename BusType::Bus::Msg_t;
+      using Msg_t = Bus_t::Msg_t;
+      using LeaderTask_f = std::function<void()>;
 
-      explicit LeaderAliveTask() noexcept;
+      explicit LeaderAliveTask_t() noexcept;
 
-      LeaderAliveTask(
+      LeaderAliveTask_t(
           EventWriter& pipe,
-          BusType& bus,
-          const Internal_t& internal) :
+          Bus_t& bus,
+          const Internal_t& internal,
+          const LeaderTask_f leader_task) :
         UserTask_t(pipe),
         m_bus(bus),
-        m_internal(internal)
-        {
-        }
+        m_internal(internal),
+        m_leader_task(leader_task)
+    {
+    }
+
+
+      LeaderAliveTask_t(
+          EventWriter& pipe,
+          Bus_t& bus,
+          const Internal_t& internal,
+          const LeaderTask_f&& leader_task) :
+        UserTask_t(pipe),
+        m_bus(bus),
+        m_internal(internal),
+        m_leader_task(std::move(leader_task))
+    {
+    }
 
       void run(void) noexcept override
       {
@@ -62,10 +78,13 @@ namespace nearest_ap {
               //TODO: manage failures in sending
             }
           }//TODO: manage failures in serialization
+
+          m_leader_task();
         }
       }
     private:
-      BusType& m_bus;
+      Bus_t& m_bus;
       const Internal_t& m_internal;
+      const LeaderTask_f m_leader_task;
   };
 };

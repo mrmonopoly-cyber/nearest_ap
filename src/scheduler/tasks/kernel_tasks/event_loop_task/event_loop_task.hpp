@@ -6,23 +6,17 @@
 
 namespace nearest_ap
 {
-  template<typename BusType, typename SpawnerType >
-    class EventTask : public BaseTask_t
+  class EventTask_t : public BaseTask_t
   {
     public:
-      using AddressType = Internal_t::AddressType_t;
-      using PotentialElectionTask_t = PotentialElectionTask<BusType>;
-      using LeaderAliveTask_t = LeaderAliveTask<BusType>;
-      using BusReaderTask_t = BusReaderTask<BusType>;
+      EventTask_t() = delete;
+      EventTask_t(const EventTask_t&) =delete;
+      EventTask_t& operator=(const EventTask_t&) =delete;
 
-      EventTask() = delete;
-      EventTask(const EventTask&) =delete;
-      EventTask& operator=(const EventTask&) =delete;
+      EventTask_t(EventTask_t&&) =delete;
+      EventTask_t operator=(EventTask_t&&) =delete;
 
-      EventTask(EventTask&&) =delete;
-      EventTask operator=(EventTask&&) =delete;
-
-      EventTask(
+      EventTask_t(
           EventQueue& event_queue,
           Spawner_t& spawner,
           PotentialElectionTask_t& potential_election_task,

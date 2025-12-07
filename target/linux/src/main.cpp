@@ -7,9 +7,11 @@
 int main(void)
 {
   using namespace nearest_ap;
-  using Node_t = Node<BusLinux_t, SpawnerLinux_t>;
+  using Node_t = Node<SpawnerLinux_t>;
 
-  Node_t drone{SpawnerLinux_t{},BusLinux_t{}, [](){return 0;}};
+  BusLinux_t bus{};
+
+  Node_t drone{SpawnerLinux_t{},bus, [](){return 0;}, []{}};
 
   drone.async_start();
 

@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <array>
 
+#include <cstdint>
 #include <pb.h>
 
 namespace nearest_ap {
@@ -14,19 +15,21 @@ namespace nearest_ap {
     UnknowError,
   };
 
-  template<typename AddressType, std::size_t payload_max_size = 8>
-  class Bus
+  class Bus_t
   {
     public:
+      using AddressType_t = std::uint32_t;
+      static constexpr std::size_t m_payload_max_size = 16;
+
       struct Msg_t
       {
-        AddressType m_id;
-        std::array<pb_byte_t, payload_max_size> m_payload; 
+        AddressType_t m_id;
+        std::array<pb_byte_t, m_payload_max_size> m_payload; 
       };
-
-      static constexpr size_t m_payload_max_size = payload_max_size;
 
       virtual Msg_t Read() const noexcept =0;
       virtual BusStatus_t Write(const Msg_t&) noexcept =0;
+
+      virtual ~Bus_t() = default;
   };
 }

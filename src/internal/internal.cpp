@@ -2,32 +2,32 @@
 
 using namespace nearest_ap;
 
-using AddressType_t = Internal_t::AddressType_t;
+using VirtualId_t = Internal_t::VirtualId_t;
 using Potential_t = Internal_t::Potential_t;
 using Round_t = Internal_t::Round_t;
 using ComputePot_f = Internal_t::ComputePot_f;
 
 Internal_t::Internal_t(const ComputePot_f&& compute_pot) noexcept
 :
-  m_users({AddressType_t{}}),
+  m_users({VirtualId_t{}}),
   m_compute_local_potential(std::move(compute_pot)),
   m_current_user(0,0),
   m_leader(0,0),
   m_vote_info()
 {}
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot, const AddressType_t current_user) noexcept
+Internal_t::Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t current_user) noexcept
 :
-  m_users({AddressType_t{std::move(current_user)}}),
+  m_users({VirtualId_t{std::move(current_user)}}),
   m_compute_local_potential(std::move(compute_pot)),
   m_current_user(0,0),
   m_leader(0,0),
   m_vote_info()
 {}
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot, const AddressType_t&& current_user) noexcept
+Internal_t::Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t&& current_user) noexcept
 :
-  m_users({AddressType_t{std::move(current_user)}}),
+  m_users({VirtualId_t{std::move(current_user)}}),
   m_compute_local_potential(std::move(compute_pot)),
   m_current_user(0,0),
   m_leader(0,0),
@@ -35,7 +35,7 @@ Internal_t::Internal_t(const ComputePot_f&& compute_pot, const AddressType_t&& c
 {}
 
 
-void Internal_t::check_and_set_leader(const AddressType_t &new_leader, const Potential_t pot) noexcept
+void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
 {
   if (pot > m_leader.m_potential)
   {
@@ -50,7 +50,7 @@ void Internal_t::check_and_set_leader(const AddressType_t &new_leader, const Pot
   }
 }
 
-AddressType_t Internal_t::user_id() const noexcept
+VirtualId_t Internal_t::user_id() const noexcept
 {
   return m_users[m_current_user.m_user_index];
 }
@@ -75,7 +75,7 @@ bool Internal_t::is_leader() const noexcept
   return m_current_user.m_user_index == m_leader.m_user_index;
 }
 
-bool Internal_t::is_leader(AddressType_t& user) const noexcept
+bool Internal_t::is_leader(VirtualId_t& user) const noexcept
 {
   return m_users[m_leader.m_user_index] == user;
 }

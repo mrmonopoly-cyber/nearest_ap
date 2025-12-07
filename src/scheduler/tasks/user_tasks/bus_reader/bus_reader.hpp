@@ -3,7 +3,7 @@
 //Copyright (c) 2025 Alberto Damo. All Rights Reserved.
 
 /*
- * BusReaderTask: receive messages from the bus and update internal data
+ * BusReaderTask_t: receive messages from the bus and update internal data
  *
  * Possible messages:
  *
@@ -27,17 +27,16 @@
 #include <nearest_ap/scheduler/tasks/user_tasks/user_task.hpp>
 
 namespace nearest_ap {
-  template< typename BusType >
-    class BusReaderTask : public UserTask_t
+  class BusReaderTask_t : public UserTask_t
   {
     public:
-      using Msg_t = typename BusType::Msg_t;
+      using Msg_t = typename Bus_t::Msg_t;
 
-      explicit BusReaderTask() = delete;
+      explicit BusReaderTask_t() = delete;
 
-      BusReaderTask(
+      BusReaderTask_t(
           EventWriter& m_pipe,
-          BusType& bus,
+          Bus_t& bus,
           Internal_t& internal) noexcept:
         UserTask_t(m_pipe),
         m_bus(bus),
@@ -110,7 +109,7 @@ namespace nearest_ap {
       }
 
     private:
-      BusType& m_bus;
+      Bus_t& m_bus;
       Internal_t& m_internal;
   };
 };
