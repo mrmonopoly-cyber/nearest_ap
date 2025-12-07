@@ -16,9 +16,11 @@ namespace nearest_ap
 
 
         Scheduler() = delete;
+        Scheduler(const Scheduler&) =delete;
+        Scheduler& operator=(const Scheduler&) =delete;
 
         Scheduler(
-            SpawnerType&& spawner,
+            SpawnerType spawner,
             Bus_t& bus,
             LeaderTaks_f && leader_task_f,
             Internal_t& internal) noexcept:

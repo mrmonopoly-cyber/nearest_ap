@@ -12,9 +12,10 @@ namespace nearest_ap {
   {
     public:
       using Scheduler_t = Scheduler<SpawnerType>;
-      using VirtualId_t = Internal_t::VirtualId_t;
       using ComputePot_f = typename Scheduler_t::ComputePot_f;
       using LeaderTask_f = typename Scheduler_t::LeaderTaks_f;
+
+      using VirtualId_t = Internal_t::VirtualId_t;
 
       Node() = delete;
 

@@ -9,7 +9,6 @@
  *          SEND LeaderAlive(vote.user(), potential_info.potential())
  */
 
-#include <cstdint>
 #include <functional>
 
 #include <nearest_ap/internal/internal.hpp>
@@ -24,64 +23,25 @@ namespace nearest_ap {
   class LeaderAliveTask_t : public UserTask_t
   {
     public:
-      using Msg_t = Bus_t::Msg_t;
       using LeaderTask_f = std::function<void()>;
 
-      explicit LeaderAliveTask_t() noexcept;
+      LeaderAliveTask_t() = delete;
 
       LeaderAliveTask_t(
           EventWriter& pipe,
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f leader_task) :
-        UserTask_t(pipe),
-        m_bus(bus),
-        m_internal(internal),
-        m_leader_task(leader_task)
-    {
-    }
+          const LeaderTask_f leader_task) noexcept;
 
 
       LeaderAliveTask_t(
           EventWriter& pipe,
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f&& leader_task) :
-        UserTask_t(pipe),
-        m_bus(bus),
-        m_internal(internal),
-        m_leader_task(std::move(leader_task))
-    {
-    }
+          const LeaderTask_f&& leader_task) noexcept;
 
-      void run(void) noexcept override
-      {
-        Msg_t msg{};
-        pb_ostream_t ostream{};
+      void run(void) noexcept override;
 
-        ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
-        if (m_internal.is_leader())
-        {
-          near_ap_LeaderHeartbit heartbit =
-          {
-            .has_id = true,
-            .id = static_cast<std::uint32_t>(m_internal.user_id()),
-            .has_potential = true,
-            .potential = m_internal.user_potential(),
-          };
-
-          if (pb_encode(&ostream, near_ap_LeaderHeartbit_fields, &heartbit))
-          {
-            BusStatus_t error = m_bus.Write(msg);
-            if (error != BusStatus_t::Ok)
-            {
-              //TODO: manage failures in sending
-            }
-          }//TODO: manage failures in serialization
-
-          m_leader_task();
-        }
-      }
     private:
       Bus_t& m_bus;
       const Internal_t& m_internal;

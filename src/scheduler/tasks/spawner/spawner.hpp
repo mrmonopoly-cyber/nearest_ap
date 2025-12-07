@@ -11,5 +11,7 @@ namespace nearest_ap
       virtual void start_task(BaseTask_t*) =0;
       virtual void suspend_task(BaseTask_t*) =0;
       virtual void resume_task(BaseTask_t*) =0;
+
+      virtual ~Spawner_t() = default;
   };
 };
