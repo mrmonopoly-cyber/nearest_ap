@@ -7,32 +7,40 @@ using Potential_t = Internal_t::Potential_t;
 using Round_t = Internal_t::Round_t;
 using ComputePot_f = Internal_t::ComputePot_f;
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot) noexcept
-:
-  m_users({VirtualId_t{}}),
+Internal_t::Internal_t(const ComputePot_f&& compute_pot) noexcept:
+m_users({VirtualId_t()}),
   m_compute_local_potential(std::move(compute_pot)),
+  m_tollerance(0),
   m_current_user(0,0),
   m_leader(0,0),
   m_vote_info()
-{}
+{
+}
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t current_user) noexcept
-:
-  m_users({VirtualId_t{std::move(current_user)}}),
+Internal_t::Internal_t(
+          const ComputePot_f&& compute_pot,
+          const Tollerance_t tollerance) noexcept:
+m_users({VirtualId_t()}),
   m_compute_local_potential(std::move(compute_pot)),
+  m_tollerance(tollerance),
   m_current_user(0,0),
   m_leader(0,0),
   m_vote_info()
-{}
+{
+}
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t&& current_user) noexcept
-:
-  m_users({VirtualId_t{std::move(current_user)}}),
+Internal_t::Internal_t(
+          const ComputePot_f&& compute_pot,
+          const Tollerance_t tollerance,
+          const VirtualId_t&& current_user) noexcept:
+m_users({current_user}),
   m_compute_local_potential(std::move(compute_pot)),
+  m_tollerance(tollerance),
   m_current_user(0,0),
   m_leader(0,0),
   m_vote_info()
-{}
+{
+}
 
 
 void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
@@ -65,9 +73,9 @@ Potential_t Internal_t::user_potential() const noexcept
   return m_current_user.m_potential;
 }
 
-Potential_t Internal_t::leader_potential() const noexcept
+bool Internal_t::user_pot_better_leader_pot() const noexcept
 {
-  return m_leader.m_potential;
+  return m_current_user.m_potential > m_leader.m_potential + m_tollerance;
 }
 
 bool Internal_t::is_leader() const noexcept

@@ -17,19 +17,24 @@ namespace nearest_ap
       using Round_t = VoteInfo_t::Round_t;
       using Potential_t = std::uint32_t;
       using ComputePot_f = std::function<int()>;
+      using Tollerance_t = std::uint32_t;
 
       Internal_t() = delete;
       Internal_t(const ComputePot_f&& compute_pot) noexcept;
-      Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t current_user) noexcept;
-      Internal_t(const ComputePot_f&& compute_pot, const VirtualId_t&& current_user) noexcept;
+      Internal_t(const ComputePot_f&& compute_pot, const Tollerance_t tollerance) noexcept;
+      Internal_t(
+          const ComputePot_f&& compute_pot,
+          const Tollerance_t tollerance,
+          const VirtualId_t&& current_user) noexcept;
+
 
       void check_and_set_leader(const VirtualId_t& new_leader, const Potential_t pot) noexcept;
 
       VirtualId_t user_id() const noexcept;
 
       void compute_user_potential() noexcept;
+      bool user_pot_better_leader_pot() const noexcept;
       Potential_t user_potential() const noexcept;
-      Potential_t leader_potential() const noexcept;
 
       Round_t round() const noexcept;
       void update_round(Round_t round) noexcept;
@@ -43,27 +48,30 @@ namespace nearest_ap
     private:
       struct UserData_t
       {
+        using UserIndex = std::uint32_t;
+
         UserData_t() noexcept :
           m_user_index(0),
           m_potential(0)
           {}
 
-        UserData_t(std::size_t user_index) noexcept:
+        UserData_t(UserIndex user_index) noexcept:
           m_user_index(user_index),
           m_potential(0)
           {}
 
-        UserData_t(std::size_t user_index, Potential_t potential) noexcept :
+        UserData_t(UserIndex user_index, Potential_t potential) noexcept :
           m_user_index(user_index),
           m_potential(potential)
           {}
 
-        std::size_t m_user_index=0;
+        UserIndex m_user_index=0;
         Potential_t m_potential=0;
       };
 
       std::vector<VirtualId_t> m_users;
       const ComputePot_f m_compute_local_potential;
+      const Tollerance_t m_tollerance;
       UserData_t m_current_user;
       UserData_t m_leader;
 

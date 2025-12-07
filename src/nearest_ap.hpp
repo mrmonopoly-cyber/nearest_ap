@@ -1,9 +1,8 @@
 #pragma once
 
-#include "scheduler/bus/bus.hpp"
+#include <nearest_ap/scheduler/bus/bus.hpp>
 #include <nearest_ap/scheduler/scheduler.hpp>
 #include <nearest_ap/internal/internal.hpp>
-#include <utility>
 
 namespace nearest_ap {
 
@@ -16,16 +15,29 @@ namespace nearest_ap {
       using LeaderTask_f = typename Scheduler_t::LeaderTaks_f;
 
       using VirtualId_t = Internal_t::VirtualId_t;
+      using Tollercance_t = Internal_t::Tollerance_t;
 
       Node() = delete;
 
       explicit Node(
-          SpawnerType&& spawner,
           Bus_t& bus,
+          SpawnerType&& spawner,
           ComputePot_f&& compute_pot_f,
-          LeaderTask_f&& leader_task_f
-          ) noexcept :
+          LeaderTask_f&& leader_task_f) noexcept :
         m_internal(std::move(compute_pot_f)),
+        m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
+        {
+        }
+
+      explicit Node(
+          Bus_t& bus,
+          SpawnerType&& spawner,
+          ComputePot_f&& compute_pot_f,
+          LeaderTask_f&& leader_task_f,
+          Tollercance_t tollerance
+
+          ) noexcept :
+        m_internal(std::move(compute_pot_f), tollerance),
         m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
         {
         }

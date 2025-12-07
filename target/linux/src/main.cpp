@@ -11,7 +11,7 @@ int main(void)
 
   BusLinux_t bus{};
 
-  Node_t drone{SpawnerLinux_t{},bus, [](){return 0;}, []{}};
+  Node_t drone{bus, SpawnerLinux_t{}, [](){return 0;}, []{}};
 
   drone.async_start();
 
