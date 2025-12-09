@@ -28,6 +28,9 @@
 
 #include <nearest_ap/nearest_ap.hpp>
 
+#include "task_spawner/task_spawner.hpp"
+#include "radio_bus/radio_bus.hpp"
+
 
 extern "C"
 {
@@ -45,5 +48,11 @@ extern "C"
 
 void appMain()
 {
+  using namespace nearest_ap;
+
+  RadioBus bus{};
+
+  Node node = Node(bus, TaskCraziflieSpawner{},[]{return 0;},[]{});
+
   DEBUG_PRINT("Starting Drone\n");
 }

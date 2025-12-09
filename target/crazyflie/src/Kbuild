@@ -1,2 +1,4 @@
 obj-y += ac_find.o
 obj-y += $(patsubst %.cpp,%.o,$(notdir $(wildcard *.cpp)))
+obj-y += task_spawner/
+obj-y += radio_bus/
