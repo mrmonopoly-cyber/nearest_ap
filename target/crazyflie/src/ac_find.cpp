@@ -23,9 +23,10 @@
  */
 
 
-#include <vector>
 #include <stdint.h>
 #include <stdbool.h>
+
+#include <nearest_ap/nearest_ap.hpp>
 
 
 extern "C"

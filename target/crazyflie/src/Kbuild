@@ -1,1 +1,2 @@
 obj-y += ac_find.o
+obj-y += $(patsubst %.cpp,%.o,$(notdir $(wildcard *.cpp)))
