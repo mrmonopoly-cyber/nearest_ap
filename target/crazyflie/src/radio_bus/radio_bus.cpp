@@ -1,14 +1,15 @@
 #include <cstdint>
 
-#include "radio_bus.hpp"
-#include "portmacro.h"
 
 extern "C"
 {
 #include "radiolink.h"
 #include "FreeRTOS.h"
 #include "task.h"
+#include "portmacro.h"
 }
+
+#include "radio_bus.hpp"
 
 using Msg_t = RadioBus::Msg_t;
 using namespace nearest_ap;
@@ -18,7 +19,7 @@ static std::queue<Msg_t> g_recv_messages;
 
 static void p2pcallbackHandler(P2PPacket* packet)
 {
-  g_recv_messages.emplace(packet->size, packet->rssi, packet->port, packet->data);
+  // g_recv_messages.emplace(packet->size, packet->rssi, packet->port, packet->data);
 }
 
 RadioBus::RadioBus()
@@ -44,12 +45,10 @@ Msg_t RadioBus::Read() noexcept
 
 BusStatus_t Write(const Msg_t& msg) noexcept
 {
-  P2PPacket packet = 
-  {
-    .size = static_cast<uint8_t>(msg.m_payload.size()),
-    .rssi =0,
-    .port = 0x00,
-  };
+  P2PPacket packet;
+  packet.size = static_cast<uint8_t>(msg.m_payload.size());
+  packet.rssi =0;
+  packet.port = 0x00;
 
   const pb_byte_t* ptr_data = msg.m_payload.data();
 

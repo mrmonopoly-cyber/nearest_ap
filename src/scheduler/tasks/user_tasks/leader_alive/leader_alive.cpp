@@ -3,6 +3,7 @@
 #include "leader_alive.hpp"
 
 using namespace nearest_ap;
+using TaskId = BaseTask_t::TaskId;
 using Msg_t = Bus_t::Msg_t;
 
 LeaderAliveTask_t::LeaderAliveTask_t(
@@ -10,7 +11,7 @@ LeaderAliveTask_t::LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
           const LeaderTask_f leader_task) noexcept:
-        UserTask_t(pipe),
+        UserTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), pipe),
         m_bus(bus),
         m_internal(internal),
         m_leader_task(leader_task) 
@@ -22,7 +23,7 @@ LeaderAliveTask_t::LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
           const LeaderTask_f&& leader_task) noexcept:
-        UserTask_t(pipe),
+        UserTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), pipe),
         m_bus(bus),
         m_internal(internal),
         m_leader_task(std::move(leader_task))

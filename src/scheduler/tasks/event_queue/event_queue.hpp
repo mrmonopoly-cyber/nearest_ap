@@ -1,14 +1,12 @@
 #pragma once
 
+#include <cstdint>
 #include <queue>
+
+#include <nearest_ap/scheduler/tasks/task_list.hpp>
+
 namespace nearest_ap
 {
-  enum class InteractibleTask
-  {
-    BUS_READER,
-    LEADER_ALIVE,
-    POTENTIAL_ELECTION,
-  };
 
   enum class TaskSignal
   {

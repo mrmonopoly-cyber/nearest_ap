@@ -14,7 +14,10 @@ namespace nearest_ap {
     public:
       UserTask_t() = delete;
 
-      UserTask_t(EventWriter& queue) noexcept;
+      UserTask_t(const TaskId id, EventWriter& queue) noexcept :
+        BaseTask_t(id), m_queue(queue)
+        {
+        }
     private:
       EventWriter& m_queue;
   };
