@@ -29,13 +29,14 @@
  */
 
 #include <nearest_ap/scheduler/bus/bus.hpp>
+#include <optional>
 
 class RadioBus : public nearest_ap::Bus_t
 {
   public:
     RadioBus();
 
-    Msg_t Read() noexcept;
+    std::optional<Msg_t> Read() noexcept;
     nearest_ap::BusStatus_t Write(const Msg_t&) noexcept;
 
   private:

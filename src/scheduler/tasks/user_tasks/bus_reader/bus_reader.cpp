@@ -2,6 +2,7 @@
 
 
 #include "bus_reader.hpp"
+#include <optional>
 
 using namespace nearest_ap;
 
@@ -19,11 +20,16 @@ UserTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER), m_pipe),
 
 void BusReaderTask_t::run(void) noexcept 
 {
-  Msg_t msg_raw{m_bus.Read()};
+  std::optional<Msg_t> msg_raw{m_bus.Read()};
   _near_ap_MessageIndex msg_index{};
   pb_istream_t stream;
 
-  stream = pb_istream_from_buffer(msg_raw.m_payload.data(), msg_raw.m_payload.size());
+  if (!msg_raw.has_value())
+  {
+    return;
+  }
+
+  stream = pb_istream_from_buffer(msg_raw->m_payload.data(), msg_raw->m_payload.size());
   pb_decode(&stream, near_ap_MessageIndex_fields, &msg_index);
   stream = pb_istream_from_buffer(
       reinterpret_cast<const pb_byte_t *>(msg_index.data),

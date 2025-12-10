@@ -29,15 +29,14 @@ RadioBus::RadioBus()
   p2pRegisterCB(p2pcallbackHandler);
 }
 
-Msg_t RadioBus::Read() noexcept
+std::optional<Msg_t> RadioBus::Read() noexcept
 {
   //INFO: const TickType_t xDelay = 500 / portTICK_PERIOD_MS;  //from task.h
-  const constexpr TickType_t read_delay_ms = 1 / portTICK_PERIOD_MS;
 
-  while (g_recv_messages.empty())
+  if(g_recv_messages.empty())
   {
-	  vTaskDelay(read_delay_ms);
-  };
+    return {};
+  }
 
   Msg_t m{};
   P2PPacket& packet = g_recv_messages.front();

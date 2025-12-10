@@ -1,10 +1,11 @@
 #include <iostream>
+#include <optional>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <cerrno>
 #include <unistd.h>
 
-#include "bus.h"
+#include "bus.hpp"
 
 #define SOCKET_PATH "/tmp/nearest_ap_linux.socket"
 
@@ -17,6 +18,8 @@ static void _socket_setup(int& m_socket, const int max_connections)
     .sun_family = AF_UNIX,
     .sun_path = SOCKET_PATH,
   };
+
+  unlink(SOCKET_PATH); //INFO: remove old socket if still present
 
   std::cout << "bus creation for local comunication" << std::endl;
 
@@ -38,22 +41,38 @@ static void _socket_setup(int& m_socket, const int max_connections)
   }
 }
 
-BusLinux_t::BusLinux_t()
+BusLinux_t::BusLinux_t() noexcept :
+m_socket(0), m_client_connected(0), m_clients()
 {
-  int max_connections = 5;
+  const constexpr int max_connections = 5;
   _socket_setup(m_socket, max_connections);
 }
 
-BusLinux_t::BusLinux_t(const int max_connections)
+BusLinux_t::BusLinux_t(const int max_connections) noexcept :
+m_socket(0), m_client_connected(0), m_clients()
 {
   _socket_setup(m_socket, max_connections);
 }
 
-Msg_t BusLinux_t::Read() noexcept
+void BusLinux_t::Accept_connections() noexcept
 {
-  Msg_t msg{};
-  read(m_socket, msg.m_payload.data(), msg.m_payload.size());
-  return msg;
+  int new_client =0;
+
+  while (true)
+  {
+    new_client = accept(m_socket, NULL, NULL);
+    m_clients[m_client_connected++] = new_client;
+    //TODO: start read thread for this client
+  }
+}
+
+std::optional<Msg_t> BusLinux_t::Read() noexcept
+{
+  while(!m_msg_queue.empty())
+  {
+  
+  }
+  return {};
 }
 
 BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept

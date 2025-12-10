@@ -4,6 +4,7 @@
 #include <array>
 
 #include <cstdint>
+#include <optional>
 #include <pb.h>
 
 namespace nearest_ap {
@@ -26,7 +27,7 @@ namespace nearest_ap {
         std::array<pb_byte_t, m_payload_max_size> m_payload; 
       };
 
-      virtual Msg_t Read() noexcept =0;
+      virtual std::optional<Msg_t> Read() noexcept =0;
       virtual BusStatus_t Write(const Msg_t&) noexcept =0;
 
       virtual ~Bus_t() = default;
