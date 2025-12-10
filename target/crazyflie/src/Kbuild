@@ -1,4 +1,7 @@
-obj-y += ac_find.o
-obj-y += $(patsubst %.cpp,%.o,$(notdir $(wildcard *.cpp)))
+CPP_SRCS := $(shell find  $(src)/nearest_ap -follow -name '*.cpp')
+
 obj-y += task_spawner/
 obj-y += radio_bus/
+obj-y += ac_find.o
+
+obj-y += $(patsubst $(src)/%.cpp,%.o,$(CPP_SRCS))

@@ -7,7 +7,7 @@ using Msg_t = Bus_t::Msg_t;
 
 PotentialElectionTask_t::PotentialElectionTask_t(EventWriter& pipe, Bus_t& bus,
     Internal_t& internal) noexcept :
-UserTask_t(pipe),
+UserTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION), pipe),
   m_bus(bus),
   m_internal(internal)
 {

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <nearest_ap/scheduler/bus/bus.hpp>
-#include <queue>
 
 class RadioBus : public nearest_ap::Bus_t
 {

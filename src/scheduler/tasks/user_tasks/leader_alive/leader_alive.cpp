@@ -3,7 +3,6 @@
 #include "leader_alive.hpp"
 
 using namespace nearest_ap;
-using TaskId = BaseTask_t::TaskId;
 using Msg_t = Bus_t::Msg_t;
 
 LeaderAliveTask_t::LeaderAliveTask_t(

@@ -11,7 +11,7 @@ EventTask_t::EventTask_t(
     PotentialElectionTask_t& potential_election_task,
     LeaderAliveTask_t& leader_alive_task,
     BusReaderTask_t& bus_reader_task) noexcept:
-  BaseTask_t(),
+  BaseTask_t(static_cast<TaskId>(NonInteractibleTask::EVENT_LOOP_TASK)),
   m_event_queue(event_queue),
   m_spawner(spawner),
   m_pot_election_task(potential_election_task),

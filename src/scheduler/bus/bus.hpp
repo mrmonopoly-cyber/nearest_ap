@@ -23,7 +23,6 @@ namespace nearest_ap {
 
       struct Msg_t
       {
-        AddressType_t m_id;
         std::array<pb_byte_t, m_payload_max_size> m_payload; 
       };
 

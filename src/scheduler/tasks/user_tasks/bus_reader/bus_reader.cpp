@@ -11,7 +11,7 @@ BusReaderTask_t::BusReaderTask_t(
     EventWriter& m_pipe,
     Bus_t& bus,
     Internal_t& internal) noexcept:
-UserTask_t(m_pipe),
+UserTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER), m_pipe),
   m_bus(bus),
   m_internal(internal)
 {

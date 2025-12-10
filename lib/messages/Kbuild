@@ -1,2 +1,6 @@
 obj-y += out/leader_alive.pb.o
 obj-y += out/new_election.pb.o
+obj-y += out/message_index.pb.o
+obj-y += nanopb_src/pb_common.o
+obj-y += nanopb_src/pb_decode.o
+obj-y += nanopb_src/pb_encode.o

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <queue>
 
 #include <nearest_ap/scheduler/tasks/task_list.hpp>
