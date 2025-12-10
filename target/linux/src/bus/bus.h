@@ -20,7 +20,7 @@ namespace nearest_ap
       BusLinux_t(BusLinux_t&&) = default;
       BusLinux_t& operator=(BusLinux_t&&) = default;
 
-      Msg_t Read() const noexcept override;
+      Msg_t Read() noexcept override;
 
       BusStatus_t Write(const Msg_t&) noexcept override;
 

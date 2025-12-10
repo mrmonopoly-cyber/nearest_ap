@@ -20,12 +20,14 @@ class SpawnerLinux_t : public Spawner_t
       SpawnerLinux_t(SpawnerLinux_t&& ) = default;
       SpawnerLinux_t& operator=(SpawnerLinux_t&& ) = default;
 
-      void attach_timer_to_task(const BaseTask_t&, Millis_t) override
-      {
-      }
       void start_task(BaseTask_t*) override
       {
       }
+
+      void start_task(BaseTask_t*, Millis_t) override
+      {
+      }
+
       void suspend_task(BaseTask_t*) override
       {
       }

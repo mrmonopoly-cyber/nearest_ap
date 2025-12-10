@@ -49,7 +49,7 @@ BusLinux_t::BusLinux_t(const int max_connections)
   _socket_setup(m_socket, max_connections);
 }
 
-Msg_t BusLinux_t::Read() const noexcept
+Msg_t BusLinux_t::Read() noexcept
 {
   Msg_t msg{};
   read(m_socket, msg.m_payload.data(), msg.m_payload.size());
