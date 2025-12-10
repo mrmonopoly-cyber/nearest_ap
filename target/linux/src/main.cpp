@@ -11,6 +11,8 @@ int main(void)
 
   BusLinux_t bus{};
 
+  bus.Accept_connections();
+
   Node_t drone{bus, SpawnerLinux_t{}, [](){return 0;}, []{}};
 
   drone.async_start();

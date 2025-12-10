@@ -1,6 +1,8 @@
 #pragma once
 
+#include <atomic>
 #include <array>
+#include <mutex>
 #include <queue>
 #include <sys/socket.h>
 
@@ -20,8 +22,8 @@ namespace nearest_ap
       BusLinux_t(const BusLinux_t&) = delete;
       BusLinux_t& operator=(const BusLinux_t&) = delete;
 
-      BusLinux_t(BusLinux_t&&) = default;
-      BusLinux_t& operator=(BusLinux_t&&) = default;
+      BusLinux_t(BusLinux_t&&) = delete;
+      BusLinux_t& operator=(BusLinux_t&&) = delete;
 
       void Accept_connections() noexcept;
 
@@ -30,11 +32,15 @@ namespace nearest_ap
       BusStatus_t Write(const Msg_t&) noexcept override;
 
     private:
+      static void _Accept(BusLinux_t* const self) noexcept;
+
+    private:
       static constexpr std::size_t m_max_clients = 20;
       socket_t m_socket;
-      std::size_t m_client_connected;
       std::array<socket_t, m_max_clients> m_clients;
       std::queue<Msg_t> m_msg_queue;
+      std::mutex m_msg_queue_lock;
+      std::atomic_uint8_t m_client_connected;
   };
 };
 
