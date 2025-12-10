@@ -70,8 +70,11 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
 {
   while(!m_msg_queue.empty())
   {
-  
+    Msg_t& m = m_msg_queue.front();
+    m_msg_queue.pop();
+    return m;
   }
+
   return {};
 }
 

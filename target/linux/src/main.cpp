@@ -1,6 +1,6 @@
 #include <nearest_ap/nearest_ap.hpp>
 
-#include "bus/bus.h"
+#include "bus/bus.hpp"
 #include "spawner/spawner.h"
 
 
