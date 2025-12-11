@@ -25,7 +25,7 @@ int main(void)
 
   for (uint i=0; i<drones.size(); i++)
   {
-    drones[i].emplace(clients[0], SpawnerLinux_t{}, [](){return 0;}, []{});
+    drones[i].emplace(clients[i], SpawnerLinux_t{}, [](){return 0;}, []{});
   }
 
   for (uint i=0 ; i<BusLinux_t::m_max_clients;i++)
