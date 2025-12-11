@@ -75,7 +75,7 @@ void BusLinux_t::_socket_setup(void) noexcept
   {
     std::cout 
       << "set socket listen to : " << m_max_clients 
-      << " with err: " << strerror(errno)<< std::endl;
+      << " with written: " << strerror(errno)<< std::endl;
     return;
   }
 }
@@ -83,7 +83,7 @@ void BusLinux_t::_socket_setup(void) noexcept
 void BusLinux_t::enstablis_connection(void) noexcept
 {
   const auto id = m_id;
-  int err=0;
+  int written=0;
 
   for (Id i=0; i<m_max_clients; i++)
   {
@@ -115,7 +115,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
       continue;
     }
 
-    if((err=connect(sock, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
+    if((written=connect(sock, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
     {
       std::cout 
         << "error connecting from client: " << id 
@@ -157,13 +157,27 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
 
 BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
 {
-  size_t byte_wrote = write(m_socket, msg.m_payload.data(), msg.m_payload.size());
-  if(byte_wrote != msg.m_payload.size())
+  size_t written =0;
+  bool err=false;
+  const constexpr uint max_tries = 33;
+
+  for (socket_t& client : m_clients)
   {
-    return BusStatus_t::UnknowError;
+    uint tries = 0;
+
+    do
+    {
+      tries++;
+      written = write(client, msg.m_payload.data(), msg.m_payload.size());
+    }while(written!=msg.m_payload.size() && tries < max_tries);
+
+    if (tries >= max_tries)
+    {
+      err=true;
+    }
   }
 
-  return  BusStatus_t::Ok;
+  return err ? BusStatus_t::UnknowError : BusStatus_t::Ok;
 }
 
 void BusLinux_t::_Accept(BusLinux_t* const self) noexcept

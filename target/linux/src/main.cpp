@@ -4,6 +4,7 @@
 #include <optional>
 #include <sys/types.h>
 #include <thread>
+#include <iostream>
 
 #include "bus/bus.hpp"
 #include "spawner/spawner.h"
@@ -19,18 +20,24 @@ int main(void)
 {
   using namespace nearest_ap;
   using Node_t = Node<SpawnerLinux_t>;
+  // const constexpr uint num_clients = BusLinux_t::m_max_clients;
+  const constexpr uint num_clients = 2;
 
-  std::array<BusLinux_t, BusLinux_t::m_max_clients> clients{};
-  std::array<std::optional<Node_t>, BusLinux_t::m_max_clients> drones{};
+  std::array<BusLinux_t, num_clients> clients{};
+  std::array<std::optional<Node_t>, num_clients> drones{};
+
+  auto leader_f = [](){
+    return 0;
+  };
 
   for (uint i=0; i<drones.size(); i++)
   {
-    drones[i].emplace(clients[i], SpawnerLinux_t{}, [](){return 0;}, []{});
+    drones[i].emplace(clients[i], SpawnerLinux_t{}, leader_f, []{}, 10);
   }
 
-  for (uint i=0 ; i<BusLinux_t::m_max_clients;i++)
+  for (auto& client : clients)
   {
-    clients[i].enstablis_connection();
+    client.enstablis_connection();
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
