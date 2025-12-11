@@ -1,15 +1,18 @@
 #include <chrono>
+#include <cstring>
 #include <iostream>
 #include <mutex>
 #include <optional>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <sys/un.h>
 #include <thread>
 #include <unistd.h>
 
 #include "bus.hpp"
 
-#define SOCKET_PATH "/tmp/nearest_ap_linux.socket"
+#define SOCKET_PATH "/tmp/nearest_ap_linux_XX"
+#define SOCKET_SUFFIX ".socket"
 
 using namespace nearest_ap;
 using Msg_t = BusLinux_t::Msg_t;
@@ -39,51 +42,104 @@ static void _client_connection(ClientConnectionData client_socket_data)
   }
 }
 
-static void _socket_setup(int& m_socket, const int max_connections)
+void BusLinux_t::_socket_setup(void) noexcept
 {
   struct sockaddr_un sock_addr{
     .sun_family = AF_UNIX,
-    .sun_path = SOCKET_PATH,
+    .sun_path = SOCKET_PATH SOCKET_SUFFIX,
   };
 
-  unlink(SOCKET_PATH); //INFO: remove old socket if still present
+  const char decimal = '0' + (m_id/10);
+  const char unit = '0' + (m_id%10);
 
-  std::cout << "bus creation for local comunication" << std::endl;
+  sock_addr.sun_path[sizeof(SOCKET_PATH)-3] = decimal;
+  sock_addr.sun_path[sizeof(SOCKET_PATH)-2] = unit;
 
-  std::cout << "socket creation" << std::endl;
+  unlink(sock_addr.sun_path); //INFO: remove old socket if still present
+
+  std::cout << "socket creation: " << sock_addr.sun_path << std::endl;
   m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
   if (m_socket<0)
   {
-    std::cout << "socket creation failed: " << errno << std::endl;
+    std::cout << "socket creation failed: " << strerror(errno) << std::endl;
+    return;
   }
 
   if(bind(m_socket, reinterpret_cast<const struct sockaddr *>(&sock_addr), sizeof(sock_addr))<0)
   {
-    std::cout << "socket bind failed: " << errno << std::endl;
+    std::cout << "socket bind failed: " << strerror(errno) << std::endl;
+    return;
   }
 
-  if(listen(m_socket, max_connections)<0)
+  if(listen(m_socket, m_max_clients)<0)
   {
-    std::cout << "set socket listen to : " << max_connections << "with err: " << errno<< std::endl;
+    std::cout 
+      << "set socket listen to : " << m_max_clients 
+      << " with err: " << strerror(errno)<< std::endl;
+    return;
   }
 }
 
+void BusLinux_t::enstablis_connection(void) noexcept
+{
+  const auto id = m_id;
+  int err=0;
+
+  for (Id i=0; i<m_max_clients; i++)
+  {
+    int sock=0;
+
+    if( (sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1  )
+    {
+      std::cout << "Client: Error on socket() call" << std::endl;
+      continue;
+    }
+    struct sockaddr_un remote
+    {
+      .sun_family = AF_UNIX,
+       .sun_path= SOCKET_PATH SOCKET_SUFFIX
+    };
+
+    const char decimal = '0' + (i/10);
+    const char unit = '0' + (i%10);
+
+    remote.sun_path[sizeof(SOCKET_PATH)-3] = decimal;
+    remote.sun_path[sizeof(SOCKET_PATH)-2] = unit;
+
+    if (i==id || m_clients[i]) //INFO: if myself or already saved
+    {
+      std::cout 
+        << "client: " << id
+        << " skipping client: " << i
+        << std::endl;
+      continue;
+    }
+
+    if((err=connect(sock, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
+    {
+      std::cout 
+        << "error connecting from client: " << id 
+        << " to client: " << remote.sun_path 
+        << " skipping client"
+        << std::endl;
+      continue;
+    }
+
+    std::cout 
+      << "connection ok from client: " << id 
+      << " to client: " << remote.sun_path 
+      << std::endl;
+    m_clients[m_client_connected++] = sock;
+  }
+}
+
+static std::atomic_uint8_t _s_id_generator{};
 BusLinux_t::BusLinux_t() noexcept :
-m_socket(0), m_clients(), m_msg_queue(), m_msg_queue_lock(), m_client_connected(0)
+m_id(_s_id_generator++),m_socket(0), m_clients(), m_msg_queue(), m_msg_queue_lock(), m_client_connected(0)
 {
-  const constexpr int max_connections = 5;
-  _socket_setup(m_socket, max_connections);
-}
-
-BusLinux_t::BusLinux_t(const int max_connections) noexcept :
-m_socket(0), m_clients(), m_msg_queue(), m_msg_queue_lock(), m_client_connected(0)
-{
-  _socket_setup(m_socket, max_connections);
-}
-
-void BusLinux_t::Accept_connections() noexcept
-{
+  _socket_setup();
   std::thread th{BusLinux_t::_Accept, this};
+
   th.detach();
 }
 
@@ -113,10 +169,21 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
 void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
 {
   ClientConnectionData data{0,self->m_msg_queue_lock, self->m_msg_queue};
+  sockaddr_un remote{};
+  socklen_t size = sizeof(remote);
 
   while (true)
   {
-    data.client_socket = accept(self->m_socket, NULL, NULL);
+    data.client_socket = accept(self->m_socket,reinterpret_cast<sockaddr*>(&remote), &size);
+    if (data.client_socket<0)
+    {
+      std::cout
+        << "error accepting connection: "
+        << " bus: " << self->m_id 
+        << "from: " << remote.sun_path
+        << std::endl;
+      continue;
+    }
     self->m_clients[self->m_client_connected++] = data.client_socket;
     std::thread client{_client_connection, std::move(data)};
     client.detach();

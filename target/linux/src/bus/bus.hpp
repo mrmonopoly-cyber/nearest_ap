@@ -14,10 +14,9 @@ namespace nearest_ap
   {
     public:
       using socket_t = int;
+      using Id = uint;
 
-      explicit BusLinux_t() noexcept;
-
-      BusLinux_t(const int max_connections) noexcept;
+      BusLinux_t() noexcept;
 
       BusLinux_t(const BusLinux_t&) = delete;
       BusLinux_t& operator=(const BusLinux_t&) = delete;
@@ -25,17 +24,21 @@ namespace nearest_ap
       BusLinux_t(BusLinux_t&&) = delete;
       BusLinux_t& operator=(BusLinux_t&&) = delete;
 
-      void Accept_connections() noexcept;
 
-      std::optional<Msg_t> Read() noexcept override;
+      void enstablis_connection(void) noexcept;
 
+      std::optional<Msg_t> Read(void) noexcept override;
       BusStatus_t Write(const Msg_t&) noexcept override;
+
+    public:
+      static constexpr std::size_t m_max_clients = 20;
 
     private:
       static void _Accept(BusLinux_t* const self) noexcept;
+      void _socket_setup(void) noexcept;
 
     private:
-      static constexpr std::size_t m_max_clients = 20;
+      const Id m_id;
       socket_t m_socket;
       std::array<socket_t, m_max_clients> m_clients;
       std::queue<Msg_t> m_msg_queue;
