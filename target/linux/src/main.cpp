@@ -4,6 +4,7 @@
 #include <optional>
 #include <sys/types.h>
 #include <thread>
+#include <iostream>
 
 #include "bus/bus.hpp"
 #include "spawner/spawner.h"
