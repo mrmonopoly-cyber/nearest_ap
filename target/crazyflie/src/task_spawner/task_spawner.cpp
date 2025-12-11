@@ -51,11 +51,3 @@ void TaskCraziflieSpawner::start_task(BaseTask_t* const task, Millis_t time)
     //TODO: add error handling
   }
 }
-
-void TaskCraziflieSpawner::suspend_task(BaseTask_t* const task)
-{
-}
-
-void TaskCraziflieSpawner::resume_task(BaseTask_t* const task)
-{
-}

@@ -9,10 +9,9 @@ using namespace nearest_ap;
 using Msg_t = typename Bus_t::Msg_t;
 
 BusReaderTask_t::BusReaderTask_t(
-    EventWriter& m_pipe,
     Bus_t& bus,
     Internal_t& internal) noexcept:
-UserTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER), m_pipe),
+BaseTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER)),
   m_bus(bus),
   m_internal(internal)
 {

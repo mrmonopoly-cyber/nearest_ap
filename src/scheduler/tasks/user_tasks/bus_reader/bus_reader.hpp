@@ -24,14 +24,14 @@
 
 #include <nearest_ap/internal/internal.hpp>
 #include <nearest_ap/scheduler/bus/bus.hpp>
-#include <nearest_ap/scheduler/tasks/user_tasks/user_task.hpp>
+#include <nearest_ap/scheduler/tasks/base_task.hpp>
 
 namespace nearest_ap {
-  class BusReaderTask_t : public UserTask_t
+  class BusReaderTask_t : public BaseTask_t
   {
     public:
       BusReaderTask_t() = delete;
-      BusReaderTask_t(EventWriter& m_pipe, Bus_t& bus, Internal_t& internal) noexcept;
+      BusReaderTask_t(Bus_t& bus, Internal_t& internal) noexcept;
 
       void run(void) noexcept override;
 

@@ -4,7 +4,7 @@
 
 namespace  nearest_ap
 {
-  using TaskId = std::uint8_t;
+  using TaskId = std::uint16_t;
 
 
   enum class InteractibleTask : TaskId

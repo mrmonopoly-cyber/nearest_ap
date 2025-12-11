@@ -1,13 +1,11 @@
-
-
 #include "potential_election.hpp"
 
 using namespace nearest_ap;
 using Msg_t = Bus_t::Msg_t;
 
-PotentialElectionTask_t::PotentialElectionTask_t(EventWriter& pipe, Bus_t& bus,
+PotentialElectionTask_t::PotentialElectionTask_t(Bus_t& bus,
     Internal_t& internal) noexcept :
-UserTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION), pipe),
+BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
   m_bus(bus),
   m_internal(internal)
 {

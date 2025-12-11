@@ -14,13 +14,11 @@
 #include <nearest_ap/internal/internal.hpp>
 #include <nearest_ap/scheduler/bus/bus.hpp>
 #include <nearest_ap/scheduler/tasks/base_task.hpp>
-#include <nearest_ap/scheduler/tasks/user_tasks/user_task.hpp>
-#include <nearest_ap/scheduler/tasks/event_queue/event_queue.hpp>
 
 #include <project_deps.h>
 
 namespace nearest_ap {
-  class LeaderAliveTask_t : public UserTask_t
+  class LeaderAliveTask_t : public BaseTask_t
   {
     public:
       using LeaderTask_f = std::function<void()>;
@@ -28,14 +26,12 @@ namespace nearest_ap {
       LeaderAliveTask_t() = delete;
 
       LeaderAliveTask_t(
-          EventWriter& pipe,
           Bus_t& bus,
           const Internal_t& internal,
           const LeaderTask_f leader_task) noexcept;
 
 
       LeaderAliveTask_t(
-          EventWriter& pipe,
           Bus_t& bus,
           const Internal_t& internal,
           const LeaderTask_f&& leader_task) noexcept;
