@@ -16,12 +16,12 @@ struct NodeCluster{
 };
 
 
-int main(void)
+int main()
 {
   using namespace nearest_ap;
   using Node_t = Node<SpawnerLinux_t>;
   // const constexpr uint num_clients = BusLinux_t::m_max_clients;
-  const constexpr uint num_clients = 2;
+  const constexpr uint num_clients = 1;
 
   std::array<BusLinux_t, num_clients> clients{};
   std::array<std::optional<Node_t>, num_clients> drones{};
@@ -32,7 +32,7 @@ int main(void)
 
   for (uint i=0; i<drones.size(); i++)
   {
-    drones[i].emplace(clients[i], SpawnerLinux_t{}, leader_f, []{}, 10);
+    drones[i].emplace(clients[i], SpawnerLinux_t{}, leader_f, []{return 12;}, 10);
   }
 
   for (auto& client : clients)

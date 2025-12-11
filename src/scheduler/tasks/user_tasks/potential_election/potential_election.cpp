@@ -14,7 +14,7 @@ BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
 void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
-  if (m_internal.user_pot_better_leader_pot()) //TODO: add tollerance
+  if (m_internal.user_pot_better_leader_pot() && m_internal.in_election())
   {
     Msg_t msg{};
     pb_ostream_t ostream{};

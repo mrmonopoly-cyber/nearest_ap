@@ -44,6 +44,11 @@ namespace nearest_ap
 
       void support() noexcept;
       void new_election() noexcept;
+      inline bool in_election() const noexcept
+      {
+        return m_vote_info.in_election();
+      }
+
 
     private:
       struct UserData_t

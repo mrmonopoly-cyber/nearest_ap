@@ -15,6 +15,12 @@ VoteInfo_t::VoteInfo_t():
 {
   m_consent =0;
   m_round++;
+  m_in_election = true;
+}
+
+bool VoteInfo_t::in_election() const noexcept
+{
+  return m_in_election;
 }
 
 void VoteInfo_t::support() noexcept
@@ -25,9 +31,15 @@ void VoteInfo_t::support() noexcept
   }
 }
 
-bool VoteInfo_t::won() const noexcept
+bool VoteInfo_t::won() noexcept
 {
-  return m_consent > (m_num_candidates/2);
+  bool res =m_consent > (m_num_candidates/2);
+  if (res)
+  {
+    m_in_election = false;
+  }
+
+  return res;
 }
 
 Round_t VoteInfo_t::round() const noexcept

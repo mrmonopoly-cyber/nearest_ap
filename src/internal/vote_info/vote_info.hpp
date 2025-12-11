@@ -12,10 +12,11 @@ namespace nearest_ap {
         VoteInfo_t();
 
         void start_new_election() noexcept;
+        bool in_election() const noexcept;
 
         void support() noexcept;
 
-        bool won() const noexcept;
+        bool won() noexcept;
 
         Round_t round() const noexcept;
         void update_round(Round_t round) noexcept;
@@ -24,5 +25,6 @@ namespace nearest_ap {
         std::size_t m_num_candidates = 1;
         std::size_t m_consent=0;
         Round_t m_round=0;
+        bool m_in_election = false;
     };
 };

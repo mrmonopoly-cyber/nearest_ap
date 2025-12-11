@@ -34,6 +34,7 @@ static void _client_connection(ClientConnectionData client_socket_data)
   {
     if(read(data.client_socket, msg.m_payload.data(), msg.m_payload.size())<=0)
     {
+      std::cout << "closing connection";
       return;
     }
     data.lock.lock();
@@ -147,8 +148,10 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
 {
   while(!m_msg_queue.empty())
   {
+    m_msg_queue_lock.lock();
     Msg_t& m = m_msg_queue.front();
     m_msg_queue.pop();
+    m_msg_queue_lock.unlock();
     return m;
   }
 

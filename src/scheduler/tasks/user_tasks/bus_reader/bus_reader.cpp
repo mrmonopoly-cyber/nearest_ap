@@ -2,6 +2,7 @@
 
 
 #include "bus_reader.hpp"
+#include <iostream>
 #include <optional>
 
 using namespace nearest_ap;
@@ -34,6 +35,11 @@ void BusReaderTask_t::run(void) noexcept
       reinterpret_cast<const pb_byte_t *>(msg_index.data),
       sizeof(msg_index.data)
       );
+
+  std::cout 
+    << "parsing mex: type: "
+    << msg_index.msg_type
+    << std::endl;
 
   switch (msg_index.msg_type)
   {
@@ -80,6 +86,11 @@ void BusReaderTask_t::run(void) noexcept
       {
         _near_ap_LeaderHeartbit leader_heartbit{};
         pb_decode(&stream, near_ap_LeaderHeartbit_fields, &leader_heartbit);
+        std::cout << "recevied leader_heartbit: " 
+          << leader_heartbit.id
+          << ":"
+          << leader_heartbit.potential 
+          << std::endl;
         m_internal.check_and_set_leader(leader_heartbit.id, leader_heartbit.potential);
       }
       break;
