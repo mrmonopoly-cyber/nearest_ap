@@ -45,7 +45,8 @@ m_users({current_user}),
 
 void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
 {
-  if (pot > m_leader.m_potential)
+  if ((pot > m_leader.m_potential) ||
+      (pot == m_leader.m_potential && new_leader < m_leader.m_user_index))
   {
     for (uint32_t i=0; i<m_users.size(); i++)
     {
@@ -66,6 +67,10 @@ VirtualId_t Internal_t::user_id() const noexcept
 void Internal_t::compute_user_potential() noexcept
 {
   m_current_user.m_potential = m_compute_local_potential();
+  if (m_current_user.m_user_index == m_leader.m_user_index)
+  {
+    m_leader.m_potential = m_current_user.m_potential;
+  }
 }
 
 Potential_t Internal_t::user_potential() const noexcept
@@ -100,7 +105,12 @@ void Internal_t::update_round(Round_t round) noexcept
 
 void Internal_t::support() noexcept
 {
-  return m_vote_info.support();
+  m_vote_info.support();
+  if(m_vote_info.check_winning())
+  {
+    m_leader.m_user_index = m_current_user.m_user_index;
+    m_leader.m_potential = m_current_user.m_potential;
+  }
 }
 
 void Internal_t::new_election() noexcept

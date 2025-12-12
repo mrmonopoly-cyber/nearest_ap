@@ -1,5 +1,7 @@
 #include "potential_election.hpp"
 
+#include <iostream>
+
 using namespace nearest_ap;
 using Msg_t = Bus_t::Msg_t;
 
@@ -14,29 +16,49 @@ BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
 void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
-  if (m_internal.user_pot_better_leader_pot() && m_internal.in_election())
+  if (m_internal.user_pot_better_leader_pot() && !m_internal.in_election())
   {
     Msg_t msg{};
     pb_ostream_t ostream{};
-    near_ap_NewElection new_election{
+    _near_ap_MessageIndexV2 msg_index_v2 = near_ap_MessageIndexV2_init_default;
+
+    msg_index_v2.which_value = near_ap_MessageIndexV2_new_election_tag;
+    msg_index_v2.value.new_election = 
+    {
       .has_round = true,
-        .round = m_internal.round(),
-        .has_id = true,
-        .id = m_internal.user_id(),
-        .has_potential = true,
-        .potential = m_internal.user_potential(),
+      .round = m_internal.round(),
+      .has_id = true,
+      .id = m_internal.user_id(),
+      .has_potential = true,
+      .potential = m_internal.user_potential(),
     };
 
     ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
-    if (pb_encode(&ostream, near_ap_NewElection_fields, &new_election))
+    if (pb_encode(&ostream, near_ap_NewElection_fields, &msg_index_v2))
     {
       BusStatus_t error = m_bus.Write(msg);
       if (error != BusStatus_t::Ok)
       {
-        //TODO: manage failures in sending
+        std::cout
+          << "write error: "
+          << __FILE__ 
+          << ":"
+          << __LINE__
+          << std::endl;
       }
-    }//TODO: manage failures in serialization
+    }
+    else
+    {
+      std::cout
+        << "encode error: "
+        << PB_GET_ERROR(&ostream) 
+        << ", at: "
+        << __FILE__ 
+        << ":"
+        << __LINE__
+        << std::endl;
+    }
 
     m_internal.new_election();
   }

@@ -1,9 +1,7 @@
-
-
-
 #include "bus_reader.hpp"
-#include <iostream>
+
 #include <optional>
+#include <iostream>
 
 using namespace nearest_ap;
 
@@ -21,7 +19,7 @@ BaseTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER)),
 void BusReaderTask_t::run(void) noexcept 
 {
   std::optional<Msg_t> msg_raw{m_bus.Read()};
-  _near_ap_MessageIndex msg_index{};
+  _near_ap_MessageIndexV2 msg_index{};
   pb_istream_t stream;
 
   if (!msg_raw.has_value())
@@ -30,68 +28,66 @@ void BusReaderTask_t::run(void) noexcept
   }
 
   stream = pb_istream_from_buffer(msg_raw->m_payload.data(), msg_raw->m_payload.size());
-  pb_decode(&stream, near_ap_MessageIndex_fields, &msg_index);
-  stream = pb_istream_from_buffer(
-      reinterpret_cast<const pb_byte_t *>(msg_index.data),
-      sizeof(msg_index.data)
-      );
+  pb_decode(&stream, near_ap_MessageIndexV2_fields, &msg_index);
 
-  std::cout 
-    << "parsing mex: type: "
-    << msg_index.msg_type
-    << std::endl;
-
-  switch (msg_index.msg_type)
+  switch (msg_index.which_value)
   {
-    case near_ap_MessageType_NewElection:
+    case near_ap_MessageIndexV2_heartbit_tag:
       {
-        _near_ap_NewElection new_election{};
-        pb_decode(&stream, near_ap_NewElection_fields, &new_election);
-        if( new_election.round > m_internal.round() )
+        const auto new_leader_id = msg_index.value.heartbit.id;
+        const auto new_leader_pot = msg_index.value.heartbit.potential;
+
+        m_internal.check_and_set_leader(new_leader_id, new_leader_pot);
+        std::cout << "recevied leader_heartbit: " << new_leader_id << ":" << new_leader_pot << std::endl;
+      }
+      break;
+    case near_ap_MessageIndexV2_new_election_tag:
+      {
+        const auto new_round = msg_index.value.new_election.round;
+        const auto new_pot = msg_index.value.new_election.potential;
+
+        if ( new_round > m_internal.round() && new_pot > m_internal.user_potential())
         {
-          Msg_t msg{};
-          pb_ostream_t ostream{};
-          _near_ap_VoteRespone election_respone{
+          pb_ostream_t ostream = pb_ostream_from_buffer(
+              msg_raw->m_payload.data(),
+              msg_raw->m_payload.size());
+
+          m_internal.update_round(new_round);
+          msg_index.which_value = near_ap_MessageIndexV2_vote_response_tag,
+          msg_index.value.vote_response = 
+          {
             .has_round = true,
-              .round = new_election.round,
-              .has_id = true,
-              .id = m_internal.user_id(),
+            .round = new_round,
+            .has_id = true,
+            .id = m_internal.user_id()
           };
 
-          ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
-          m_internal.update_round(new_election.round);
-          if (pb_encode(&ostream, near_ap_VoteRespone_fields, &election_respone))
+          if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
           {
-            BusStatus_t error = m_bus.Write(msg);
-            if (error != BusStatus_t::Ok)
-            {
-              //TODO: manage failures in sending
-            }
-          }//TODO: manage failures in serialization
-
+            std::cout
+              << "encode error: " << PB_GET_ERROR(&ostream)  << ", at: "
+              << __FILE__  << ":" << __LINE__ << std::endl;
+          }
+          BusStatus_t error = m_bus.Write(*msg_raw);
+          if (error != BusStatus_t::Ok)
+          {
+            std::cout << "write error: " << __FILE__  << ":" << __LINE__ << std::endl;
+          }
         }
       }
       break;
-    case near_ap_MessageType_VoteRespone:
+    case near_ap_MessageIndexV2_vote_response_tag:
       {
-        _near_ap_VoteRespone vote_response{};
-        pb_decode(&stream, near_ap_VoteRespone_fields, &vote_response);
-        if (m_internal.round() == vote_response.round)
+        const auto user_vote_id = msg_index.value.vote_response.id;
+        (void) user_vote_id;
+        const auto election_round = msg_index.value.vote_response.round;
+
+        //TODO: add check on vote id
+
+        if (election_round == m_internal.round() && m_internal.in_election())
         {
           m_internal.support();
         }
-      }
-      break;
-    case near_ap_MessageType_LeaderHeartbit:
-      {
-        _near_ap_LeaderHeartbit leader_heartbit{};
-        pb_decode(&stream, near_ap_LeaderHeartbit_fields, &leader_heartbit);
-        std::cout << "recevied leader_heartbit: " 
-          << leader_heartbit.id
-          << ":"
-          << leader_heartbit.potential 
-          << std::endl;
-        m_internal.check_and_set_leader(leader_heartbit.id, leader_heartbit.potential);
       }
       break;
   }

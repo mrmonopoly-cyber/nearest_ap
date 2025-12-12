@@ -164,19 +164,22 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
   bool err=false;
   const constexpr uint max_tries = 33;
 
-  for (socket_t& client : m_clients)
+  for (std::optional<socket_t>& client : m_clients)
   {
-    uint tries = 0;
-
-    do
+    if (client.has_value())
     {
-      tries++;
-      written = write(client, msg.m_payload.data(), msg.m_payload.size());
-    }while(written!=msg.m_payload.size() && tries < max_tries);
+      uint tries = 0;
 
-    if (tries >= max_tries)
-    {
-      err=true;
+      do
+      {
+        tries++;
+        written = send(*client, msg.m_payload.data(), msg.m_payload.size(),0);
+      }while(written!=msg.m_payload.size() && tries < max_tries);
+
+      if (tries >= max_tries)
+      {
+        err=true;
+      }
     }
   }
 

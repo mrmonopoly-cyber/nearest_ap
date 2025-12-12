@@ -4,7 +4,6 @@
 #include <optional>
 #include <sys/types.h>
 #include <thread>
-#include <iostream>
 
 #include "bus/bus.hpp"
 #include "spawner/spawner.h"
@@ -32,7 +31,7 @@ int main()
 
   for (uint i=0; i<drones.size(); i++)
   {
-    drones[i].emplace(clients[i], SpawnerLinux_t{}, leader_f, []{return 12;}, 10);
+    drones[i].emplace(clients[i], SpawnerLinux_t{},[]{return 12;}, leader_f, 10);
   }
 
   for (auto& client : clients)

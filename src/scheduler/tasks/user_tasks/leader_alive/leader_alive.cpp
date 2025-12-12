@@ -1,5 +1,3 @@
-
-
 #include "leader_alive.hpp"
 #include <iostream>
 
@@ -32,20 +30,14 @@ void LeaderAliveTask_t::run(void) noexcept
 {
   Msg_t msg{};
   pb_ostream_t ostream{};
-  pb_ostream_t ostream_wrapper{};
-  near_ap_MessageIndex msg_index
-  {
-    .has_msg_type = true,
-    .msg_type = near_ap_MessageType_LeaderHeartbit,
-    .data_count = 2,
-    .data = {0},
-  };
-  ostream_wrapper = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
-  ostream = pb_ostream_from_buffer(reinterpret_cast<pb_byte_t*>(&msg_index.data), sizeof msg_index.data);
+  near_ap_MessageIndexV2 msg_index = near_ap_MessageIndexV2_init_default;
+
+  ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
   if (m_internal.is_leader())
   {
-    near_ap_LeaderHeartbit heartbit =
+    msg_index.which_value = near_ap_MessageIndexV2_heartbit_tag;
+    msg_index.value.heartbit =
     {
       .has_id = true,
       .id = static_cast<std::uint32_t>(m_internal.user_id()),
@@ -53,26 +45,32 @@ void LeaderAliveTask_t::run(void) noexcept
       .potential = m_internal.user_potential(),
     };
 
-    if (pb_encode(&ostream, near_ap_LeaderHeartbit_fields, &heartbit) //&&
-        )
+    if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
     {
-      pb_encode(&ostream_wrapper, near_ap_MessageIndex_fields, &msg_index);
-
-      std::cout 
-        << "i'm leader_alive:"
-        << m_internal.user_id()
-        << " pot: "
-        << m_internal.user_potential()
+      std::cout
+        << "encode error: "
+        << PB_GET_ERROR(&ostream) 
+        << ", at: "
+        << __FILE__ 
+        << ":"
+        << __LINE__
         << std::endl;
-      BusStatus_t error = m_bus.Write(msg);
-      if (error != BusStatus_t::Ok)
-      {
-        //TODO: manage failures in sending
-      }
     }
-    else
+    std::cout 
+      << "i'm leader_alive:"
+      << m_internal.user_id()
+      << " pot: "
+      << m_internal.user_potential()
+      << std::endl;
+    BusStatus_t error = m_bus.Write(msg);
+    if (error != BusStatus_t::Ok)
     {
-      //TODO: manage failures in serialization
+      std::cout
+        << "write error: "
+        << __FILE__ 
+        << ":"
+        << __LINE__
+        << std::endl;
     }
 
     m_leader_task();

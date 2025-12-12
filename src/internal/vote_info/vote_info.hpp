@@ -16,7 +16,7 @@ namespace nearest_ap {
 
         void support() noexcept;
 
-        bool won() noexcept;
+        bool check_winning() noexcept;
 
         Round_t round() const noexcept;
         void update_round(Round_t round) noexcept;

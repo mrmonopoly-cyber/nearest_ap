@@ -2,14 +2,14 @@ edition = "2023";
 
 package near_ap;
 
-enum MessageType{
-  NewElection = 0;
-  VoteRespone = 1;
-  LeaderHeartbit = 2;
-};
+import "leader_alive.proto";
+import "new_election.proto";
 
-
-message MessageIndex{
-  MessageType msg_type = 1;
-  repeated fixed64 data = 5;
+message MessageIndexV2{
+  oneof value
+  {
+    LeaderHeartbit heartbit =1;
+    NewElection new_election =2;
+    VoteRespone vote_response =3;
+  };
 };

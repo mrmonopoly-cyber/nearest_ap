@@ -40,7 +40,7 @@ namespace nearest_ap
     private:
       const Id m_id;
       socket_t m_socket;
-      std::array<socket_t, m_max_clients> m_clients;
+      std::array<std::optional<socket_t>, m_max_clients> m_clients;
       std::queue<Msg_t> m_msg_queue;
       std::mutex m_msg_queue_lock;
       std::atomic_uint8_t m_client_connected;

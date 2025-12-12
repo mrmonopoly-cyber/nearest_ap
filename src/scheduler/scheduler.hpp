@@ -35,8 +35,8 @@ namespace nearest_ap
         void spawn_tasks() noexcept
         {
           m_spawner.start_task(&m_bus_reader_task, Millis_t{10});
-          m_spawner.start_task(&m_pot_election_task, Millis_t{200});
-          m_spawner.start_task(&m_alive_task, Millis_t{20});
+          m_spawner.start_task(&m_pot_election_task, Millis_t{100});
+          m_spawner.start_task(&m_alive_task, Millis_t{10});
         }
 
       private:
