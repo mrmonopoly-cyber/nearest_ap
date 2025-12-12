@@ -54,10 +54,33 @@ namespace nearest_ap {
         {
         }
 
-      void async_start(void)
-      {
-        m_scheduler.spawn_tasks();
-      }
+      explicit Node(
+          Bus_t& bus,
+          SpawnerType&& spawner,
+          Topology topology,
+          const std::uint16_t current_user_index,
+          ComputePot_f&& compute_pot_f,
+          LeaderTask_f&& leader_task_f,
+          Tollercance_t tollerance,
+          const Millis_t bus_task_freq,
+          const Millis_t pot_task_freq,
+          const Millis_t alive_task_freq
+          ) noexcept :
+        m_internal(
+            std::move(topology),
+            current_user_index,
+            std::move(compute_pot_f),
+            tollerance),
+        m_scheduler(
+            std::move(spawner),
+            bus,
+            std::move(leader_task_f),
+            m_internal,
+            bus_task_freq, 
+            pot_task_freq,
+            alive_task_freq)
+        {
+        }
 
     private:
       Internal_t m_internal;

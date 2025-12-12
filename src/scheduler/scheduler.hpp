@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bus/bus.hpp"
+#include "tasks/base_task.hpp"
 #include "tasks/tasks.hpp"
 #include <nearest_ap/internal/internal.hpp>
 
@@ -30,16 +31,35 @@ namespace nearest_ap
           m_alive_task {bus, internal, leader_task_f},
           m_bus_reader_task {bus, internal}
         {
+          _spawn_task();
         }
 
-        void spawn_tasks() noexcept
+        Scheduler(
+            SpawnerType spawner,
+            Bus_t& bus,
+            LeaderTaks_f && leader_task_f,
+            Internal_t& internal,
+            const Millis_t bus_task_freq,
+            const Millis_t pot_task_freq,
+            const Millis_t alive_task_freq
+            ) noexcept:
+          m_spawner{std::move(spawner)},
+          m_bus {bus},
+          m_pot_election_task {bus, internal},
+          m_alive_task {bus, internal, leader_task_f},
+          m_bus_reader_task {bus, internal}
         {
-          m_spawner.start_task(&m_bus_reader_task, Millis_t{10});
-          m_spawner.start_task(&m_pot_election_task, Millis_t{100});
-          m_spawner.start_task(&m_alive_task, Millis_t{10});
+          _spawn_task(bus_task_freq, pot_task_freq, alive_task_freq);
         }
 
       private:
+        void _spawn_task(Millis_t bus=10, Millis_t pot=100, Millis_t alive=10) noexcept
+        {
+          m_spawner.start_task(&m_bus_reader_task, bus);
+          m_spawner.start_task(&m_pot_election_task, pot);
+          m_spawner.start_task(&m_alive_task, alive);
+        }
+
         SpawnerType m_spawner;
         Bus_t& m_bus;
 

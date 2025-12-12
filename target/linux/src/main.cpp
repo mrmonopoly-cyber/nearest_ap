@@ -32,6 +32,12 @@ int main()
     std::cout << "I'm leader" << std::endl;
   };
 
+  for (auto& client : clients)
+  {
+    client.enstablis_connection();
+    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  }
+
   for (uint i=0; i<drones.size(); i++)
   {
     drones[i].emplace(
@@ -42,17 +48,6 @@ int main()
         []{return 12;}, 
         leader_f, 
         10);
-  }
-
-  for (auto& client : clients)
-  {
-    client.enstablis_connection();
-    std::this_thread::sleep_for(std::chrono::milliseconds{10});
-  }
-
-  for (auto& drone : drones)
-  {
-    drone->async_start();
   }
 
   std::this_thread::sleep_for(std::chrono::hours(99));
