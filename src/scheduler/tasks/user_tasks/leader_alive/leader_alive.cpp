@@ -56,12 +56,6 @@ void LeaderAliveTask_t::run(void) noexcept
         << __LINE__
         << std::endl;
     }
-    std::cout 
-      << "i'm leader_alive:"
-      << m_internal.user_id()
-      << " pot: "
-      << m_internal.user_potential()
-      << std::endl;
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {

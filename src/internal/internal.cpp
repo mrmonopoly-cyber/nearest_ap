@@ -1,4 +1,5 @@
 #include "internal.hpp"
+#include <cstdint>
 
 using namespace nearest_ap;
 
@@ -6,91 +7,78 @@ using VirtualId_t = Internal_t::VirtualId_t;
 using Potential_t = Internal_t::Potential_t;
 using Round_t = Internal_t::Round_t;
 using ComputePot_f = Internal_t::ComputePot_f;
+using Topology = Internal_t::Topology;
 
-Internal_t::Internal_t(const ComputePot_f&& compute_pot) noexcept:
-m_users({VirtualId_t()}),
-  m_compute_local_potential(std::move(compute_pot)),
+Internal_t::Internal_t(
+    Topology&& topology,
+    const std::uint16_t current_user_index,
+    const ComputePot_f&& compute_pot
+    ) noexcept
+: m_users(topology),
+  m_current_user_index(current_user_index),
+  m_user_potential(0),
+  m_leader_potential(0),
+  m_compute_local_potential(compute_pot),
   m_tollerance(0),
-  m_current_user(0,0),
-  m_leader(0,0),
   m_vote_info()
 {
 }
 
 Internal_t::Internal_t(
-          const ComputePot_f&& compute_pot,
-          const Tollerance_t tollerance) noexcept:
-m_users({VirtualId_t()}),
-  m_compute_local_potential(std::move(compute_pot)),
+    Topology&& topology,
+    const std::uint16_t current_user_index,
+    const ComputePot_f&& compute_pot,
+    const Tollerance_t tollerance
+    ) noexcept
+: m_users(topology),
+  m_current_user_index(current_user_index),
+  m_user_potential(0),
+  m_leader_potential(0),
+  m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
-  m_current_user(0,0),
-  m_leader(0,0),
   m_vote_info()
 {
 }
-
-Internal_t::Internal_t(
-          const ComputePot_f&& compute_pot,
-          const Tollerance_t tollerance,
-          const VirtualId_t&& current_user) noexcept:
-m_users({current_user}),
-  m_compute_local_potential(std::move(compute_pot)),
-  m_tollerance(tollerance),
-  m_current_user(0,0),
-  m_leader(0,0),
-  m_vote_info()
-{
-}
-
 
 void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
 {
-  if ((pot > m_leader.m_potential) ||
-      (pot == m_leader.m_potential && new_leader < m_leader.m_user_index))
+  if ((pot > m_leader_potential) ||
+      (pot == m_leader_potential && new_leader < m_users.m_leader_index))
   {
-    for (uint32_t i=0; i<m_users.size(); i++)
+    if(m_users.update_leader(new_leader))
     {
-      if (m_users[i] == new_leader)
-      {
-        m_leader.m_user_index = i;
-        m_leader.m_potential = pot;
-      }
+      m_leader_potential = pot;
     }
   }
 }
 
 VirtualId_t Internal_t::user_id() const noexcept
 {
-  return m_users[m_current_user.m_user_index];
+  return m_users.m_elements[m_current_user_index];
 }
 
 void Internal_t::compute_user_potential() noexcept
 {
-  m_current_user.m_potential = m_compute_local_potential();
-  if (m_current_user.m_user_index == m_leader.m_user_index)
+  m_user_potential = m_compute_local_potential();
+  if (is_leader())
   {
-    m_leader.m_potential = m_current_user.m_potential;
+    m_leader_potential = m_user_potential;
   }
 }
 
 Potential_t Internal_t::user_potential() const noexcept
 {
-  return m_current_user.m_potential;
+  return m_user_potential;
 }
 
 bool Internal_t::user_pot_better_leader_pot() const noexcept
 {
-  return m_current_user.m_potential > m_leader.m_potential + m_tollerance;
+  return m_user_potential > m_leader_potential + m_tollerance;
 }
 
 bool Internal_t::is_leader() const noexcept
 {
-  return m_current_user.m_user_index == m_leader.m_user_index;
-}
-
-bool Internal_t::is_leader(VirtualId_t& user) const noexcept
-{
-  return m_users[m_leader.m_user_index] == user;
+  return m_users.m_elements[m_current_user_index] == m_users.leader();
 }
 
 Round_t Internal_t::round() const noexcept
@@ -108,8 +96,8 @@ void Internal_t::support() noexcept
   m_vote_info.support();
   if(m_vote_info.check_winning())
   {
-    m_leader.m_user_index = m_current_user.m_user_index;
-    m_leader.m_potential = m_current_user.m_potential;
+    m_users.m_leader_index = m_current_user_index;
+    m_leader_potential = m_user_potential;
   }
 }
 

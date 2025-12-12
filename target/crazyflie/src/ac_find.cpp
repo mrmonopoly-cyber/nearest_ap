@@ -23,6 +23,7 @@
  */
 
 
+#include <cstdint>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -49,10 +50,18 @@ extern "C"
 void appMain()
 {
   using namespace nearest_ap;
+  using Node_t = Node<TaskCraziflieSpawner>;
+  using Topology = Node_t::Topology;
 
   RadioBus bus{};
+  Topology topology{{0, 1}, 0};
+  Node_t::Tollercance_t tollerance = 10;
+  auto leader_f = [](){};
+  auto compute_potential = []{return 42;};
+  std::uint16_t user_index =0;
 
-  Node node = Node(bus, TaskCraziflieSpawner{},[]{return 0;},[]{});
+  Node node{bus, TaskCraziflieSpawner{}, topology,
+      user_index, compute_potential, leader_f, tollerance};
 
   DEBUG_PRINT("Starting Drone\n");
 }

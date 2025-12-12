@@ -3,13 +3,13 @@
 //Copyright (c) 2025 Alberto Damo. All Rights Reserved.
 
 #include <functional>
-#include <vector>
 #include <cstdint>
 
-#include "vote_info/vote_info.hpp"
+#include <nearest_ap/internal/vote_info/vote_info.hpp>
 
 namespace nearest_ap 
 {
+
   class Internal_t
   {
     public:
@@ -19,13 +19,46 @@ namespace nearest_ap
       using ComputePot_f = std::function<int()>;
       using Tollerance_t = std::uint32_t;
 
+      struct Topology
+      {
+        public:
+          VirtualId_t leader() const noexcept
+          {
+            return m_elements[m_leader_index];
+          }
+
+          bool update_leader(VirtualId_t leader) noexcept
+          {
+            for (uint32_t i=0; i<m_elements.size(); i++)
+            {
+              if (m_elements[i] == leader)
+              {
+                m_leader_index = i;
+                return true;
+              }
+            }
+            return false;
+          }
+
+        public:
+          const std::vector<VirtualId_t> m_elements;
+          std::uint32_t m_leader_index;
+      };
+
+
       Internal_t() = delete;
-      Internal_t(const ComputePot_f&& compute_pot) noexcept;
-      Internal_t(const ComputePot_f&& compute_pot, const Tollerance_t tollerance) noexcept;
+
       Internal_t(
+          Topology&& topology,
+          const std::uint16_t current_user_index,
+          const ComputePot_f&& compute_pot
+          ) noexcept;
+
+      Internal_t(
+          Topology&& topology,
+          const std::uint16_t current_user_index,
           const ComputePot_f&& compute_pot,
-          const Tollerance_t tollerance,
-          const VirtualId_t&& current_user) noexcept;
+          const Tollerance_t tollerance) noexcept;
 
 
       void check_and_set_leader(const VirtualId_t& new_leader, const Potential_t pot) noexcept;
@@ -40,7 +73,6 @@ namespace nearest_ap
       void update_round(Round_t round) noexcept;
 
       bool is_leader() const noexcept;
-      bool is_leader(VirtualId_t& user) const noexcept;
 
       void support() noexcept;
       void new_election() noexcept;
@@ -74,11 +106,12 @@ namespace nearest_ap
         Potential_t m_potential=0;
       };
 
-      std::vector<VirtualId_t> m_users;
+      Topology m_users;
+      const std::uint32_t m_current_user_index;
+      Potential_t m_user_potential;
+      Potential_t m_leader_potential;
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
-      UserData_t m_current_user;
-      UserData_t m_leader;
 
       VoteInfo_t m_vote_info;
   };

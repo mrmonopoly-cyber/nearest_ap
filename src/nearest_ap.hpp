@@ -16,15 +16,21 @@ namespace nearest_ap {
 
       using VirtualId_t = Internal_t::VirtualId_t;
       using Tollercance_t = Internal_t::Tollerance_t;
+      using Topology = Internal_t::Topology;
 
       Node() = delete;
 
       explicit Node(
           Bus_t& bus,
           SpawnerType&& spawner,
+          Topology topology,
+          const std::uint16_t current_user_index,
           ComputePot_f&& compute_pot_f,
           LeaderTask_f&& leader_task_f) noexcept :
-        m_internal(std::move(compute_pot_f)),
+        m_internal(
+            std::move(topology),
+            current_user_index,
+            std::move(compute_pot_f)),
         m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
         {
         }
@@ -32,12 +38,18 @@ namespace nearest_ap {
       explicit Node(
           Bus_t& bus,
           SpawnerType&& spawner,
+          Topology topology,
+          const std::uint16_t current_user_index,
           ComputePot_f&& compute_pot_f,
           LeaderTask_f&& leader_task_f,
           Tollercance_t tollerance
 
           ) noexcept :
-        m_internal(std::move(compute_pot_f), tollerance),
+        m_internal(
+            std::move(topology),
+            current_user_index,
+            std::move(compute_pot_f),
+            tollerance),
         m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
         {
         }
