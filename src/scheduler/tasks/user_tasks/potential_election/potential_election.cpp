@@ -55,6 +55,7 @@ void PotentialElectionTask_t::run(void) noexcept
     }
 
     m_internal.new_election();
+    msg.m_msg_size = ostream.bytes_written;
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {

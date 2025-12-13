@@ -53,12 +53,14 @@ void LeaderAliveTask_t::run(void) noexcept
           "encode error: %s", PB_GET_ERROR(&ostream));
       static_log(logger::Level::Error, buffer);
     }
+    msg.m_msg_size = ostream.bytes_written;
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {
       char buffer[128]{};
       snprintf(buffer, sizeof(buffer),
-          "write error: %s", PB_GET_ERROR(&ostream));
+          "node %d, write error: %d",
+          m_internal.user_id(), static_cast<int>(error));
       static_log(logger::Level::Error, buffer);
     }
 

@@ -29,8 +29,8 @@ void BusReaderTask_t::run(void) noexcept
     return;
   }
 
-  stream = pb_istream_from_buffer(msg_raw->m_payload.data(), msg_raw->m_payload.size());
-  if(!pb_decode(&stream, near_ap_MessageIndexV2_fields, &msg_index) && strcmp("zero tag",PB_GET_ERROR(&stream)))
+  stream = pb_istream_from_buffer(msg_raw->m_payload.data(), msg_raw->m_msg_size);
+  if(!pb_decode(&stream, near_ap_MessageIndexV2_fields, &msg_index))
   {
     char buffer[128]{};
     snprintf(buffer, sizeof(buffer), "node: %d, decode error: %s, tag: %d", 
@@ -76,6 +76,8 @@ void BusReaderTask_t::run(void) noexcept
           {
             .has_round = true,
             .round = new_round,
+            .has_supporter = true,
+            .supporter = m_internal.user_id(),
             .has_new_leader = true,
             .new_leader = new_leader,
           };
@@ -86,6 +88,7 @@ void BusReaderTask_t::run(void) noexcept
             snprintf(buffer, sizeof(buffer), "encode error: %s", PB_GET_ERROR(&ostream));
             static_log(logger::Level::Error, buffer);
           }
+          msg_raw->m_msg_size = ostream.bytes_written;
           BusStatus_t error = m_bus.Write(*msg_raw);
           if (error != BusStatus_t::Ok)
           {

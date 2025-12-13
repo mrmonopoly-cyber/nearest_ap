@@ -1,4 +1,5 @@
 #include <chrono>
+#include <cstdint>
 #include <cstdio>
 #include <cstring>
 #include <mutex>
@@ -25,18 +26,33 @@ struct ClientConnectionData
   std::queue<Msg_t>& msg_queue; 
 };
 
+static void _decode(const std::uint8_t raw_buffer[64], Msg_t& msg)
+{
+    memcpy(&msg.m_msg_size, raw_buffer, sizeof(msg.m_msg_size));
+    memcpy(msg.m_payload.data(), raw_buffer + sizeof(msg.m_msg_size), msg.m_payload.size());
+}
+
+static void _encode(std::uint8_t raw_buffer[64], const Msg_t& msg)
+{
+    memcpy(raw_buffer, &msg.m_msg_size, sizeof(msg.m_msg_size));
+    memcpy(raw_buffer + sizeof(msg.m_msg_size), msg.m_payload.data(), msg.m_payload.size());
+}
+
 static void _client_connection(ClientConnectionData client_socket_data)
 {
   ClientConnectionData data = static_cast<ClientConnectionData>(client_socket_data);
+  std::uint8_t raw_buffer[64]{};
   Msg_t msg{};
 
   while (true)
   {
-    if(read(data.client_socket, msg.m_payload.data(), msg.m_payload.size())<=0)
+    memset(raw_buffer, 0, sizeof(raw_buffer));
+    if(read(data.client_socket, raw_buffer, msg.m_payload.size() + sizeof(msg.m_msg_size))<=0)
     {
       static_log(logger::Level::Debug, "closing connection");
       return;
     }
+    _decode(raw_buffer, msg);
     data.lock.lock();
     data.msg_queue.push(std::move(msg));
     data.lock.unlock();
@@ -173,9 +189,12 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
 
 BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
 {
+  const constexpr uint max_tries = 33;
+
   size_t written =0;
   bool err=false;
-  const constexpr uint max_tries = 33;
+  std::uint8_t raw_buffer[64]{};
+  const std::uint32_t message_size = msg.m_payload.size() + sizeof(msg.m_msg_size);
 
   for (std::optional<socket_t>& client : m_clients)
   {
@@ -183,11 +202,14 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
     {
       uint tries = 0;
 
+      memset(raw_buffer, 0, sizeof(raw_buffer));
+      _encode(raw_buffer, msg);
+
       do
       {
         tries++;
-        written = send(*client, msg.m_payload.data(), msg.m_payload.size(),0);
-      }while(written!=msg.m_payload.size() && tries < max_tries);
+        written = send(*client, raw_buffer, message_size,0);
+      }while(written!=message_size && tries < max_tries);
 
       if (tries >= max_tries)
       {
