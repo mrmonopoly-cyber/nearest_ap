@@ -10,6 +10,8 @@
 #include <thread>
 #include <unistd.h>
 
+#include <nearest_ap/logger/logger.hpp>
+
 #include "bus.hpp"
 
 #define SOCKET_PATH "/tmp/nearest_ap_linux_XX"
@@ -21,6 +23,7 @@ using socket_t = BusLinux_t::socket_t;
 
 struct ClientConnectionData
 {
+  int id;
   socket_t client_socket;
   std::mutex& lock; 
   std::queue<Msg_t>& msg_queue; 
@@ -44,8 +47,18 @@ static void _client_connection(ClientConnectionData client_socket_data)
   std::uint8_t raw_buffer[64]{};
   Msg_t msg{};
 
+  {
+    char buffer[32]{};
+    snprintf(buffer, sizeof(buffer),"node %d staring read mex bus", client_socket_data.id);
+    static_log(logger::Level::Info, buffer);
+  }
+
   while (true)
   {
+    if (data.id==0)
+    {
+      static_log(logger::Level::Warning, "node 0 waiting mex");
+    }
     memset(raw_buffer, 0, sizeof(raw_buffer));
     if(read(data.client_socket, raw_buffer, msg.m_payload.size() + sizeof(msg.m_msg_size))<=0)
     {
@@ -57,6 +70,10 @@ static void _client_connection(ClientConnectionData client_socket_data)
     data.msg_queue.push(std::move(msg));
     data.lock.unlock();
   }
+
+  char buffer[64]{};
+  snprintf(buffer, sizeof(raw_buffer), "node %d stopping listening", data.id);
+  static_log(logger::Level::Warning, buffer);
 }
 
 void BusLinux_t::_socket_setup(void) noexcept
@@ -116,9 +133,9 @@ void BusLinux_t::enstablis_connection(void) noexcept
 
   for (Id i=0; i<m_max_clients; i++)
   {
-    int sock=0;
+    ClientConnectionData data{{},0,m_msg_queue_lock, m_msg_queue};
 
-    if( (sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1  )
+    if( (data.client_socket= socket(AF_UNIX, SOCK_STREAM, 0)) == -1  )
     {
       static_log(logger::Level::Debug, "Client: Error on socket() call");
       continue;
@@ -129,6 +146,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
        .sun_path= SOCKET_PATH SOCKET_SUFFIX
     };
 
+    data.id = i;
     const char decimal = '0' + (i/10);
     const char unit = '0' + (i%10);
 
@@ -144,7 +162,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
       continue;
     }
 
-    if((written=connect(sock, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
+    if((written=connect(data.client_socket, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
     {
       char buffer[128 + sizeof(remote.sun_path)]{};
       snprintf(buffer, sizeof(buffer),
@@ -159,7 +177,10 @@ void BusLinux_t::enstablis_connection(void) noexcept
         "connection ok from client: %d to client: %s", id, remote.sun_path);
     static_log(logger::Level::Debug, buffer);
 
-    m_clients[m_client_connected++] = sock;
+    std::thread client{_client_connection, std::move(data)};
+    client.detach();
+
+    m_clients[m_client_connected++] = data.client_socket;
   }
 }
 
@@ -221,9 +242,10 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
   return err ? BusStatus_t::UnknowError : BusStatus_t::Ok;
 }
 
+
 void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
 {
-  ClientConnectionData data{0,self->m_msg_queue_lock, self->m_msg_queue};
+  ClientConnectionData data{{},0,self->m_msg_queue_lock, self->m_msg_queue};
   sockaddr_un remote{};
   socklen_t size = sizeof(remote);
 
@@ -240,6 +262,7 @@ void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
       continue;
     }
     self->m_clients[self->m_client_connected++] = data.client_socket;
+    data.id = self->m_id;
     std::thread client{_client_connection, std::move(data)};
     client.detach();
     std::this_thread::sleep_for(std::chrono::milliseconds(1)); //INFO: give time to the thread to copy the data
