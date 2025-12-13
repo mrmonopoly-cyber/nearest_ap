@@ -38,7 +38,7 @@ Internal_t::Internal_t(
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
-  m_vote_info()
+  m_vote_info(m_users.m_elements.size())
 {
 }
 
