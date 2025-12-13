@@ -55,7 +55,7 @@ namespace nearest_ap
         }
 
       private:
-        void _spawn_task(Millis_t bus=10, Millis_t pot=100, Millis_t alive=10) noexcept
+        void _spawn_task(Millis_t bus=9, Millis_t pot=100, Millis_t alive=11) noexcept
         {
           m_spawner.start_task(&m_bus_reader_task, bus);
           m_spawner.start_task(&m_pot_election_task, pot);

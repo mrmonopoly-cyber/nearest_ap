@@ -19,7 +19,7 @@ int main(int argc, char **argv)
   logger::StaticLog{&logger};
   auto leader_f = [](){};
 
-  logger.setLevel(logger::Level::Info);
+  logger::StaticLog::set_level(logger::Level::Debug);
 
   std::uint16_t num_clients = 2;
 
@@ -53,7 +53,11 @@ int main(int argc, char **argv)
 
   auto bus_t_freq = 10;
   auto pot_t_freq = 1000;
-  auto alive_t_freq = 30;
+  auto alive_t_freq = 31;
+
+  (void) bus_t_freq;
+  (void) pot_t_freq;
+  (void) alive_t_freq;
 
   for (std::uint16_t i=0; i<num_clients; ++i)
   {
@@ -64,10 +68,11 @@ int main(int argc, char **argv)
         i,
         []{return 12;}, 
         leader_f, 
-        10,
-        bus_t_freq,
-        pot_t_freq,
-        alive_t_freq));
+        10
+        ));
+        // bus_t_freq,
+        // pot_t_freq,
+        // alive_t_freq));
   }
 
   std::this_thread::sleep_for(std::chrono::hours(99));
