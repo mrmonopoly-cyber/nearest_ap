@@ -44,8 +44,7 @@ Internal_t::Internal_t(
 
 void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
 {
-  if ((pot > m_leader_potential) ||
-      (pot == m_leader_potential && new_leader < m_users.m_leader_index))
+  if (pot > m_leader_potential + m_tollerance)
   {
     if(m_users.update_leader(new_leader))
     {
