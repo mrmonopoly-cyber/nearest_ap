@@ -34,7 +34,8 @@ void LinuxLogger::_print_log(LinuxLogger* self) noexcept
     if (!self->m_log_queue.empty())
     {
       self->m_lock.lock();
-      LogInstace& log = self->m_log_queue.front();
+      LogInstace log = self->m_log_queue.front();
+      self->m_lock.unlock();
       auto in_time_t = std::chrono::system_clock::to_time_t(log.current_time);
       auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
               log.current_time.time_since_epoch()) % 1000;
@@ -63,6 +64,7 @@ void LinuxLogger::_print_log(LinuxLogger* self) noexcept
         << log.file << ":" << log.line << " " 
         << "\"" << log.str << "\""
         << std::endl;
+      self->m_lock.lock();
       self->m_log_queue.pop();
       self->m_lock.unlock();
     }
