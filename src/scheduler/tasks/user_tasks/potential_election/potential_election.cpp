@@ -1,6 +1,6 @@
 #include "potential_election.hpp"
 
-#include <string>
+#include <cstdio>
 #include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
@@ -17,9 +17,12 @@ BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
 void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
+
+  const auto no_hearthbit = m_internal.consume_heartbit();
+  const auto user_better_pot = m_internal.user_pot_better_leader_pot();
   if (!m_internal.is_leader() &&
       !m_internal.in_election() &&
-      (m_internal.user_pot_better_leader_pot() || !m_internal.consume_heartbit()))
+      (user_better_pot || !no_hearthbit))
   {
     Msg_t msg{};
     pb_ostream_t ostream{};
@@ -36,21 +39,30 @@ void PotentialElectionTask_t::run(void) noexcept
       .potential = m_internal.user_potential(),
     };
 
+
     ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
-    if (pb_encode(&ostream, near_ap_NewElection_fields, &msg_index_v2))
+    if (!pb_encode(&ostream, near_ap_NewElection_fields, &msg_index_v2))
     {
-      BusStatus_t error = m_bus.Write(msg);
-      if (error != BusStatus_t::Ok)
-      {
-        static_log(logger::Level::Error, "write error: ");
-      }
+      static_log(logger::Level::Error, "encode error: ");
+      return;
     }
-    else
     {
-        static_log(logger::Level::Error, "encode error: ");
+      char buffer[100]{};
+      snprintf(buffer, sizeof(buffer), "node: %d, starting_new_election. user_pot_case: %b, no_hearthbit: %b",
+          id(), user_better_pot, no_hearthbit);
+      static_log(logger::Level::Warning, buffer);
     }
 
     m_internal.new_election();
+    BusStatus_t error = m_bus.Write(msg);
+    if (error != BusStatus_t::Ok)
+    {
+      char buffer[64]{};
+      snprintf(buffer, sizeof(buffer), "node: %d, write error: %d",
+          id(), static_cast<int>(error));
+      static_log(logger::Level::Error, buffer);
+    }
+
   }
 }

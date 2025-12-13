@@ -63,7 +63,8 @@ void LeaderAliveTask_t::run(void) noexcept
     }
 
     char buffer[128]{};
-    snprintf(buffer, sizeof(buffer), "node %d: i'm leader", m_internal.user_id());
+    snprintf(buffer, sizeof(buffer), "node %d: i'm leader with pot %d",
+        m_internal.user_id(), msg_index.value.heartbit.potential);
     static_log(logger::Level::Debug, buffer);
     m_leader_task();
   }
