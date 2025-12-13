@@ -56,13 +56,15 @@ void LeaderAliveTask_t::run(void) noexcept
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {
-
       char buffer[128]{};
       snprintf(buffer, sizeof(buffer),
           "write error: %s", PB_GET_ERROR(&ostream));
       static_log(logger::Level::Error, buffer);
     }
 
+    char buffer[128]{};
+    snprintf(buffer, sizeof(buffer), "node %d: i'm leader", m_internal.user_id());
+    static_log(logger::Level::Debug, buffer);
     m_leader_task();
   }
 }
