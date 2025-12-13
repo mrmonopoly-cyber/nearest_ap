@@ -38,7 +38,12 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_leader_pot = msg_index.value.heartbit.potential;
 
         m_internal.check_and_set_leader(new_leader_id, new_leader_pot);
-        std::cout << "recevied leader_heartbit: " << new_leader_id << ":" << new_leader_pot << std::endl;
+        std::cout
+          << "current node: "
+          << m_internal.user_id()
+          << " recevied leader_heartbit: "
+          << new_leader_id << ":" << new_leader_pot
+          << std::endl;
       }
       break;
     case near_ap_MessageIndexV2_new_election_tag:

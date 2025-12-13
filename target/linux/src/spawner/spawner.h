@@ -1,7 +1,9 @@
 #pragma once
 
 #include <array>
+#include <iostream>
 #include <nearest_ap/nearest_ap.hpp>
+#include <ostream>
 
 namespace nearest_ap
 {
@@ -24,9 +26,10 @@ class SpawnerLinux_t : public Spawner_t
               : m_run(true), m_freq(freq), m_base_task(m_base_task) {}
 
           TaskWrapper(TaskWrapper&&) =default;
-          TaskWrapper& operator=(TaskWrapper&&);
+          TaskWrapper& operator=(TaskWrapper&&) = default;
 
           bool can_execute() const noexcept;
+          bool still_valid() const noexcept;
           TaskId id() const noexcept;
 
           void stop() noexcept;
@@ -39,7 +42,9 @@ class SpawnerLinux_t : public Spawner_t
       };
 
     public:
-      explicit SpawnerLinux_t(){}
+      explicit SpawnerLinux_t(){
+        std::cout << "creating new empty task" << std::endl;
+      }
 
       SpawnerLinux_t(const SpawnerLinux_t& ) =delete;
       SpawnerLinux_t operator=(const SpawnerLinux_t& ) =delete;

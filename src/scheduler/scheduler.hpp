@@ -20,6 +20,8 @@ namespace nearest_ap
         Scheduler(const Scheduler&) =delete;
         Scheduler& operator=(const Scheduler&) =delete;
 
+        Scheduler (Scheduler&&) =default;
+
         Scheduler(
             SpawnerType spawner,
             Bus_t& bus,

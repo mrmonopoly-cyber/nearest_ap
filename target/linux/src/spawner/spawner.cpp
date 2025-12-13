@@ -38,32 +38,25 @@ SpawnerLinux_t::~SpawnerLinux_t()
 {
   for(auto& task: m_tasks)
   {
-    std::cout
-      << "stopping task: "
-      << task.id()
-      << std::endl;
-    task.stop();
+    if (task.still_valid())
+    {
+      std::cout
+        << "stopping task: "
+        << task.id()
+        << std::endl;
+      task.stop();
+    }
   }
-}
-
-SpawnerLinux_t::TaskWrapper& SpawnerLinux_t::TaskWrapper::operator=(TaskWrapper&&other)
-{
-  if (this != &other)
-  {
-    this->m_base_task = other.m_base_task;
-    this->m_run = other.m_run;
-    this->m_freq = other.m_freq;
-
-    other.m_base_task = nullptr;
-    other.m_run = false;
-    other.m_freq =0;
-  }
-  return *this;
 }
 
 bool SpawnerLinux_t::TaskWrapper::can_execute() const noexcept
 {
   return m_run;
+}
+
+bool SpawnerLinux_t::TaskWrapper::still_valid() const noexcept
+{
+  return m_base_task != nullptr;
 }
 
 TaskId SpawnerLinux_t::TaskWrapper::id() const noexcept

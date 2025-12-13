@@ -20,6 +20,8 @@ namespace nearest_ap {
 
       Node() = delete;
 
+      Node(Node&&) = default;
+
       explicit Node(
           Bus_t& bus,
           SpawnerType&& spawner,
