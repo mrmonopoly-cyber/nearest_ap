@@ -20,6 +20,12 @@ namespace nearest_ap::logger
           const int line,
           const Level,
           std::string_view str) noexcept =0;
+
+      void setLevel(Level) noexcept;
+      Level level(void) const noexcept;
+
+    private:
+      Level m_level = Level::Debug;
   };
 
   class StaticLog
