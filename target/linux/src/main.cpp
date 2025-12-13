@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <memory>
 #include <nearest_ap/nearest_ap.hpp>
-#include <optional>
 #include <sys/types.h>
 #include <thread>
 
@@ -19,6 +18,8 @@ int main(int argc, char **argv)
   LinuxLogger logger{};
   logger::StaticLog{&logger};
   auto leader_f = [](){};
+
+  logger.setLevel(logger::Level::Info);
 
   std::uint16_t num_clients = 2;
 
@@ -50,6 +51,10 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
+  auto bus_t_freq = 10;
+  auto pot_t_freq = 1000;
+  auto alive_t_freq = 30;
+
   for (std::uint16_t i=0; i<num_clients; ++i)
   {
     drones.push_back(std::make_unique<Node_t>(
@@ -60,9 +65,9 @@ int main(int argc, char **argv)
         []{return 12;}, 
         leader_f, 
         10,
-        10,
-        1000,
-        10));
+        bus_t_freq,
+        pot_t_freq,
+        alive_t_freq));
   }
 
   std::this_thread::sleep_for(std::chrono::hours(99));
