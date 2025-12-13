@@ -16,7 +16,9 @@ BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
 void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
-  if (m_internal.user_pot_better_leader_pot() && !m_internal.in_election())
+  if (!m_internal.is_leader() &&
+      !m_internal.in_election() &&
+      (m_internal.user_pot_better_leader_pot() || !m_internal.consume_heartbit()))
   {
     Msg_t msg{};
     pb_ostream_t ostream{};

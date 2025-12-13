@@ -60,26 +60,23 @@ namespace nearest_ap
           const ComputePot_f&& compute_pot,
           const Tollerance_t tollerance) noexcept;
 
-
-      void check_and_set_leader(const VirtualId_t& new_leader, const Potential_t pot) noexcept;
-
-      VirtualId_t user_id() const noexcept;
-
-      void compute_user_potential() noexcept;
-      bool user_pot_better_leader_pot() const noexcept;
-      Potential_t user_potential() const noexcept;
-
       Round_t round() const noexcept;
-      void update_round(Round_t round) noexcept;
-
       bool is_leader() const noexcept;
-
-      void support() noexcept;
-      void new_election() noexcept;
+      VirtualId_t user_id() const noexcept;
+      Potential_t user_potential() const noexcept;
+      bool user_pot_better_leader_pot() const noexcept;
+      bool consume_heartbit() noexcept;
       inline bool in_election() const noexcept
       {
         return m_vote_info.in_election();
       }
+
+      void compute_user_potential() noexcept;
+      void update_round(Round_t round) noexcept;
+      void check_and_set_leader(const VirtualId_t& new_leader, const Potential_t pot) noexcept;
+      void support() noexcept;
+      void new_election() noexcept;
+
 
 
     private:
@@ -110,6 +107,7 @@ namespace nearest_ap
       const std::uint32_t m_current_user_index;
       Potential_t m_user_potential;
       Potential_t m_leader_potential;
+      bool m_received_heartbit;
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
 

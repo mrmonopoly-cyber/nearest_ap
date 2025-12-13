@@ -18,6 +18,7 @@ Internal_t::Internal_t(
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
+  m_received_heartbit(false),
   m_compute_local_potential(compute_pot),
   m_tollerance(0),
   m_vote_info()
@@ -34,6 +35,7 @@ Internal_t::Internal_t(
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
+  m_received_heartbit(false),
   m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
   m_vote_info()
@@ -47,6 +49,7 @@ void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Poten
   {
     if(m_users.update_leader(new_leader))
     {
+      m_received_heartbit = true;
       m_leader_potential = pot;
     }
   }
@@ -74,6 +77,13 @@ Potential_t Internal_t::user_potential() const noexcept
 bool Internal_t::user_pot_better_leader_pot() const noexcept
 {
   return m_user_potential > m_leader_potential + m_tollerance;
+}
+
+bool Internal_t::consume_heartbit() noexcept
+{
+  bool consumed = m_received_heartbit;
+  m_received_heartbit = false;
+  return consumed;
 }
 
 bool Internal_t::is_leader() const noexcept
@@ -104,4 +114,5 @@ void Internal_t::support() noexcept
 void Internal_t::new_election() noexcept
 {
   m_vote_info.start_new_election();
+  support();
 }

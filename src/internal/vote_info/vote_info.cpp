@@ -33,7 +33,7 @@ void VoteInfo_t::support() noexcept
 
 bool VoteInfo_t::check_winning() noexcept
 {
-  bool res =m_consent > (m_num_candidates/2);
+  bool res =m_consent >= (m_num_candidates/2);
   if (res)
   {
     m_in_election = false;
