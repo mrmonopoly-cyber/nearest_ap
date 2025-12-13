@@ -38,6 +38,8 @@ class LinuxLogger : public nearest_ap::logger::Logger
         }
       };
 
+    void print_current_level() const noexcept override;
+
     static void _print_log(LinuxLogger*) noexcept;
 
   private:

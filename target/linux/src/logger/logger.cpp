@@ -27,6 +27,27 @@ static void _write_in(Color textColor,const char str[])
     << str << "\033[" << static_cast<uint>(Color::White) << "m";
 }
 
+void LinuxLogger::print_current_level() const noexcept 
+{
+  _write_in(Color::BrightMagenta, "CURRENT DEBUG LEVEL: ");
+  switch (nearest_ap::logger::StaticLog::level())
+  {
+    case nearest_ap::logger::Level::Debug:
+      _write_in(Color::BrightCyan, "DEBUG");
+      break;
+    case nearest_ap::logger::Level::Info:
+      _write_in(Color::BrightWhite, "INFO");
+      break;
+    case nearest_ap::logger::Level::Warning:
+      _write_in(Color::BrightYellow, "WARNING");
+      break;
+    case nearest_ap::logger::Level::Error:
+      _write_in(Color::BrightRed, "ERROR");
+      break;
+  }
+  std::cout << std::endl;
+}
+
 void LinuxLogger::_print_log(LinuxLogger* self) noexcept
 {
   while(true)
@@ -57,6 +78,7 @@ void LinuxLogger::_print_log(LinuxLogger* self) noexcept
           _write_in(Color::BrightRed, "ERROR");
           break;
       }
+
       std::cout
         << "]"
         << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %H:%M:%S")
