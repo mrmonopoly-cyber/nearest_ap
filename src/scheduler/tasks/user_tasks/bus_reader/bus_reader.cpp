@@ -24,6 +24,9 @@ void BusReaderTask_t::run(void) noexcept
   pb_istream_t stream;
   char buffer[256]{};
 
+  snprintf(buffer, sizeof(buffer), "bus reader task node: %d", m_internal.user_id());
+  static_log(logger::Level::Info, buffer);
+
   if (!msg_raw.has_value())
   {
     return;

@@ -33,6 +33,11 @@ void LeaderAliveTask_t::run(void) noexcept
   pb_ostream_t ostream{};
   near_ap_MessageIndexV2 msg_index = near_ap_MessageIndexV2_init_default;
 
+  char buffer[32]{};
+
+  snprintf(buffer, sizeof(buffer), "leader_alive task node: %d", m_internal.user_id());
+  static_log(logger::Level::Info, buffer);
+
   ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
   if (m_internal.is_leader())

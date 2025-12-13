@@ -18,6 +18,10 @@ void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
 
+  char buffer[32]{};
+  snprintf(buffer, sizeof(buffer), "potential task node: %d", m_internal.user_id());
+  static_log(logger::Level::Info, buffer);
+
   const auto no_hearthbit = m_internal.consume_heartbit();
   const auto user_better_pot = m_internal.user_pot_better_leader_pot();
   if (!m_internal.is_leader() &&
