@@ -12,16 +12,19 @@ namespace nearest_ap::logger
     Error
   };
 
+  class StaticLog;
+
   class Logger
   {
-    public:
-      virtual void log_full(
+    private:
+      friend StaticLog;
+       virtual void log_full(
           const char* file,
           const int line,
           const Level,
           std::string_view str) noexcept =0;
-
-      void setLevel(Level) noexcept;
+      virtual void print_current_level() const noexcept=0;
+      void set_level(Level) noexcept;
       Level level(void) const noexcept;
 
     private:
@@ -40,6 +43,10 @@ namespace nearest_ap::logger
       StaticLog& operator=(StaticLog&&) =delete;
 
       StaticLog(Logger*const);
+
+      static void print_current_level() noexcept;
+      static void set_level(Level) noexcept;
+      static Level level(void) noexcept;
 
       static void log_full(
           const char* file,

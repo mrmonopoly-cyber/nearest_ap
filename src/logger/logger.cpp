@@ -6,7 +6,7 @@ using namespace nearest_ap::logger;
 Logger* g_logger = nullptr;
 
 
-void Logger::setLevel(Level level) noexcept
+void Logger::set_level(Level level) noexcept
 {
   m_level = level;
 }
@@ -29,9 +29,27 @@ void StaticLog::log_full(
 {
   if (g_logger)
   {
-    if (level >=g_logger->level())
+    if (level >= g_logger->level())
     {
       return g_logger->log_full(file, line, level, str);
     }
   }
+}
+
+void StaticLog::set_level(Level l) noexcept
+{
+  if (g_logger)
+  {
+    g_logger->set_level(l);
+    g_logger->print_current_level();
+  }
+}
+
+Level StaticLog::level(void) noexcept
+{
+  if (g_logger)
+  {
+    return g_logger->level();
+  }
+  return Level::Debug;
 }
