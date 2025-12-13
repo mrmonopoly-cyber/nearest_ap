@@ -16,17 +16,15 @@ int main()
   using Topology = Node_t::Topology;
 
   const constexpr uint num_clients = 2;
-  std::array<BusLinux_t, num_clients> clients{};
-  std::array<std::optional<Node_t>, num_clients> drones{};
 
   LinuxLogger logger{};
   logger::StaticLog{&logger};
+  auto leader_f = [](){};
+
+  std::vector<BusLinux_t> clients{num_clients};
+  std::vector<std::optional<Node_t>> drones{num_clients};
 
   Topology topology{{0, 1}, 1};
-
-  auto leader_f = [](){
-    static_log(logger::Level::Debug, "I'm leader");
-  };
 
   for (auto& client : clients)
   {
