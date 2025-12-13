@@ -1,20 +1,13 @@
 #include <array>
 #include <chrono>
-#include <iostream>
 #include <nearest_ap/nearest_ap.hpp>
 #include <optional>
 #include <sys/types.h>
 #include <thread>
 
 #include "bus/bus.hpp"
+#include "logger/logger.hpp"
 #include "spawner/spawner.h"
-
-struct NodeCluster{
-  public:
-
-  private:
-};
-
 
 int main()
 {
@@ -26,10 +19,13 @@ int main()
   std::array<BusLinux_t, num_clients> clients{};
   std::array<std::optional<Node_t>, num_clients> drones{};
 
-  Topology topology{{0, 1}, 0};
+  LinuxLogger logger{};
+  logger::StaticLog{&logger};
+
+  Topology topology{{0, 1}, 1};
 
   auto leader_f = [](){
-    std::cout << "I'm leader" << std::endl;
+    static_log(logger::Level::Debug, "I'm leader");
   };
 
   for (auto& client : clients)

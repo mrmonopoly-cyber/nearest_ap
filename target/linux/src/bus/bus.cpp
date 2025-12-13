@@ -1,6 +1,6 @@
 #include <chrono>
+#include <cstdio>
 #include <cstring>
-#include <iostream>
 #include <mutex>
 #include <optional>
 #include <sys/socket.h>
@@ -34,7 +34,7 @@ static void _client_connection(ClientConnectionData client_socket_data)
   {
     if(read(data.client_socket, msg.m_payload.data(), msg.m_payload.size())<=0)
     {
-      std::cout << "closing connection";
+      static_log(logger::Level::Debug, "closing connection");
       return;
     }
     data.lock.lock();
@@ -58,25 +58,37 @@ void BusLinux_t::_socket_setup(void) noexcept
 
   unlink(sock_addr.sun_path); //INFO: remove old socket if still present
 
-  std::cout << "socket creation: " << sock_addr.sun_path << std::endl;
+  {
+    char buffer[128 + sizeof(sock_addr.sun_path)]{};
+    snprintf(buffer, sizeof(buffer), "socket creation: %s", sock_addr.sun_path);
+    static_log(logger::Level::Debug, buffer);
+  }
+
   m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
   if (m_socket<0)
   {
-    std::cout << "socket creation failed: " << strerror(errno) << std::endl;
+    char buffer[128]{};
+    snprintf(buffer, sizeof(buffer), "socket creation: %s", sock_addr.sun_path);
+    snprintf(buffer, sizeof(buffer), "socket creation failed: %s", strerror(errno));
+    static_log(logger::Level::Debug, buffer);
     return;
   }
 
   if(bind(m_socket, reinterpret_cast<const struct sockaddr *>(&sock_addr), sizeof(sock_addr))<0)
   {
-    std::cout << "socket bind failed: " << strerror(errno) << std::endl;
+    char buffer[128]{};
+    snprintf(buffer, sizeof(buffer), "socket bind failed: %s", strerror(errno));
+    static_log(logger::Level::Debug, buffer);
     return;
   }
 
   if(listen(m_socket, m_max_clients)<0)
   {
-    std::cout 
-      << "set socket listen to : " << m_max_clients 
-      << " with written: " << strerror(errno)<< std::endl;
+    char buffer[128]{};
+    snprintf(buffer, sizeof(buffer),
+        "set socket listen to : %ld  with written: %s", m_max_clients, strerror(errno));
+    static_log(logger::Level::Debug, buffer);
+
     return;
   }
 }
@@ -92,7 +104,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
 
     if( (sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1  )
     {
-      std::cout << "Client: Error on socket() call" << std::endl;
+      static_log(logger::Level::Debug, "Client: Error on socket() call");
       continue;
     }
     struct sockaddr_un remote
@@ -109,27 +121,28 @@ void BusLinux_t::enstablis_connection(void) noexcept
 
     if (i==id || m_clients[i]) //INFO: if myself or already saved
     {
-      std::cout 
-        << "client: " << id
-        << " skipping client: " << i
-        << std::endl;
+      char buffer[128]{};
+      snprintf(buffer, sizeof(buffer), "client: %d skipping client: %d", id, i);
+      static_log(logger::Level::Debug, buffer);
+
       continue;
     }
 
     if((written=connect(sock, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
     {
-      std::cout 
-        << "error connecting from client: " << id 
-        << " to client: " << remote.sun_path 
-        << " skipping client"
-        << std::endl;
+      char buffer[128 + sizeof(remote.sun_path)]{};
+      snprintf(buffer, sizeof(buffer),
+          "error connecting from client: %d to client: %s  skipping client", id, remote.sun_path);
+      static_log(logger::Level::Debug, buffer);
+
       continue;
     }
 
-    std::cout 
-      << "connection ok from client: " << id 
-      << " to client: " << remote.sun_path 
-      << std::endl;
+    char buffer[128 + sizeof(remote.sun_path)]{};
+    snprintf(buffer, sizeof(buffer),
+        "connection ok from client: %d to client: %s", id, remote.sun_path);
+    static_log(logger::Level::Debug, buffer);
+
     m_clients[m_client_connected++] = sock;
   }
 }
@@ -197,11 +210,11 @@ void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
     data.client_socket = accept(self->m_socket,reinterpret_cast<sockaddr*>(&remote), &size);
     if (data.client_socket<0)
     {
-      std::cout
-        << "error accepting connection: "
-        << " bus: " << self->m_id 
-        << "from: " << remote.sun_path
-        << std::endl;
+      char buffer[128 + sizeof(remote.sun_path)]{};
+      snprintf(buffer, sizeof(buffer),
+          "error accepting connection. bus: %d from: %s", self->m_id, remote.sun_path);
+      static_log(logger::Level::Debug, buffer);
+
       continue;
     }
     self->m_clients[self->m_client_connected++] = data.client_socket;

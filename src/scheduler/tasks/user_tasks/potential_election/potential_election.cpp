@@ -1,6 +1,7 @@
 #include "potential_election.hpp"
 
-#include <iostream>
+#include <string>
+#include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
 using Msg_t = Bus_t::Msg_t;
@@ -42,24 +43,12 @@ void PotentialElectionTask_t::run(void) noexcept
       BusStatus_t error = m_bus.Write(msg);
       if (error != BusStatus_t::Ok)
       {
-        std::cout
-          << "write error: "
-          << __FILE__ 
-          << ":"
-          << __LINE__
-          << std::endl;
+        static_log(logger::Level::Error, "write error: ");
       }
     }
     else
     {
-      std::cout
-        << "encode error: "
-        << PB_GET_ERROR(&ostream) 
-        << ", at: "
-        << __FILE__ 
-        << ":"
-        << __LINE__
-        << std::endl;
+        static_log(logger::Level::Error, "encode error: ");
     }
 
     m_internal.new_election();

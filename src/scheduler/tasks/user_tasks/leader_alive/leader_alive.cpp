@@ -1,5 +1,6 @@
 #include "leader_alive.hpp"
-#include <iostream>
+#include <string>
+#include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
 using Msg_t = Bus_t::Msg_t;
@@ -47,24 +48,19 @@ void LeaderAliveTask_t::run(void) noexcept
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
     {
-      std::cout
-        << "encode error: "
-        << PB_GET_ERROR(&ostream) 
-        << ", at: "
-        << __FILE__ 
-        << ":"
-        << __LINE__
-        << std::endl;
+      char buffer[128]{};
+      snprintf(buffer, sizeof(buffer),
+          "encode error: %s", PB_GET_ERROR(&ostream));
+      static_log(logger::Level::Error, buffer);
     }
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {
-      std::cout
-        << "write error: "
-        << __FILE__ 
-        << ":"
-        << __LINE__
-        << std::endl;
+
+      char buffer[128]{};
+      snprintf(buffer, sizeof(buffer),
+          "write error: %s", PB_GET_ERROR(&ostream));
+      static_log(logger::Level::Error, buffer);
     }
 
     m_leader_task();

@@ -1,7 +1,8 @@
 #include "bus_reader.hpp"
 
 #include <optional>
-#include <iostream>
+#include <string>
+#include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
 
@@ -36,14 +37,13 @@ void BusReaderTask_t::run(void) noexcept
       {
         const auto new_leader_id = msg_index.value.heartbit.id;
         const auto new_leader_pot = msg_index.value.heartbit.potential;
+        char buffer[256]{};
 
         m_internal.check_and_set_leader(new_leader_id, new_leader_pot);
-        std::cout
-          << "current node: "
-          << m_internal.user_id()
-          << " recevied leader_heartbit: "
-          << new_leader_id << ":" << new_leader_pot
-          << std::endl;
+        snprintf(buffer, sizeof(buffer),
+            "current node: %d, recevied leader_heartbit: %d:%d",
+            m_internal.user_id(), new_leader_id, new_leader_pot);
+        static_log(logger::Level::Debug, buffer);
       }
       break;
     case near_ap_MessageIndexV2_new_election_tag:
@@ -69,14 +69,14 @@ void BusReaderTask_t::run(void) noexcept
 
           if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
           {
-            std::cout
-              << "encode error: " << PB_GET_ERROR(&ostream)  << ", at: "
-              << __FILE__  << ":" << __LINE__ << std::endl;
+            char buffer[128]{};
+            snprintf(buffer, sizeof(buffer), "encode error: %s", PB_GET_ERROR(&ostream));
+            static_log(logger::Level::Error, buffer);
           }
           BusStatus_t error = m_bus.Write(*msg_raw);
           if (error != BusStatus_t::Ok)
           {
-            std::cout << "write error: " << __FILE__  << ":" << __LINE__ << std::endl;
+            static_log(logger::Level::Error, "write error");
           }
         }
       }

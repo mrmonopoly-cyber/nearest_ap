@@ -1,9 +1,7 @@
 #pragma once
 
 #include <array>
-#include <iostream>
 #include <nearest_ap/nearest_ap.hpp>
-#include <ostream>
 
 namespace nearest_ap
 {
@@ -42,8 +40,9 @@ class SpawnerLinux_t : public Spawner_t
       };
 
     public:
-      explicit SpawnerLinux_t(){
-        std::cout << "creating new empty task" << std::endl;
+      explicit SpawnerLinux_t()
+      {
+        static_log(logger::Level::Debug, "creating new empty task");
       }
 
       SpawnerLinux_t(const SpawnerLinux_t& ) =delete;

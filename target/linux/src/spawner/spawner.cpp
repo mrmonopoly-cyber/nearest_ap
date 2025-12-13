@@ -1,6 +1,7 @@
 #include "spawner.h"
+#include <cstdio>
+#include <string_view>
 #include <thread>
-#include <iostream>
 
 using namespace nearest_ap;
 
@@ -26,10 +27,9 @@ void SpawnerLinux_t::start_task(BaseTask_t* t) noexcept
 
 void SpawnerLinux_t::start_task(BaseTask_t* t, Millis_t f) noexcept
 {
-  std::cout
-    << "staring task: " << t->id()
-    << " with freq: " << f
-    << std::endl;
+  char buffer[128]{};
+  snprintf(buffer, sizeof(buffer), "staring task: %d with freq: %ld", t->id(), f);
+  static_log(logger::Level::Debug, buffer);
 
   _run_task(t,f);
 }
@@ -40,10 +40,9 @@ SpawnerLinux_t::~SpawnerLinux_t()
   {
     if (task.still_valid())
     {
-      std::cout
-        << "stopping task: "
-        << task.id()
-        << std::endl;
+      char buffer[128]{};
+      snprintf(buffer, sizeof(buffer), "stopping task: %d, ",task.id());
+      static_log(logger::Level::Debug, buffer);
       task.stop();
     }
   }
