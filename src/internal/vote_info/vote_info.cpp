@@ -4,14 +4,12 @@ using namespace nearest_ap;
 
 using Round_t = VoteInfo_t::Round_t;
 
-VoteInfo_t::VoteInfo_t():
-  m_num_candidates(1),
-  m_consent(0),
-  m_round(0)
-  {}
+VoteInfo_t::VoteInfo_t(const uint32_t num_candidates) noexcept:
+m_num_candidates(num_candidates)
+{}
 
 
-  void VoteInfo_t::start_new_election() noexcept
+void VoteInfo_t::start_new_election() noexcept
 {
   m_consent =0;
   m_round++;
@@ -33,9 +31,10 @@ void VoteInfo_t::support() noexcept
 
 bool VoteInfo_t::check_winning() noexcept
 {
-  bool res =m_consent >= (m_num_candidates/2);
+  bool res =m_consent >= (m_num_candidates/2)+1;
   if (res)
   {
+    m_consent =0;
     m_in_election = false;
   }
 

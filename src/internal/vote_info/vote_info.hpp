@@ -9,7 +9,8 @@ namespace nearest_ap {
       public:
         using Round_t = std::uint32_t;
 
-        VoteInfo_t();
+        VoteInfo_t() noexcept = default;
+        VoteInfo_t(const uint32_t num_candidates) noexcept;
 
         void start_new_election() noexcept;
         bool in_election() const noexcept;

@@ -2,6 +2,7 @@
 
 //Copyright (c) 2025 Alberto Damo. All Rights Reserved.
 
+#include <atomic>
 #include <functional>
 #include <cstdint>
 
@@ -107,7 +108,7 @@ namespace nearest_ap
       const std::uint32_t m_current_user_index;
       Potential_t m_user_potential;
       Potential_t m_leader_potential;
-      bool m_received_heartbit;
+      std::atomic_uint32_t m_received_heartbit;
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
 
