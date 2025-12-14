@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <nearest_ap/nearest_ap.hpp>
 #include <sys/types.h>
@@ -22,6 +23,20 @@ int main(int argc, char **argv)
   logger::StaticLog::set_level(logger::Level::Debug);
 
   std::uint16_t num_clients = 2;
+  auto leader = num_clients-1;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+  switch (argc)
+  {
+    case 3:
+      leader = std::atoi(argv[2]);
+    case 2:
+      num_clients= std::atoi(argv[1]);
+    default:
+      break;
+  }
+#pragma GCC diagnostic pop
 
   if (argc >=2)
   {
@@ -43,7 +58,7 @@ int main(int argc, char **argv)
     user_ids.emplace_back(i);
   }
 
-  Topology topology{user_ids, 1};
+  Topology topology{user_ids, static_cast<uint32_t>(leader)};
 
   for (auto& client : clients)
   {
@@ -51,9 +66,9 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
-  auto bus_t_freq = 10;
-  auto pot_t_freq = 1000;
-  auto alive_t_freq = 31;
+  auto bus_t_freq = 1000;
+  auto pot_t_freq = 5000;
+  auto alive_t_freq = 1000;
 
   (void) bus_t_freq;
   (void) pot_t_freq;
@@ -66,13 +81,13 @@ int main(int argc, char **argv)
         SpawnerLinux_t{},
         topology,
         i,
-        []{return 12;}, 
+        [i]{return 12 + i;}, 
         leader_f, 
-        10
+        0,
+        bus_t_freq,
+        pot_t_freq,
+        alive_t_freq
         ));
-        // bus_t_freq,
-        // pot_t_freq,
-        // alive_t_freq));
   }
 
   std::this_thread::sleep_for(std::chrono::hours(99));

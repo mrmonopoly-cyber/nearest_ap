@@ -1,9 +1,7 @@
 #include "bus_reader.hpp"
 
-#include <cmath>
 #include <optional>
 #include <nearest_ap/logger/logger.hpp>
-#include <stdio.h>
 
 using namespace nearest_ap;
 
