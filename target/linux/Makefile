@@ -9,7 +9,7 @@ LDIR := lib
 PROTOBUF_MESSAGE_PATH := $(LDIR)/messages
 
 # Compiler flags (optional, add as needed)
-CC_FLAGS := -Wall -Wextra 
+CC_FLAGS := -Wall -Wextra -g -O0
 CXX_FLAGS := $(CC_FLAGS) -std=c++17
 
 # Find all .cpp files in the src directory
