@@ -45,11 +45,13 @@ namespace nearest_ap::logger
 
         inline void append_msg(const std::string_view obj) noexcept
         {
-          const std::uint32_t written = snprintf(m_cursor, m_available_space,
-              "%.*s", static_cast<int>(obj.size()),obj.data());
-          m_cursor += written;
-          m_available_space -= written;
-
+          if (obj.length() <m_available_space)
+          {
+            const std::uint32_t written = snprintf(m_cursor, m_available_space,
+                "%.*s", static_cast<int>(obj.size()),obj.data());
+            m_cursor += written;
+            m_available_space -= written;
+          }
         }
 
         inline void append_msg(std::int32_t obj) noexcept
