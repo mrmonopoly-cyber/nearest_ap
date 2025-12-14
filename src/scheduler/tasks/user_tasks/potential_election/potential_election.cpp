@@ -17,16 +17,25 @@ void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
 
-  logger::UserLog<64> buffer;
-  buffer.append_msg("potential task node: ");
+  const auto hearthbit = m_internal.consume_heartbit();
+  const auto user_better_pot = m_internal.user_pot_better_leader_pot();
+
+  logger::UserLog<128> buffer;
+  buffer.append_msg("potential task node : ");
   buffer.append_msg(m_internal.user_id());
+  buffer.append_msg(" user_pot: ");
+  buffer.append_msg(m_internal.user_potential());
+  buffer.append_msg(" hearthbit: ");
+  buffer.append_msg(hearthbit);
+  buffer.append_msg(" in_election: ");
+  buffer.append_msg(m_internal.in_election());
+  buffer.append_msg(" is_leader: ");
+  buffer.append_msg(m_internal.is_leader());
   static_log(logger::Level::Info, buffer);
 
-  const auto no_hearthbit = m_internal.consume_heartbit();
-  const auto user_better_pot = m_internal.user_pot_better_leader_pot();
   if (!m_internal.is_leader() &&
       !m_internal.in_election() &&
-      (user_better_pot || !no_hearthbit))
+      (user_better_pot || !hearthbit))
   {
     Msg_t msg{};
     pb_ostream_t ostream{};
@@ -57,8 +66,6 @@ void PotentialElectionTask_t::run(void) noexcept
       log.append_msg(m_internal.user_id());
       log.append_msg(", starting_new_election. user_pot_case: ");
       log.append_msg(user_better_pot);
-      log.append_msg(", no_hearthbit: ");
-      log.append_msg(no_hearthbit);
       static_log(logger::Level::Warning, log);
     }
 
