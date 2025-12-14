@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <cstdio>
+#include <cstring>
 #include <string_view>
 
 namespace nearest_ap::logger
@@ -33,6 +34,13 @@ namespace nearest_ap::logger
         inline uint32_t original_size() const noexcept
         {
           return size;
+        }
+
+        inline void reset() noexcept
+        {
+          m_cursor = m_buffer;
+          m_available_space = size;
+          memset(m_buffer, 0, size);
         }
 
         inline void append_msg(const std::string_view obj) noexcept

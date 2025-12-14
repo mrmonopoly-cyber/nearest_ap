@@ -21,7 +21,7 @@ void BusReaderTask_t::run(void) noexcept
   std::optional<Msg_t> msg_raw{m_bus.Read()};
   _near_ap_MessageIndexV2 msg_index{};
   pb_istream_t stream;
-  logger::UserLog<100>log{};
+  logger::UserLog<200>log{};
   
   {
     logger::UserLog<32>log{};
@@ -79,6 +79,16 @@ void BusReaderTask_t::run(void) noexcept
         log.append_msg(new_round);
         log.append_msg(" -- pot");
         log.append_msg(new_pot);
+        log.append_msg(". Internal: ");
+        log.append_msg(" round: ");
+        log.append_msg(m_internal.round());
+        log.append_msg(" in_election: ");
+        log.append_msg(m_internal.in_election());
+        log.append_msg(" user_id: ");
+        log.append_msg(m_internal.user_id());
+        log.append_msg(" local pot: ");
+        log.append_msg(m_internal.user_potential());
+
         static_log(logger::Level::Info, log);
 
         if (new_round > m_internal.round() && new_pot > m_internal.user_potential())
@@ -120,17 +130,35 @@ void BusReaderTask_t::run(void) noexcept
         const auto user_vote_id = msg_index.value.vote_response.new_leader;
         const auto election_round = msg_index.value.vote_response.round;
 
-        log.append_msg("current node: ");
+        log.reset();
+        log.append_msg("recevied vote response: round: ");
+        log.append_msg(msg_index.value.vote_response.round);
+        log.append_msg(" new_leader: ");
+        log.append_msg(msg_index.value.vote_response.new_leader);
+        log.append_msg(" supporter: ");
+        log.append_msg(msg_index.value.vote_response.supporter);
+        log.append_msg(". Internal: ");
+        log.append_msg(" round: ");
+        log.append_msg(m_internal.round());
+        log.append_msg(" in_election: ");
+        log.append_msg(m_internal.in_election());
+        log.append_msg(" user_id: ");
         log.append_msg(m_internal.user_id());
-        log.append_msg(", recevied new vote response. :supporter");
-        log.append_msg(user_vote_id);
-        log.append_msg(election_round);
-        static_log(logger::Level::Debug, log);
+
+        static_log(logger::Level::Info, log);
 
         if (election_round == m_internal.round() &&
             m_internal.in_election() && 
             user_vote_id == m_internal.user_id())
         {
+          log.reset();
+          log.append_msg("current node: ");
+          log.append_msg(m_internal.user_id());
+          log.append_msg(", recevied new vote response. supporter: ");
+          log.append_msg(user_vote_id);
+          log.append_msg(" round: ");
+          log.append_msg(election_round);
+          static_log(logger::Level::Debug, log);
           m_internal.support();
         }
       }
