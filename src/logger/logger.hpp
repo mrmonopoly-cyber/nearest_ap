@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <cstdio>
 #include <string_view>
 
 namespace nearest_ap::logger
@@ -11,6 +13,59 @@ namespace nearest_ap::logger
     Warning,
     Error
   };
+
+  template <uint32_t size>
+    class UserLog 
+    {
+      public:
+        UserLog() = default;
+
+        UserLog(std::string_view str) noexcept
+          :m_buffer(str)
+        {
+        }
+
+        inline std::string_view raw() const noexcept
+        {
+          return m_buffer;
+        }
+
+        inline uint32_t original_size() const noexcept
+        {
+          return size;
+        }
+
+        inline void append_msg(const std::string_view obj) noexcept
+        {
+          const std::uint32_t written = snprintf(m_cursor, m_available_space,
+              "%.*s", static_cast<int>(obj.size()),obj.data());
+          m_cursor += written;
+          m_available_space -= written;
+
+        }
+
+        inline void append_msg(std::int32_t obj) noexcept
+        {
+          const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
+          m_cursor += written;
+          m_available_space -= written;
+        }
+
+        inline void append_msg(std::uint32_t obj) noexcept
+        {
+          const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
+          m_cursor += written;
+          m_available_space -= written;
+        }
+
+
+        template<typename T>
+          void append_msg(char* buffer, std::size_t buffer_size, T obj) noexcept = delete;
+      private:
+        char m_buffer[size]{};
+        char* m_cursor = m_buffer;
+        uint32_t m_available_space = size;
+    };
 
   class StaticLog;
 
@@ -48,17 +103,38 @@ namespace nearest_ap::logger
       static void set_level(Level) noexcept;
       static Level level(void) noexcept;
 
+
       static void log_full(
           const char* file,
           const int line,
           const Level level,
           const std::string_view str)noexcept;
+
+      template<uint32_t size>
+        static void log_full(
+            const char* file,
+            const int line,
+            const Level level,
+            const UserLog<size>& str)noexcept
+        {
+          if (StaticLog::g_logger)
+          {
+            if (level >= StaticLog::g_logger->level())
+            {
+              return StaticLog::g_logger->log_full(file, line, level, str.raw());
+            }
+          }
+        }
+
+
+    private:
+      static Logger* g_logger;
   };
 }
 
-#define static_log(LEVEL, STR)\
+#define static_log(LEVEL, LOG)\
   nearest_ap::logger::StaticLog::log_full( \
       __FILE__, \
       __LINE__, \
       LEVEL, \
-      STR)
+      LOG)
