@@ -44,18 +44,15 @@ void PotentialElectionTask_t::run(void) noexcept
     msg_index_v2.which_value = near_ap_MessageIndexV2_new_election_tag;
     msg_index_v2.value.new_election = 
     {
-      .has_round = true,
       .round = m_internal.round(),
-      .has_id = true,
       .id = m_internal.user_id(),
-      .has_potential = true,
       .potential = m_internal.user_potential(),
     };
 
 
     ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
-    if (!pb_encode(&ostream, near_ap_NewElection_fields, &msg_index_v2))
+    if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index_v2))
     {
       static_log(logger::Level::Error, "encode error: ");
       return;
@@ -64,8 +61,8 @@ void PotentialElectionTask_t::run(void) noexcept
       logger::UserLog<100> log{};
       log.append_msg("node: ");
       log.append_msg(m_internal.user_id());
-      log.append_msg(", starting_new_election. user_pot_case: ");
-      log.append_msg(user_better_pot);
+      log.append_msg(", starting_new_election. user potential: ");
+      log.append_msg(m_internal.user_potential());
       static_log(logger::Level::Warning, log);
     }
 

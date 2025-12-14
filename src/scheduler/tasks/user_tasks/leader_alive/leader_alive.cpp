@@ -45,9 +45,7 @@ void LeaderAliveTask_t::run(void) noexcept
     msg_index.which_value = near_ap_MessageIndexV2_heartbit_tag;
     msg_index.value.heartbit =
     {
-      .has_id = true,
       .id = static_cast<std::uint32_t>(m_internal.user_id()),
-      .has_potential = true,
       .potential = m_internal.user_potential(),
     };
 

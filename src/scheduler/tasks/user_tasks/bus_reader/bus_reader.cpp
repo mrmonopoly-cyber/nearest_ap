@@ -21,7 +21,7 @@ void BusReaderTask_t::run(void) noexcept
   std::optional<Msg_t> msg_raw{m_bus.Read()};
   _near_ap_MessageIndexV2 msg_index{};
   pb_istream_t stream;
-  logger::UserLog<64>log{};
+  logger::UserLog<100>log{};
   
   {
     logger::UserLog<32>log{};
@@ -43,8 +43,6 @@ void BusReaderTask_t::run(void) noexcept
     log.append_msg(m_internal.user_id());
     log.append_msg(", decode error: ");
     log.append_msg(PB_GET_ERROR(&stream));
-    log.append_msg(", tag: ");
-    log.append_msg(msg_index.which_value);
     static_log(logger::Level::Error, log);
     return;
   }
@@ -83,8 +81,9 @@ void BusReaderTask_t::run(void) noexcept
         log.append_msg(new_pot);
         static_log(logger::Level::Info, log);
 
-        if ( new_round > m_internal.round() && new_pot > m_internal.user_potential())
+        if (new_round > m_internal.round() && new_pot > m_internal.user_potential())
         {
+          msg_raw->reset();
           pb_ostream_t ostream = pb_ostream_from_buffer(
               msg_raw->m_payload.data(),
               msg_raw->m_payload.size());
@@ -93,11 +92,8 @@ void BusReaderTask_t::run(void) noexcept
           msg_index.which_value = near_ap_MessageIndexV2_vote_response_tag,
           msg_index.value.vote_response = 
           {
-            .has_round = true,
             .round = new_round,
-            .has_supporter = true,
             .supporter = m_internal.user_id(),
-            .has_new_leader = true,
             .new_leader = new_leader,
           };
 
@@ -107,12 +103,14 @@ void BusReaderTask_t::run(void) noexcept
             log.append_msg("encode error: ");
             log.append_msg(PB_GET_ERROR(&ostream));
             static_log(logger::Level::Error, log);
+            break;
           }
           msg_raw->m_msg_size = ostream.bytes_written;
           BusStatus_t error = m_bus.Write(*msg_raw);
           if (error != BusStatus_t::Ok)
           {
             static_log(logger::Level::Error, "write error");
+            break;
           }
         }
       }
