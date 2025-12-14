@@ -38,13 +38,20 @@ Round_t VoteInfo_t::round(void) const noexcept
 
 void VoteInfo_t::start_new_election(void) noexcept
 {
-  m_round++;
   m_consent=1;
   m_election_sent = true;
   m_voted = true;
 }
 
 void VoteInfo_t::end_election(void) noexcept
+{
+  m_round++;
+  m_election_sent = false;
+  m_voted = false;
+  m_consent =0;
+}
+
+void VoteInfo_t::renunce(void) noexcept
 {
   m_election_sent = false;
   m_voted = false;

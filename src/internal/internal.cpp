@@ -105,21 +105,16 @@ void Internal_t::recv_heartbit(
     return;
   }
 
-  const auto strong_leader_pot = leader_pot >= user_pot();
-  if (m_users.leader() == leader_id || strong_leader_pot)
+  m_vote_info.update_round(leader_round);
+  m_leader_potential = leader_pot;
+
+  if (leader_pot >= user_pot())
   {
-    m_leader_potential = leader_pot;
-    if (leader_round > round())
-    {
-      m_vote_info.update_round(leader_round);
-      m_vote_info.end_election();
-    }
-    if (strong_leader_pot)
-    {
-      m_users.update_leader(leader_id);
-    }
+    m_vote_info.renunce();
     m_received_heartbit++;
+    m_users.update_leader(leader_id);
   }
+
 }
 
 bool Internal_t::support_check_wining(void) noexcept

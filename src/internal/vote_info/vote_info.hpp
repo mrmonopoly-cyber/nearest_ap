@@ -19,6 +19,7 @@ namespace nearest_ap {
 
         void start_new_election(void) noexcept;
         void end_election(void) noexcept;
+        void renunce(void) noexcept;
         void support(void) noexcept;
         void vote(const Round_t, const bool leader) noexcept;
         void update_round(const Round_t round) noexcept;
