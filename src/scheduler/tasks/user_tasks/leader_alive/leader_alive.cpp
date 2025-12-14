@@ -40,13 +40,14 @@ void LeaderAliveTask_t::run(void) noexcept
 
   ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
-  if (m_internal.is_leader())
+  if (m_internal.leader())
   {
     msg_index.which_value = near_ap_MessageIndexV2_heartbit_tag;
     msg_index.value.heartbit =
     {
       .id = static_cast<std::uint32_t>(m_internal.user_id()),
-      .potential = m_internal.user_potential(),
+      .potential = m_internal.user_pot(),
+      .round = m_internal.round(),
     };
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))

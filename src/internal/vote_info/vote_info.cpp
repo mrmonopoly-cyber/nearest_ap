@@ -6,55 +6,68 @@ using namespace nearest_ap;
 
 using Round_t = VoteInfo_t::Round_t;
 
+//INFO: constructor
+
 VoteInfo_t::VoteInfo_t(const uint32_t num_candidates) noexcept:
 m_num_candidates(num_candidates)
 {}
 
+//INFO: observer
 
-void VoteInfo_t::start_new_election() noexcept
+bool VoteInfo_t::election_sent(void) const noexcept
 {
-  m_consent =0;
-  m_round++;
-  m_in_election = true;
+  return m_election_sent;
 }
 
-bool VoteInfo_t::in_election() const noexcept
+bool VoteInfo_t::voted(void) const noexcept
 {
-  return m_in_election;
+  return m_voted;
 }
 
-void VoteInfo_t::support() noexcept
+bool VoteInfo_t::won(void) const noexcept
 {
-  if (m_consent < m_num_candidates)
-  {
-    m_consent++;
-  }
+  return m_consent > (m_num_candidates/2)+1;
 }
 
-bool VoteInfo_t::check_winning() noexcept
-{
-  bool res =m_consent >= (m_num_candidates/2)+1;
-  if (res)
-  {
-    logger::UserLog<64>log{};
-    log.append_msg("node won election with: consent:");
-    log.append_msg(static_cast<std::uint32_t>(m_consent));
-    log.append_msg(static_cast<std::uint32_t>(m_num_candidates));
-    static_log(logger::Level::Warning, log);
-
-    m_consent =0;
-    m_in_election = false;
-  }
-
-  return res;
-}
-
-Round_t VoteInfo_t::round() const noexcept
+Round_t VoteInfo_t::round(void) const noexcept
 {
   return m_round;
 }
 
-void VoteInfo_t::update_round(Round_t round) noexcept
+//INFO: modifiers
+
+void VoteInfo_t::start_new_election(void) noexcept
+{
+  m_round++;
+  m_consent=1;
+  m_election_sent = true;
+}
+
+void VoteInfo_t::end_election(void) noexcept
+{
+  m_election_sent = false;
+  m_voted = false;
+  m_consent =0;
+}
+
+void VoteInfo_t::support(void) noexcept
+{
+  m_consent++;
+}
+
+void VoteInfo_t::vote(const Round_t round, const bool leader) noexcept
+{
+  if (!m_voted)
+  {
+    if (!leader)
+    {
+      update_round(round);
+    }
+    m_voted = !leader;
+  }
+}
+
+void VoteInfo_t::update_round(const Round_t round) noexcept
 {
   m_round = round;
 }

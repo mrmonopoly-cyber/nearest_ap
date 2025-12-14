@@ -17,40 +17,41 @@ void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
 
-  const auto hearthbit = m_internal.consume_heartbit();
-  const auto user_better_pot = m_internal.user_pot_better_leader_pot();
-
   logger::UserLog<128> buffer;
   buffer.append_msg("potential task node : ");
   buffer.append_msg(m_internal.user_id());
-  buffer.append_msg(" user_pot: ");
-  buffer.append_msg(m_internal.user_potential());
-  buffer.append_msg(" hearthbit: ");
-  buffer.append_msg(hearthbit);
-  buffer.append_msg(" in_election: ");
-  buffer.append_msg(m_internal.in_election());
+  buffer.append_msg(" election_sent: ");
+  buffer.append_msg(m_internal.election_sent());
+  buffer.append_msg(" voted: ");
+  buffer.append_msg(m_internal.voted());
   buffer.append_msg(" is_leader: ");
-  buffer.append_msg(m_internal.is_leader());
+  buffer.append_msg(m_internal.leader());
+  buffer.append_msg(" user_pot: ");
+  buffer.append_msg(m_internal.user_pot());
+  buffer.append_msg(" leader_pot: ");
+  buffer.append_msg(m_internal.leader_pot());
   static_log(logger::Level::Info, buffer);
 
-  if (!m_internal.is_leader() &&
-      !m_internal.in_election() &&
-      (user_better_pot || !hearthbit))
+  if (
+      !m_internal.voted() &&
+      !m_internal.leader() &&
+      ( m_internal.strong_pot() || m_internal.check_heartbit() )
+     )
   {
     Msg_t msg{};
-    pb_ostream_t ostream{};
+    pb_ostream_t ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());;
     _near_ap_MessageIndexV2 msg_index_v2 = near_ap_MessageIndexV2_init_default;
 
+    m_internal.new_election();
+  
     msg_index_v2.which_value = near_ap_MessageIndexV2_new_election_tag;
     msg_index_v2.value.new_election = 
     {
       .round = m_internal.round(),
       .id = m_internal.user_id(),
-      .potential = m_internal.user_potential(),
+      .potential = m_internal.user_pot(),
     };
 
-
-    ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index_v2))
     {
@@ -62,11 +63,12 @@ void PotentialElectionTask_t::run(void) noexcept
       log.append_msg("node: ");
       log.append_msg(m_internal.user_id());
       log.append_msg(", starting_new_election. user potential: ");
-      log.append_msg(m_internal.user_potential());
+      log.append_msg(m_internal.user_pot());
+      log.append_msg(", round: ");
+      log.append_msg(m_internal.round());
       static_log(logger::Level::Warning, log);
     }
 
-    m_internal.new_election();
     msg.m_msg_size = ostream.bytes_written;
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)

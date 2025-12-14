@@ -9,23 +9,25 @@ namespace nearest_ap {
       public:
         using Round_t = std::uint32_t;
 
-        VoteInfo_t() noexcept = default;
+        VoteInfo_t(void) noexcept = default;
         VoteInfo_t(const uint32_t num_candidates) noexcept;
 
-        void start_new_election() noexcept;
-        bool in_election() const noexcept;
+        bool election_sent(void) const noexcept;
+        bool voted() const noexcept;
+        bool won(void) const noexcept;
+        Round_t round(void) const noexcept;
 
-        void support() noexcept;
-
-        bool check_winning() noexcept;
-
-        Round_t round() const noexcept;
-        void update_round(Round_t round) noexcept;
+        void start_new_election(void) noexcept;
+        void end_election(void) noexcept;
+        void support(void) noexcept;
+        void vote(const Round_t, const bool leader) noexcept;
+        void update_round(const Round_t round) noexcept;
 
       private:
         std::size_t m_num_candidates = 1;
         std::size_t m_consent=0;
         Round_t m_round=0;
-        bool m_in_election = false;
+        bool m_election_sent = false;
+        bool m_voted = false;
     };
 };

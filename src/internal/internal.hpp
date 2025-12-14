@@ -61,24 +61,24 @@ namespace nearest_ap
           const ComputePot_f&& compute_pot,
           const Tollerance_t tollerance) noexcept;
 
-      Round_t round() const noexcept;
-      bool is_leader() const noexcept;
-      VirtualId_t user_id() const noexcept;
-      Potential_t user_potential() const noexcept;
-      bool user_pot_better_leader_pot() const noexcept;
-      bool consume_heartbit() noexcept;
-      inline bool in_election() const noexcept
-      {
-        return m_vote_info.in_election();
-      }
+      bool leader(void) const noexcept;
+      bool election_sent(void) const noexcept;
+      bool strong_pot(void) const noexcept;
+      bool voted(void) const noexcept;
+      Round_t round(void) const noexcept;
+      Potential_t user_pot(void) const noexcept;
+      Potential_t leader_pot(void) const noexcept;
+      VirtualId_t user_id(void) const noexcept;
 
-      void compute_user_potential() noexcept;
-      void update_round(Round_t round) noexcept;
-      void check_and_set_leader(const VirtualId_t& new_leader, const Potential_t pot) noexcept;
-      void support() noexcept;
-      void new_election() noexcept;
-
-
+      void new_election(void) noexcept;
+      void recv_heartbit(
+          const VirtualId_t leader_id,
+          const Potential_t leader_pot,
+          const Round_t round) noexcept;
+      bool support_check_wining(void) noexcept;
+      void vote_for(const Round_t round, const VirtualId_t user) noexcept;
+      void compute_user_potential(void) noexcept;
+      bool check_heartbit(void) noexcept;
 
     private:
       struct UserData_t

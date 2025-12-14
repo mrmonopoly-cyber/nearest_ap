@@ -9,6 +9,8 @@ using Round_t = Internal_t::Round_t;
 using ComputePot_f = Internal_t::ComputePot_f;
 using Topology = Internal_t::Topology;
 
+//INFO: Constructor
+
 Internal_t::Internal_t(
     Topology&& topology,
     const std::uint16_t current_user_index,
@@ -17,12 +19,13 @@ Internal_t::Internal_t(
 : m_users(topology),
   m_current_user_index(current_user_index),
   m_user_potential(0),
-  m_leader_potential(0),
+  m_leader_potential(~0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(0),
   m_vote_info(m_users.m_elements.size())
 {
+  compute_user_potential();
 }
 
 Internal_t::Internal_t(
@@ -34,83 +37,127 @@ Internal_t::Internal_t(
 : m_users(topology),
   m_current_user_index(current_user_index),
   m_user_potential(0),
-  m_leader_potential(0),
+  m_leader_potential(~0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
   m_vote_info(m_users.m_elements.size())
 {
+  compute_user_potential();
 }
 
-void Internal_t::check_and_set_leader(const VirtualId_t &new_leader, const Potential_t pot) noexcept
+//INFO: Obvserver
+
+bool Internal_t::leader(void) const noexcept
 {
-  if (pot > m_leader_potential + m_tollerance)
-  {
-    if(m_users.update_leader(new_leader))
-    {
-      m_received_heartbit++;
-      m_leader_potential = pot;
-    }
-  }
+  return m_users.m_leader_index == m_current_user_index;
 }
 
-VirtualId_t Internal_t::user_id() const noexcept
+bool Internal_t::election_sent(void) const noexcept
 {
-  return m_users.m_elements[m_current_user_index];
+  return m_vote_info.election_sent();
 }
 
-void Internal_t::compute_user_potential() noexcept
+bool Internal_t::strong_pot(void) const noexcept
 {
-  m_user_potential = m_compute_local_potential();
-  if (is_leader())
-  {
-    m_leader_potential = m_user_potential;
-  }
+  return user_pot() > m_leader_potential + m_tollerance;
 }
 
-Potential_t Internal_t::user_potential() const noexcept
+bool Internal_t::voted(void) const noexcept
 {
-  return m_user_potential;
+  return m_vote_info.voted();
 }
 
-bool Internal_t::user_pot_better_leader_pot() const noexcept
-{
-  return m_user_potential > m_leader_potential + m_tollerance;
-}
-
-bool Internal_t::consume_heartbit() noexcept
-{
-  m_received_heartbit--;
-  return m_received_heartbit;
-}
-
-bool Internal_t::is_leader() const noexcept
-{
-  return m_users.m_elements[m_current_user_index] == m_users.leader();
-}
-
-Round_t Internal_t::round() const noexcept
+Round_t Internal_t::round(void) const noexcept
 {
   return m_vote_info.round();
 }
 
-void Internal_t::update_round(Round_t round) noexcept
+Potential_t Internal_t::user_pot(void) const noexcept
 {
-  m_vote_info.update_round(round);
+  return m_user_potential;
 }
 
-void Internal_t::support() noexcept
+Potential_t Internal_t::leader_pot(void) const noexcept
+{
+  return m_leader_potential;
+}
+
+VirtualId_t Internal_t::user_id(void) const noexcept
+{
+  return m_users.m_elements[m_current_user_index];
+}
+
+//INFO: Modifiers
+
+void Internal_t::new_election(void) noexcept
+{
+  m_vote_info.start_new_election();
+}
+
+void Internal_t::recv_heartbit(
+    const VirtualId_t leader_id,
+    const Potential_t leader_pot,
+    const Round_t leader_round) noexcept
+{
+  if (leader_round < round())
+  {
+    return;
+  }
+
+  const auto strong_leader_pot = leader_pot >= user_pot();
+  if (m_users.leader() == leader_id || strong_leader_pot)
+  {
+    m_leader_potential = leader_pot;
+    if (leader_round > round())
+    {
+      m_vote_info.update_round(leader_round);
+      m_vote_info.end_election();
+    }
+    if (strong_leader_pot)
+    {
+      m_users.update_leader(leader_id);
+    }
+    m_received_heartbit++;
+  }
+}
+
+bool Internal_t::support_check_wining(void) noexcept
 {
   m_vote_info.support();
-  if(m_vote_info.check_winning())
+  const bool res = m_vote_info.won();
+
+  if (res)
   {
+    m_vote_info.end_election();
     m_users.m_leader_index = m_current_user_index;
+    m_leader_potential = m_user_potential;
+  }
+
+  return res;
+}
+
+void Internal_t::vote_for(const Round_t round, const VirtualId_t user) noexcept
+{
+  m_vote_info.vote(round, leader());
+  (void) user; //TODO: add an use case in future
+}
+
+void Internal_t::compute_user_potential(void) noexcept
+{
+  m_user_potential = m_compute_local_potential();
+  if (leader())
+  {
     m_leader_potential = m_user_potential;
   }
 }
 
-void Internal_t::new_election() noexcept
+bool Internal_t::check_heartbit() noexcept
 {
-  m_vote_info.start_new_election();
-  support();
+  if (m_received_heartbit)
+  {
+    m_received_heartbit--;
+  }
+
+  return m_received_heartbit;
 }
