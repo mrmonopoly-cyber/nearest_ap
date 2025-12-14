@@ -66,6 +66,9 @@ void BusReaderTask_t::run(void) noexcept
         log.append_msg(new_leader_pot);
         log.append_msg(", round: ");
         log.append_msg(new_leader_round);
+        log.append_msg("| internal>");
+        log.append_msg(" round: ");
+        log.append_msg(m_internal.round());
         static_log(logger::Level::Debug, log);
       }
       break;
@@ -96,6 +99,7 @@ void BusReaderTask_t::run(void) noexcept
         if (
             new_round >= m_internal.round() &&
             new_pot > m_internal.user_pot() &&
+            !m_internal.election_sent() &&
             !m_internal.voted()
            )
         {
@@ -113,6 +117,15 @@ void BusReaderTask_t::run(void) noexcept
             .supporter = m_internal.user_id(),
             .new_leader = new_leader,
           };
+
+          log.reset();
+          log.append_msg("current node: ");
+          log.append_msg(m_internal.user_id());
+          log.append_msg(" sending vote request to: ");
+          log.append_msg(new_leader);
+          log.append_msg(" with round: ");
+          log.append_msg(new_round);
+          static_log(logger::Level::Info, log);
 
           if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
           {
@@ -138,6 +151,8 @@ void BusReaderTask_t::run(void) noexcept
         const auto election_round = msg_index.value.vote_response.round;
 
         log.reset();
+        log.append_msg("current node: ");
+        log.append_msg(m_internal.user_id());
         log.append_msg("recevied vote response.");
         log.append_msg(" round: ");
         log.append_msg(msg_index.value.vote_response.round);

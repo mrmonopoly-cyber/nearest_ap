@@ -74,6 +74,8 @@ void LeaderAliveTask_t::run(void) noexcept
     log.append_msg(m_internal.user_id());
     log.append_msg(": i'm leader with pot ");
     log.append_msg(msg_index.value.heartbit.potential);
+    log.append_msg(", round: ");
+    log.append_msg(msg_index.value.heartbit.round);
     static_log(logger::Level::Debug, log);
     m_leader_task();
   }
