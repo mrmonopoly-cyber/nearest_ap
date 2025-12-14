@@ -1,5 +1,5 @@
 #include "leader_alive.hpp"
-#include <string>
+#include <cstdint>
 #include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
@@ -33,10 +33,10 @@ void LeaderAliveTask_t::run(void) noexcept
   pb_ostream_t ostream{};
   near_ap_MessageIndexV2 msg_index = near_ap_MessageIndexV2_init_default;
 
-  char buffer[32]{};
-
-  snprintf(buffer, sizeof(buffer), "leader_alive task node: %d", m_internal.user_id());
-  static_log(logger::Level::Info, buffer);
+  logger::UserLog<32>log{};
+  log.append_msg("leader_alive task node: ");
+  log.append_msg(m_internal.user_id());
+  static_log(logger::Level::Info, log);
 
   ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
@@ -53,26 +53,29 @@ void LeaderAliveTask_t::run(void) noexcept
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
     {
-      char buffer[128]{};
-      snprintf(buffer, sizeof(buffer),
-          "encode error: %s", PB_GET_ERROR(&ostream));
-      static_log(logger::Level::Error, buffer);
+      logger::UserLog<48>log{};
+      log.append_msg("encode error: ");
+      log.append_msg(PB_GET_ERROR(&ostream));
+      static_log(logger::Level::Error, log);
     }
     msg.m_msg_size = ostream.bytes_written;
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {
-      char buffer[128]{};
-      snprintf(buffer, sizeof(buffer),
-          "node %d, write error: %d",
-          m_internal.user_id(), static_cast<int>(error));
-      static_log(logger::Level::Error, buffer);
+      logger::UserLog<48>log{};
+      log.append_msg("node ");
+      log.append_msg(m_internal.user_id());
+      log.append_msg(", write error: ");
+      log.append_msg(static_cast<std::int32_t>(error));
+      static_log(logger::Level::Error, log);
     }
 
-    char buffer[128]{};
-    snprintf(buffer, sizeof(buffer), "node %d: i'm leader with pot %d",
-        m_internal.user_id(), msg_index.value.heartbit.potential);
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<48>log{};
+    log.append_msg("node ");
+    log.append_msg(m_internal.user_id());
+    log.append_msg(": i'm leader with pot ");
+    log.append_msg(msg_index.value.heartbit.potential);
+    static_log(logger::Level::Debug, log);
     m_leader_task();
   }
 }

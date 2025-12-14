@@ -1,6 +1,5 @@
 #include "potential_election.hpp"
 
-#include <cstdio>
 #include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
@@ -18,8 +17,9 @@ void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
 
-  char buffer[32]{};
-  snprintf(buffer, sizeof(buffer), "potential task node: %d", m_internal.user_id());
+  logger::UserLog<64> buffer;
+  buffer.append_msg("potential task node: ");
+  buffer.append_msg(m_internal.user_id());
   static_log(logger::Level::Info, buffer);
 
   const auto no_hearthbit = m_internal.consume_heartbit();
@@ -52,10 +52,14 @@ void PotentialElectionTask_t::run(void) noexcept
       return;
     }
     {
-      char buffer[100]{};
-      snprintf(buffer, sizeof(buffer), "node: %d, starting_new_election. user_pot_case: %b, no_hearthbit: %b",
-          id(), user_better_pot, no_hearthbit);
-      static_log(logger::Level::Warning, buffer);
+      logger::UserLog<100> log{};
+      log.append_msg("node: ");
+      log.append_msg(m_internal.user_id());
+      log.append_msg(", starting_new_election. user_pot_case: ");
+      log.append_msg(user_better_pot);
+      log.append_msg(", no_hearthbit: ");
+      log.append_msg(no_hearthbit);
+      static_log(logger::Level::Warning, log);
     }
 
     m_internal.new_election();
@@ -63,10 +67,12 @@ void PotentialElectionTask_t::run(void) noexcept
     BusStatus_t error = m_bus.Write(msg);
     if (error != BusStatus_t::Ok)
     {
-      char buffer[64]{};
-      snprintf(buffer, sizeof(buffer), "node: %d, write error: %d",
-          id(), static_cast<int>(error));
-      static_log(logger::Level::Error, buffer);
+      logger::UserLog<64> log{};
+      log.append_msg("node: ");
+      log.append_msg(m_internal.user_id());
+      log.append_msg(", write error: ");
+      log.append_msg(static_cast<int>(error));
+      static_log(logger::Level::Error, log);
     }
 
   }

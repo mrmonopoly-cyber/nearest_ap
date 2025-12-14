@@ -1,6 +1,5 @@
 #include "vote_info.hpp"
 
-#include <cstdio>
 #include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
@@ -37,10 +36,12 @@ bool VoteInfo_t::check_winning() noexcept
   bool res =m_consent >= (m_num_candidates/2)+1;
   if (res)
   {
-    char buffer[64]{};
-    snprintf(buffer, sizeof(buffer), "node won election with: consent:%ld, candidates:%ld", 
-        m_consent, m_num_candidates);
-    static_log(logger::Level::Warning, buffer);
+    logger::UserLog<64>log{};
+    log.append_msg("node won election with: consent:");
+    log.append_msg(static_cast<std::uint32_t>(m_consent));
+    log.append_msg(static_cast<std::uint32_t>(m_num_candidates));
+    static_log(logger::Level::Warning, log);
+
     m_consent =0;
     m_in_election = false;
   }

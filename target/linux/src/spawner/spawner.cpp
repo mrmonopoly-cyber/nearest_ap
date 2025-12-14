@@ -1,4 +1,5 @@
 #include "spawner.h"
+#include <cstdint>
 #include <cstdio>
 #include <string_view>
 #include <thread>
@@ -27,9 +28,12 @@ void SpawnerLinux_t::start_task(BaseTask_t* t) noexcept
 
 void SpawnerLinux_t::start_task(BaseTask_t* t, Millis_t f) noexcept
 {
-  char buffer[128]{};
-  snprintf(buffer, sizeof(buffer), "staring task: %d with freq: %ld", t->id(), f);
-  static_log(logger::Level::Debug, buffer);
+  logger::UserLog<128>log{};
+  log.append_msg("staring task: ");
+  log.append_msg(t->id());
+  log.append_msg(" with freq: ");
+  log.append_msg(static_cast<uint32_t>(f));
+  static_log(logger::Level::Debug, log);
 
   _run_task(t,f);
 }
@@ -40,9 +44,10 @@ SpawnerLinux_t::~SpawnerLinux_t()
   {
     if (task.still_valid())
     {
-      char buffer[128]{};
-      snprintf(buffer, sizeof(buffer), "stopping task: %d, ",task.id());
-      static_log(logger::Level::Debug, buffer);
+      logger::UserLog<128>log{};
+      log.append_msg("stopping task: ");
+      log.append_msg(task.id());
+      static_log(logger::Level::Debug, log);
       task.stop();
     }
   }

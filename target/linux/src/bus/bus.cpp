@@ -48,9 +48,11 @@ static void _client_connection(ClientConnectionData client_socket_data)
   Msg_t msg{};
 
   {
-    char buffer[32]{};
-    snprintf(buffer, sizeof(buffer),"node %d staring read mex bus", client_socket_data.id);
-    static_log(logger::Level::Info, buffer);
+    logger::UserLog<32>log{};
+    log.append_msg("node ");
+    log.append_msg(client_socket_data.id);
+    log.append_msg(" staring read mex bus");
+    static_log(logger::Level::Info, log);
   }
 
   while (true)
@@ -71,9 +73,11 @@ static void _client_connection(ClientConnectionData client_socket_data)
     data.lock.unlock();
   }
 
-  char buffer[64]{};
-  snprintf(buffer, sizeof(raw_buffer), "node %d stopping listening", data.id);
-  static_log(logger::Level::Warning, buffer);
+  logger::UserLog<64>log{};
+  log.append_msg("node ");
+  log.append_msg(data.id);
+  log.append_msg(" stopping listening");
+  static_log(logger::Level::Warning, log);
 }
 
 void BusLinux_t::_socket_setup(void) noexcept
@@ -92,35 +96,41 @@ void BusLinux_t::_socket_setup(void) noexcept
   unlink(sock_addr.sun_path); //INFO: remove old socket if still present
 
   {
-    char buffer[128 + sizeof(sock_addr.sun_path)]{};
-    snprintf(buffer, sizeof(buffer), "socket creation: %s", sock_addr.sun_path);
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<32 + sizeof(sock_addr.sun_path)> log{};
+    log.append_msg("socket creation: ");
+    log.append_msg(sock_addr.sun_path);
+    static_log(logger::Level::Debug, log);
   }
 
   m_socket = socket(AF_UNIX, SOCK_STREAM, 0);
   if (m_socket<0)
   {
-    char buffer[128]{};
-    snprintf(buffer, sizeof(buffer), "socket creation: %s", sock_addr.sun_path);
-    snprintf(buffer, sizeof(buffer), "socket creation failed: %s", strerror(errno));
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<64 + sizeof(sock_addr.sun_path)> log{};
+    log.append_msg("socket creation: ");
+    log.append_msg(sock_addr.sun_path);
+    log.append_msg(", socket creation failed: ");
+    log.append_msg(strerror(errno));
+    static_log(logger::Level::Debug, log);
     return;
   }
 
   if(bind(m_socket, reinterpret_cast<const struct sockaddr *>(&sock_addr), sizeof(sock_addr))<0)
   {
-    char buffer[128]{};
-    snprintf(buffer, sizeof(buffer), "socket bind failed: %s", strerror(errno));
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<32> log{};
+    log.append_msg("socket bind failed: ");
+    log.append_msg(strerror(errno));
+    static_log(logger::Level::Debug, log);
     return;
   }
 
   if(listen(m_socket, m_max_clients)<0)
   {
-    char buffer[128]{};
-    snprintf(buffer, sizeof(buffer),
-        "set socket listen to : %ld  with written: %s", m_max_clients, strerror(errno));
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<64> log{};
+    log.append_msg("set socket listen to : ");
+    log.append_msg(static_cast<uint32_t>(m_max_clients));
+    log.append_msg("with written: ");
+    log.append_msg(strerror(errno));
+    static_log(logger::Level::Debug, log);
 
     return;
   }
@@ -155,27 +165,34 @@ void BusLinux_t::enstablis_connection(void) noexcept
 
     if (i==id || m_clients[i]) //INFO: if myself or already saved
     {
-      char buffer[128]{};
-      snprintf(buffer, sizeof(buffer), "client: %d skipping client: %d", id, i);
-      static_log(logger::Level::Debug, buffer);
+      logger::UserLog<64> log{};
+      log.append_msg("client: ");
+      log.append_msg(id);
+      log.append_msg(" skipping client: ");
+      log.append_msg(i);
+      static_log(logger::Level::Debug, log);
 
       continue;
     }
 
     if((written=connect(data.client_socket, reinterpret_cast<const struct sockaddr *>(&remote), sizeof(remote))<0))
     {
-      char buffer[128 + sizeof(remote.sun_path)]{};
-      snprintf(buffer, sizeof(buffer),
-          "error connecting from client: %d to client: %s  skipping client", id, remote.sun_path);
-      static_log(logger::Level::Debug, buffer);
+      logger::UserLog<64 + sizeof(remote.sun_path)>log{};
+      log.append_msg("error connecting from client: ");
+      log.append_msg(id);
+      log.append_msg(" skipping client");
+      log.append_msg(remote.sun_path);
+      static_log(logger::Level::Debug, log);
 
       continue;
     }
 
-    char buffer[128 + sizeof(remote.sun_path)]{};
-    snprintf(buffer, sizeof(buffer),
-        "connection ok from client: %d to client: %s", id, remote.sun_path);
-    static_log(logger::Level::Debug, buffer);
+    logger::UserLog<64 + sizeof(remote.sun_path)>log{};
+    log.append_msg("connection ok from client: ");
+    log.append_msg(id);
+    log.append_msg(" to client: ");
+    log.append_msg(remote.sun_path);
+    static_log(logger::Level::Debug, log);
 
     std::thread client{_client_connection, std::move(data)};
     client.detach();
@@ -254,10 +271,12 @@ void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
     data.client_socket = accept(self->m_socket,reinterpret_cast<sockaddr*>(&remote), &size);
     if (data.client_socket<0)
     {
-      char buffer[128 + sizeof(remote.sun_path)]{};
-      snprintf(buffer, sizeof(buffer),
-          "error accepting connection. bus: %d from: %s", self->m_id, remote.sun_path);
-      static_log(logger::Level::Debug, buffer);
+      logger::UserLog<64 + sizeof(remote.sun_path)>log{};
+      log.append_msg("error accepting connection. bus: ");
+      log.append_msg(self->m_id);
+      log.append_msg(" from: ");
+      log.append_msg(remote.sun_path);
+      static_log(logger::Level::Debug, log);
 
       continue;
     }
