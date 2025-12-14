@@ -26,7 +26,7 @@ bool VoteInfo_t::voted(void) const noexcept
 
 bool VoteInfo_t::won(void) const noexcept
 {
-  return m_consent > (m_num_candidates/2)+1;
+  return m_consent > (m_num_candidates/2);
 }
 
 Round_t VoteInfo_t::round(void) const noexcept
@@ -41,6 +41,7 @@ void VoteInfo_t::start_new_election(void) noexcept
   m_round++;
   m_consent=1;
   m_election_sent = true;
+  m_voted = true;
 }
 
 void VoteInfo_t::end_election(void) noexcept
@@ -63,7 +64,7 @@ void VoteInfo_t::vote(const Round_t round, const bool leader) noexcept
     {
       update_round(round);
     }
-    m_voted = !leader;
+    m_voted = true;
   }
 }
 
