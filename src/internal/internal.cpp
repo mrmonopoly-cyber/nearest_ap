@@ -132,10 +132,22 @@ bool Internal_t::support_check_wining(void) noexcept
   return res;
 }
 
-void Internal_t::vote_for(const Round_t round, const VirtualId_t user) noexcept
+void Internal_t::abort_election(const VirtualId_t leader, const Potential_t leader_pot) noexcept
+{
+  if (m_best_candidate != leader && m_best_candidate_pot >= leader_pot)
+  {
+    m_vote_info.renunce();
+    m_users.update_leader(leader);
+    m_leader_potential = leader_pot;
+    vote_for(round(), leader, leader_pot);
+  }
+}
+
+void Internal_t::vote_for(const Round_t round, const VirtualId_t user, const Potential_t pot) noexcept
 {
   m_vote_info.vote(round, leader());
-  (void) user; //TODO: add an use case in future
+  m_best_candidate = user;
+  m_best_candidate_pot = pot;
 }
 
 void Internal_t::compute_user_potential(void) noexcept
