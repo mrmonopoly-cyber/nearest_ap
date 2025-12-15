@@ -60,7 +60,8 @@ bool Internal_t::election_sent(void) const noexcept
 
 bool Internal_t::strong_pot(void) const noexcept
 {
-  return user_pot() > m_leader_potential + m_tollerance;
+  return 
+    user_pot() > m_leader_potential + m_tollerance;
 }
 
 bool Internal_t::voted(void) const noexcept
@@ -105,14 +106,14 @@ void Internal_t::new_election(void) noexcept
   m_vote_info.start_new_election();
 }
 
-void Internal_t::recv_heartbit(
+bool Internal_t::recv_heartbit(
     const VirtualId_t leader_id,
     const Potential_t leader_pot,
     const Round_t leader_round) noexcept
 {
   if (leader_round < round())
   {
-    return;
+    return false;
   }
 
   m_vote_info.update_round(leader_round);
@@ -123,23 +124,16 @@ void Internal_t::recv_heartbit(
    m_best_candidate = leader_id;
   }
 
-  if (
-      (
-       leader_pot >= user_pot() &&
-       !(leader_id != leader() && leader_pot < m_leader_potential)
-      )
-      ||
-      (
-       leader_pot >= user_pot() &&
-       leader_round > round()
-      )
-     )
+  if (leader_pot >= user_pot())
   {
     m_leader_potential = leader_pot;
     m_vote_info.renunce();
     m_received_heartbit++;
     m_users.update_leader(leader_id);
+    return true;
   }
+
+  return false;
 
 }
 
@@ -158,22 +152,16 @@ bool Internal_t::support_check_wining(void) noexcept
   return res;
 }
 
-void Internal_t::abort_election(const VirtualId_t leader, const Potential_t leader_pot) noexcept
+void Internal_t::abort_election(const Round_t round, const VirtualId_t leader_id, const Potential_t leader_pot) noexcept
 {
   if (m_best_candidate_pot >= leader_pot)
   {
     m_vote_info.renunce();
-    m_users.update_leader(leader);
-    m_leader_potential = leader_pot;
-    vote_for(round(), leader, leader_pot);
+    m_vote_info.update_round(round);
+    m_vote_info.vote(round, leader());
+    m_best_candidate = leader_id;
+    m_best_candidate_pot = leader_pot;
   }
-}
-
-void Internal_t::vote_for(const Round_t round, const VirtualId_t user, const Potential_t pot) noexcept
-{
-  m_vote_info.vote(round, leader());
-  m_best_candidate = user;
-  m_best_candidate_pot = pot;
 }
 
 void Internal_t::compute_user_potential(void) noexcept
@@ -182,6 +170,11 @@ void Internal_t::compute_user_potential(void) noexcept
   if (leader())
   {
     m_leader_potential = m_user_potential;
+  }
+  if(m_user_potential > m_best_candidate_pot + m_tollerance)
+  {
+    m_best_candidate_pot = m_user_potential;
+    m_best_candidate = m_users.m_elements[m_current_user_index];
   }
 }
 

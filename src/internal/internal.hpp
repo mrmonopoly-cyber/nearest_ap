@@ -68,18 +68,17 @@ namespace nearest_ap
       Round_t round(void) const noexcept;
       Potential_t user_pot(void) const noexcept;
       Potential_t leader_pot(void) const noexcept;
-      VirtualId_t better_candidate_pot(void) const noexcept;
+      Potential_t better_candidate_pot(void) const noexcept;
       VirtualId_t user_id(void) const noexcept;
       VirtualId_t better_candidate(void) const noexcept;
 
       void new_election(void) noexcept;
-      void recv_heartbit(
+      bool recv_heartbit(
           const VirtualId_t leader_id,
           const Potential_t leader_pot,
           const Round_t round) noexcept;
       bool support_check_wining(void) noexcept;
-      void abort_election(const VirtualId_t leader, const Potential_t leader_pot) noexcept;
-      void vote_for(const Round_t round, const VirtualId_t user, const Potential_t pot) noexcept;
+      void abort_election(const Round_t round, const VirtualId_t leader, const Potential_t leader_pot) noexcept;
       void compute_user_potential(void) noexcept;
       bool check_heartbit(void) noexcept;
 

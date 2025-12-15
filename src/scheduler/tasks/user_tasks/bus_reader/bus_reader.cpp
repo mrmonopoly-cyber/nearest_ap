@@ -23,13 +23,6 @@ void BusReaderTask_t::run(void) noexcept
   pb_istream_t stream;
   logger::UserLog<200>log{};
   
-  {
-    logger::UserLog<32>log{};
-    log.append_msg("bus reader task node: ");
-    log.append_msg(m_internal.user_id());
-    static_log(logger::Level::Info, log);
-  }
-
   if (!msg_raw.has_value())
   {
     return;
@@ -55,21 +48,22 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_leader_pot = msg_index.value.heartbit.potential;
         const auto new_leader_round = msg_index.value.heartbit.round;
 
-        m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round);
-
-        log.append_msg("current node: ");
-        log.append_msg(m_internal.user_id());
-        log.append_msg(", recevied leader_heartbit: ");
-        log.append_msg("id:");
-        log.append_msg(new_leader_id);
-        log.append_msg(", pot: ");
-        log.append_msg(new_leader_pot);
-        log.append_msg(", round: ");
-        log.append_msg(new_leader_round);
-        log.append_msg("| internal>");
-        log.append_msg(" round: ");
-        log.append_msg(m_internal.round());
-        static_log(logger::Level::Debug, log);
+        if(m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round))
+        {
+          log.append_msg("current node: ");
+          log.append_msg(m_internal.user_id());
+          log.append_msg(", recevied valid leader_heartbit: ");
+          log.append_msg("id:");
+          log.append_msg(new_leader_id);
+          log.append_msg(", pot: ");
+          log.append_msg(new_leader_pot);
+          log.append_msg(", round: ");
+          log.append_msg(new_leader_round);
+          log.append_msg("| internal>");
+          log.append_msg(" round: ");
+          log.append_msg(m_internal.round());
+          static_log(logger::Level::Debug, log);
+        }
       }
       break;
     case near_ap_MessageIndexV2_new_election_tag:
@@ -96,25 +90,16 @@ void BusReaderTask_t::run(void) noexcept
         log.append_msg(" better candidate: ");
         log.append_msg(m_internal.better_candidate());
         log.append_msg(" better candidate pot: ");
-        log.append_msg(m_internal.user_pot());
+        log.append_msg(m_internal.better_candidate_pot());
 
         static_log(logger::Level::Info, log);
 
+
         if (
-            (
-             !m_internal.leader() &&
-             new_round >= m_internal.round() &&
-             new_pot > m_internal.user_pot() &&
-             new_pot > m_internal.better_candidate_pot()
-            )
-            ||
-            (
-             new_round >= m_internal.round() &&
-             new_pot > m_internal.user_pot() &&
-             new_pot > m_internal.better_candidate_pot() &&
-             !m_internal.election_sent() &&
-             !m_internal.voted()
-            )
+            !m_internal.leader() &&
+            new_round >= m_internal.round() &&
+            new_pot > m_internal.user_pot() &&
+            new_pot > m_internal.better_candidate_pot()
            )
         {
           pb_ostream_t ostream = pb_ostream_from_buffer(
@@ -122,8 +107,7 @@ void BusReaderTask_t::run(void) noexcept
               msg_raw->m_payload.size());
 
           msg_raw->reset();
-          m_internal.abort_election(new_leader, new_pot);
-          m_internal.vote_for(new_round, new_leader, new_pot);
+          m_internal.abort_election(new_round, new_leader, new_pot);
 
           msg_index.which_value = near_ap_MessageIndexV2_vote_response_tag,
           msg_index.value.vote_response = 
@@ -164,24 +148,6 @@ void BusReaderTask_t::run(void) noexcept
       {
         const auto leader_id = msg_index.value.vote_response.new_leader;
         const auto election_round = msg_index.value.vote_response.round;
-
-        log.reset();
-        log.append_msg("current node: ");
-        log.append_msg(m_internal.user_id());
-        log.append_msg("recevied vote response.");
-        log.append_msg(" round: ");
-        log.append_msg(msg_index.value.vote_response.round);
-        log.append_msg(" new_leader: ");
-        log.append_msg(msg_index.value.vote_response.new_leader);
-        log.append_msg(" supporter: ");
-        log.append_msg(msg_index.value.vote_response.supporter);
-        log.append_msg(". Internal: ");
-        log.append_msg(" round: ");
-        log.append_msg(m_internal.round());
-        log.append_msg(" user_id: ");
-        log.append_msg(m_internal.user_id());
-
-        static_log(logger::Level::Info, log);
 
         if (
             m_internal.election_sent() &&
