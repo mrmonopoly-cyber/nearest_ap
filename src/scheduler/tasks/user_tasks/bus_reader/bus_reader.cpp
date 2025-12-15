@@ -93,6 +93,10 @@ void BusReaderTask_t::run(void) noexcept
         log.append_msg(m_internal.user_id());
         log.append_msg(" local pot: ");
         log.append_msg(m_internal.user_pot());
+        log.append_msg(" better candidate: ");
+        log.append_msg(m_internal.better_candidate());
+        log.append_msg(" better candidate pot: ");
+        log.append_msg(m_internal.user_pot());
 
         static_log(logger::Level::Info, log);
 
@@ -101,13 +105,13 @@ void BusReaderTask_t::run(void) noexcept
              !m_internal.leader() &&
              new_round >= m_internal.round() &&
              new_pot > m_internal.user_pot() &&
-             new_leader > m_internal.better_candidate()
+             new_pot > m_internal.better_candidate_pot()
             )
             ||
             (
              new_round >= m_internal.round() &&
              new_pot > m_internal.user_pot() &&
-             new_leader > m_internal.better_candidate() &&
+             new_pot > m_internal.better_candidate_pot() &&
              !m_internal.election_sent() &&
              !m_internal.voted()
             )

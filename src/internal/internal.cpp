@@ -68,9 +68,14 @@ bool Internal_t::voted(void) const noexcept
   return m_vote_info.voted();
 }
 
-bool Internal_t::better_candidate(void) const noexcept
+VirtualId_t Internal_t::better_candidate(void) const noexcept
 {
   return m_best_candidate;
+}
+
+Potential_t Internal_t::better_candidate_pot(void) const noexcept
+{
+  return m_best_candidate_pot;
 }
 
 Round_t Internal_t::round(void) const noexcept
