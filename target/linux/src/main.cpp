@@ -74,7 +74,22 @@ int main(int argc, char **argv)
   (void) pot_t_freq;
   (void) alive_t_freq;
 
-  for (std::uint16_t i=0; i<num_clients; ++i)
+  int j=0;
+
+    drones.push_back(std::make_unique<Node_t>(
+        *clients[0],
+        SpawnerLinux_t{},
+        topology,
+        0,
+        [&j]{return 12 + j;}, 
+        leader_f, 
+        0,
+        bus_t_freq,
+        pot_t_freq + (std::rand() % 100),
+        alive_t_freq
+        ));
+
+  for (std::uint16_t i=1; i<num_clients; ++i)
   {
     drones.push_back(std::make_unique<Node_t>(
         *clients[i],
@@ -85,10 +100,14 @@ int main(int argc, char **argv)
         leader_f, 
         0,
         bus_t_freq,
-        pot_t_freq,
+        pot_t_freq + (std::rand() % 100),
         alive_t_freq
         ));
   }
+
+  std::this_thread::sleep_for(std::chrono::seconds(30));
+  static_log(nearest_ap::logger::Level::Warning, "NODE 0 WILL INCREASE POTENTIAL");
+  j=88;
 
   std::this_thread::sleep_for(std::chrono::hours(99));
 
