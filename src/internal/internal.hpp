@@ -65,6 +65,7 @@ namespace nearest_ap
       bool election_sent(void) const noexcept;
       bool strong_pot(void) const noexcept;
       bool voted(void) const noexcept;
+      bool better_candidate(void) const noexcept;
       Round_t round(void) const noexcept;
       Potential_t user_pot(void) const noexcept;
       Potential_t leader_pot(void) const noexcept;

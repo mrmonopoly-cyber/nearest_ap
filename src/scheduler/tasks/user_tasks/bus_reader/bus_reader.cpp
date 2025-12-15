@@ -97,19 +97,20 @@ void BusReaderTask_t::run(void) noexcept
         static_log(logger::Level::Info, log);
 
         if (
-            new_round >= m_internal.round() &&
-            new_pot > m_internal.user_pot() &&
-            !m_internal.election_sent()
-           )
-        {
-          m_internal.abort_election(new_leader, new_pot);
-        }
-
-        if (
-            new_round >= m_internal.round() &&
-            new_pot > m_internal.user_pot() &&
-            !m_internal.election_sent() &&
-            !m_internal.voted()
+            (
+             !m_internal.leader() &&
+             new_round >= m_internal.round() &&
+             new_pot > m_internal.user_pot() &&
+             new_leader > m_internal.better_candidate()
+            )
+            ||
+            (
+             new_round >= m_internal.round() &&
+             new_pot > m_internal.user_pot() &&
+             new_leader > m_internal.better_candidate() &&
+             !m_internal.election_sent() &&
+             !m_internal.voted()
+            )
            )
         {
           pb_ostream_t ostream = pb_ostream_from_buffer(
@@ -117,6 +118,7 @@ void BusReaderTask_t::run(void) noexcept
               msg_raw->m_payload.size());
 
           msg_raw->reset();
+          m_internal.abort_election(new_leader, new_pot);
           m_internal.vote_for(new_round, new_leader, new_pot);
 
           msg_index.which_value = near_ap_MessageIndexV2_vote_response_tag,

@@ -19,7 +19,7 @@ Internal_t::Internal_t(
 : m_users(topology),
   m_current_user_index(current_user_index),
   m_user_potential(0),
-  m_leader_potential(~0),
+  m_leader_potential(0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(0),
@@ -37,7 +37,7 @@ Internal_t::Internal_t(
 : m_users(topology),
   m_current_user_index(current_user_index),
   m_user_potential(0),
-  m_leader_potential(~0),
+  m_leader_potential(0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
@@ -66,6 +66,11 @@ bool Internal_t::strong_pot(void) const noexcept
 bool Internal_t::voted(void) const noexcept
 {
   return m_vote_info.voted();
+}
+
+bool Internal_t::better_candidate(void) const noexcept
+{
+  return m_best_candidate;
 }
 
 Round_t Internal_t::round(void) const noexcept
@@ -106,10 +111,26 @@ void Internal_t::recv_heartbit(
   }
 
   m_vote_info.update_round(leader_round);
-  m_leader_potential = leader_pot;
 
-  if (leader_pot >= user_pot())
+  if (leader_pot >= m_best_candidate_pot)
   {
+   m_best_candidate_pot = leader_pot;
+   m_best_candidate = leader_id;
+  }
+
+  if (
+      (
+       leader_pot >= user_pot() &&
+       !(leader_id != leader() && leader_pot < m_leader_potential)
+      )
+      ||
+      (
+       leader_pot >= user_pot() &&
+       leader_round > round()
+      )
+     )
+  {
+    m_leader_potential = leader_pot;
     m_vote_info.renunce();
     m_received_heartbit++;
     m_users.update_leader(leader_id);
@@ -134,7 +155,7 @@ bool Internal_t::support_check_wining(void) noexcept
 
 void Internal_t::abort_election(const VirtualId_t leader, const Potential_t leader_pot) noexcept
 {
-  if (m_best_candidate != leader && m_best_candidate_pot >= leader_pot)
+  if (m_best_candidate_pot >= leader_pot)
   {
     m_vote_info.renunce();
     m_users.update_leader(leader);
