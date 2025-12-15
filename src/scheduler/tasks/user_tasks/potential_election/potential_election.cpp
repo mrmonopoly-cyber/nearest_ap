@@ -38,7 +38,7 @@ void PotentialElectionTask_t::run(void) noexcept
 
   if (
       !m_internal.leader() &&
-      ( m_internal.strong_pot())//HACK: disabling check dead drones for now || check_heartbit )
+      ( m_internal.strong_pot() || check_heartbit )
      )
   {
     Msg_t msg{};
