@@ -26,7 +26,9 @@ bool VoteInfo_t::voted(void) const noexcept
 
 bool VoteInfo_t::won(void) const noexcept
 {
-  return m_consent > (m_num_candidates/2);
+  const auto majority = m_num_candidates%2 != 0 ? m_num_candidates/2 : (m_num_candidates/2)-1;
+
+  return m_consent > majority;
 }
 
 Round_t VoteInfo_t::round(void) const noexcept
