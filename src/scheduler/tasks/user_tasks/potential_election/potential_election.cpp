@@ -1,5 +1,6 @@
 #include "potential_election.hpp"
 
+#include <cstdint>
 #include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
@@ -77,7 +78,7 @@ void PotentialElectionTask_t::run(void) noexcept
       log.append_msg("node: ");
       log.append_msg(m_internal.user_id());
       log.append_msg(", write error: ");
-      log.append_msg(static_cast<int>(error));
+      log.append_msg(static_cast<std::uint32_t>(error));
       static_log(logger::Level::Error, log);
     }
 

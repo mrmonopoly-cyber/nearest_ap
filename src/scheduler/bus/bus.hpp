@@ -30,7 +30,7 @@ namespace nearest_ap {
         void reset() noexcept
         {
           m_msg_size =0;
-          m_payload = {0};
+          m_payload = {};
         };
       };
 

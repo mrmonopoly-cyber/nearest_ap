@@ -3,10 +3,16 @@
 
 using namespace nearest_ap::logger;
 
+class DefaultLogger : public Logger
+{
+  void log_full(const char*,const int,const Level,std::string_view) noexcept override{}
+  void print_current_level() const noexcept override{}
+};
 
 namespace nearest_ap::logger
 {
-  Logger* StaticLog::g_logger = nullptr;
+  DefaultLogger g_def_log{};
+  Logger* StaticLog::g_logger = &g_def_log;
 };
 
 void Logger::set_level(Level level) noexcept

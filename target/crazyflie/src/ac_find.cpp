@@ -41,11 +41,10 @@ extern "C"
 #include "task.h"
 
 #include "debug.h"
-
-#include "log.h"
-#include "param.h"
-
+#include "token_ring.h"
 }
+
+#define NETWORK_TOPOLOGY {0, 1, 2, 3} // Maximum size of network is 20 by default
 
 void appMain()
 {
@@ -53,12 +52,24 @@ void appMain()
   using Node_t = Node<TaskCraziflieSpawner>;
   using Topology = Node_t::Topology;
 
+  const constexpr uint8_t default_leader =0;
+
+  const Topology topology{NETWORK_TOPOLOGY, default_leader};
   RadioBus bus{};
-  Topology topology{{0, 1}, 0};
   Node_t::Tollercance_t tollerance = 10;
   auto leader_f = [](){};
   auto compute_potential = []{return 42;};
   std::uint16_t user_index =0;
+  uint8_t my_id = dtrGetSelfId();
+
+  for (uint8_t i=0;i<topology.m_elements.size();i++)
+  {
+    if (topology.m_elements[i]==my_id)
+    {
+      my_id =i;
+      break;
+    }
+  }
 
   Node node{bus, TaskCraziflieSpawner{}, topology,
       user_index, compute_potential, leader_f, tollerance};

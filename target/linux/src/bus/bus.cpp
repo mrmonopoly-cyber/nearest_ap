@@ -6,6 +6,7 @@
 #include <ctime>
 #include <mutex>
 #include <optional>
+#include <string_view>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
@@ -101,7 +102,7 @@ void BusLinux_t::_socket_setup(void) noexcept
   {
     logger::UserLog<32 + sizeof(sock_addr.sun_path)> log{};
     log.append_msg("socket creation: ");
-    log.append_msg(sock_addr.sun_path);
+    log.append_msg(std::string_view(sock_addr.sun_path));
     static_log(logger::Level::Debug, log);
   }
 
@@ -110,7 +111,7 @@ void BusLinux_t::_socket_setup(void) noexcept
   {
     logger::UserLog<64 + sizeof(sock_addr.sun_path)> log{};
     log.append_msg("socket creation: ");
-    log.append_msg(sock_addr.sun_path);
+    log.append_msg(std::string_view(sock_addr.sun_path));
     log.append_msg(", socket creation failed: ");
     log.append_msg(strerror(errno));
     static_log(logger::Level::Debug, log);
@@ -187,7 +188,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
       log.append_msg("error connecting from client: ");
       log.append_msg(id);
       log.append_msg(" skipping client");
-      log.append_msg(remote.sun_path);
+      log.append_msg(std::string_view(remote.sun_path));
       static_log(logger::Level::Debug, log);
 
       continue;
@@ -197,7 +198,7 @@ void BusLinux_t::enstablis_connection(void) noexcept
     log.append_msg("connection ok from client: ");
     log.append_msg(id);
     log.append_msg(" to client: ");
-    log.append_msg(remote.sun_path);
+    log.append_msg(std::string_view(remote.sun_path));
     static_log(logger::Level::Debug, log);
 
     std::thread client{_client_connection, std::move(data)};
@@ -295,7 +296,7 @@ void BusLinux_t::_Accept(BusLinux_t* const self) noexcept
       log.append_msg("error accepting connection. bus: ");
       log.append_msg(self->m_id);
       log.append_msg(" from: ");
-      log.append_msg(remote.sun_path);
+      log.append_msg(std::string_view(remote.sun_path));
       static_log(logger::Level::Debug, log);
 
       continue;

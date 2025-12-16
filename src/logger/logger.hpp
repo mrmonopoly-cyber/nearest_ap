@@ -1,9 +1,12 @@
 #pragma once
 
 #include <cstdint>
-#include <cstdio>
 #include <cstring>
 #include <string_view>
+
+#ifdef __linux__
+#include <cstdio>
+#endif // __linux__
 
 namespace nearest_ap::logger
 {
@@ -47,27 +50,51 @@ namespace nearest_ap::logger
         {
           if (obj.length() <m_available_space)
           {
+#ifdef __linux__
             const std::uint32_t written = snprintf(m_cursor, m_available_space,
                 "%.*s", static_cast<int>(obj.size()),obj.data());
             m_cursor += written;
             m_available_space -= written;
+#endif // __linux__
           }
         }
 
         inline void append_msg(std::int32_t obj) noexcept
         {
+#ifdef __linux__
           const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
           m_cursor += written;
           m_available_space -= written;
+#endif // __linux__
         }
 
         inline void append_msg(std::uint32_t obj) noexcept
         {
+#ifdef __linux__
           const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
           m_cursor += written;
           m_available_space -= written;
+#endif // __linux__
         }
 
+        inline void append_msg(bool obj) noexcept
+        {
+          std::uint8_t written=0;
+          if (obj)
+          {
+#ifdef __linux__
+            written = snprintf(m_cursor, m_available_space, "true");
+#endif // __linux__
+          }
+          else
+          {
+#ifdef __linux__
+            written = snprintf(m_cursor, m_available_space, "false");
+#endif // __linux__
+          }
+          m_cursor += written;
+          m_available_space -= written;
+        }
 
         template<typename T>
           void append_msg(char* buffer, std::size_t buffer_size, T obj) noexcept = delete;
