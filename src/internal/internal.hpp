@@ -77,6 +77,7 @@ namespace nearest_ap
           const VirtualId_t leader_id,
           const Potential_t leader_pot,
           const Round_t round) noexcept;
+      void recv_heartbit_best_candidate(const VirtualId_t candidate_id, const Potential_t pot) noexcept;
       bool support_check_wining(void) noexcept;
       void abort_election(const Round_t round, const VirtualId_t leader, const Potential_t leader_pot) noexcept;
       void compute_user_potential(void) noexcept;
@@ -84,7 +85,7 @@ namespace nearest_ap
       void maybe_new_best_candidate(const VirtualId_t candidate, const Potential_t pot) noexcept;
 
     private:
-      bool _consume_heartbit() noexcept;
+      bool _consume_heartbit(std::atomic_uint32_t& who) noexcept;
 
     private:
       struct UserData_t
@@ -115,7 +116,8 @@ namespace nearest_ap
       Potential_t m_user_potential;
       Potential_t m_leader_potential;
       Potential_t m_best_candidate_pot;
-      std::atomic_uint32_t m_received_heartbit;
+      std::atomic_uint32_t m_received_heartbit_leader;
+      std::atomic_uint32_t m_received_heartbit_best_candidate;
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
       VirtualId_t m_best_candidate;

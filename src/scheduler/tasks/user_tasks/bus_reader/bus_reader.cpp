@@ -48,6 +48,8 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_leader_pot = msg_index.value.heartbit.potential;
         const auto new_leader_round = msg_index.value.heartbit.round;
 
+        m_internal.recv_heartbit_best_candidate(new_leader_id, new_leader_pot);
+
         if(m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round))
         {
           log.append_msg("current node: ");
@@ -76,6 +78,8 @@ void BusReaderTask_t::run(void) noexcept
         {
           m_internal.update_round(new_round);
         }
+
+        m_internal.recv_heartbit_best_candidate(new_leader,new_pot);
 
         if (
             !m_internal.leader() &&
@@ -149,6 +153,8 @@ void BusReaderTask_t::run(void) noexcept
         {
           m_internal.update_round(election_round);
         }
+
+        m_internal.recv_heartbit_best_candidate(leader_id, msg_index.value.vote_response.potential);
 
         m_internal.maybe_new_best_candidate(leader_id, msg_index.value.vote_response.potential);
 
