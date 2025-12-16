@@ -1,7 +1,9 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <mutex>
 #include <optional>
 #include <sys/socket.h>
@@ -82,6 +84,7 @@ static void _client_connection(ClientConnectionData client_socket_data)
 
 void BusLinux_t::_socket_setup(void) noexcept
 {
+  srand(time(NULL));
   struct sockaddr_un sock_addr{
     .sun_family = AF_UNIX,
     .sun_path = SOCKET_PATH SOCKET_SUFFIX,
@@ -222,6 +225,20 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
     Msg_t& m = m_msg_queue.front();
     m_msg_queue.pop();
     m_msg_queue_lock.unlock();
+
+    const constexpr auto failure_percentage = 80;
+
+    const auto percent_failure = rand() % 100;
+
+    if (percent_failure < failure_percentage)
+    {
+      // logger::UserLog<48>log{};
+      // log.append_msg("unlucky case of send with percentage: ");
+      // log.append_msg(failure_percentage);
+      // static_log(logger::Level::Error,log);
+      return {};
+    }
+
     return m;
   }
 

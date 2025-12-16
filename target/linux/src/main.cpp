@@ -67,9 +67,9 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
-  auto bus_t_freq = 100;
-  auto pot_t_freq = 5000;
-  auto alive_t_freq = 1000;
+  auto bus_t_freq = 10;
+  auto pot_t_freq = 600;
+  auto alive_t_freq = 100;
 
   (void) bus_t_freq;
   (void) pot_t_freq;
@@ -113,9 +113,11 @@ int main(int argc, char **argv)
         ));
   }
 
-  std::this_thread::sleep_for(std::chrono::seconds(30));
+  std::this_thread::sleep_for(std::chrono::seconds(70));
   static_log(nearest_ap::logger::Level::Warning, "ALL NODES WILL DECREASE THEIR POTENTIAL");
-  for (int i=0; i<num_clients ; i++)
+  base[0] = 0;
+
+  for (int i=1; i<num_clients ; i++)
   {
     base[i] = num_clients*2 - 2*i;
   }
