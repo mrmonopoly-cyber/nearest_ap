@@ -31,7 +31,7 @@ namespace nearest_ap
       BusStatus_t Write(const Msg_t&) noexcept override;
 
     public:
-      static constexpr std::size_t m_max_clients = 20;
+      static constexpr std::size_t m_max_clients = 25;
 
     private:
       static void _Accept(BusLinux_t* const self) noexcept;

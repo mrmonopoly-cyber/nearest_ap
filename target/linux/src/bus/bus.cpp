@@ -147,7 +147,10 @@ void BusLinux_t::enstablis_connection(void) noexcept
 
     if( (data.client_socket= socket(AF_UNIX, SOCK_STREAM, 0)) == -1  )
     {
-      static_log(logger::Level::Debug, "Client: Error on socket() call");
+      logger::UserLog<64>log{};
+      log.append_msg("Client: Error on socket() call: ");
+      log.append_msg(strerror(errno));
+      static_log(logger::Level::Debug, log);
       continue;
     }
     struct sockaddr_un remote
