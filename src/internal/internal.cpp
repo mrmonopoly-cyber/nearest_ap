@@ -146,6 +146,14 @@ bool Internal_t::recv_heartbit(
     return false;
   }
 
+  if (round() < leader_round)
+  {
+    m_best_candidate = leader_id;
+    m_best_candidate_pot = leader_pot;
+    m_leader_potential = leader_pot;
+    m_users.update_leader(leader_id);
+  }
+
   m_vote_info.update_round(leader_round);
 
 

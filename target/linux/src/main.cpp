@@ -67,7 +67,7 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
-  auto bus_t_freq = 200;
+  auto bus_t_freq = 100;
   auto pot_t_freq = 5000;
   auto alive_t_freq = 1000;
 
