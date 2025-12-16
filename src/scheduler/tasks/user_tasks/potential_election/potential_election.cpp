@@ -17,9 +17,7 @@ void PotentialElectionTask_t::run(void) noexcept
 {
   m_internal.compute_user_potential();
 
-  const auto check_heartbit = !m_internal.check_heartbit();
-
-  logger::UserLog<128> buffer;
+  logger::UserLog<200> buffer;
   buffer.append_msg("potential task node : ");
   buffer.append_msg(m_internal.user_id());
   buffer.append_msg(" election_sent: ");
@@ -32,14 +30,13 @@ void PotentialElectionTask_t::run(void) noexcept
   buffer.append_msg(m_internal.user_pot());
   buffer.append_msg(" leader_pot: ");
   buffer.append_msg(m_internal.leader_pot());
-  buffer.append_msg(" check_heartbit: ");
-  buffer.append_msg(check_heartbit);
+  buffer.append_msg(" best candidate: ");
+  buffer.append_msg(m_internal.better_candidate());
+  buffer.append_msg(" best candidate pot: ");
+  buffer.append_msg(m_internal.better_candidate_pot());
   static_log(logger::Level::Info, buffer);
 
-  if (
-      !m_internal.leader() &&
-      ( m_internal.strong_pot() || check_heartbit )
-     )
+  if (m_internal.user_valid_for_election() )
   {
     Msg_t msg{};
     pb_ostream_t ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());;

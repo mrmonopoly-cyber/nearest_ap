@@ -72,27 +72,7 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_pot = msg_index.value.new_election.potential;
         const auto new_leader = msg_index.value.new_election.id;
 
-        log.append_msg("current node: ");
-        log.append_msg(m_internal.user_id());
-        log.append_msg(", recevied new election request. new_leader:");
-        log.append_msg(new_leader);
-        log.append_msg(" -- round:");
-        log.append_msg(new_round);
-        log.append_msg(" -- pot");
-        log.append_msg(new_pot);
-        log.append_msg(". Internal: ");
-        log.append_msg(" round: ");
-        log.append_msg(m_internal.round());
-        log.append_msg(" user_id: ");
-        log.append_msg(m_internal.user_id());
-        log.append_msg(" local pot: ");
-        log.append_msg(m_internal.user_pot());
-        log.append_msg(" better candidate: ");
-        log.append_msg(m_internal.better_candidate());
-        log.append_msg(" better candidate pot: ");
-        log.append_msg(m_internal.better_candidate_pot());
 
-        static_log(logger::Level::Info, log);
 
 
         if (
@@ -102,6 +82,28 @@ void BusReaderTask_t::run(void) noexcept
             new_pot > m_internal.better_candidate_pot()
            )
         {
+
+          log.append_msg("current node: ");
+          log.append_msg(m_internal.user_id());
+          log.append_msg(", recevied new election request. new_leader:");
+          log.append_msg(new_leader);
+          log.append_msg(" -- round:");
+          log.append_msg(new_round);
+          log.append_msg(" -- pot");
+          log.append_msg(new_pot);
+          log.append_msg(". Internal: ");
+          log.append_msg(" round: ");
+          log.append_msg(m_internal.round());
+          log.append_msg(" user_id: ");
+          log.append_msg(m_internal.user_id());
+          log.append_msg(" local pot: ");
+          log.append_msg(m_internal.user_pot());
+          log.append_msg(" better candidate: ");
+          log.append_msg(m_internal.better_candidate());
+          log.append_msg(" better candidate pot: ");
+          log.append_msg(m_internal.better_candidate_pot());
+          static_log(logger::Level::Info, log);
+
           pb_ostream_t ostream = pb_ostream_from_buffer(
               msg_raw->m_payload.data(),
               msg_raw->m_payload.size());
@@ -117,13 +119,6 @@ void BusReaderTask_t::run(void) noexcept
             .new_leader = new_leader,
           };
 
-          log.reset();
-          log.append_msg("current node: ");
-          log.append_msg(m_internal.user_id());
-          log.append_msg(" sending vote request to: ");
-          log.append_msg(new_leader);
-          log.append_msg(" with round: ");
-          log.append_msg(new_round);
           static_log(logger::Level::Info, log);
 
           if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))

@@ -20,9 +20,11 @@ Internal_t::Internal_t(
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
+  m_best_candidate_pot(0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(0),
+  m_best_candidate(m_current_user_index),
   m_vote_info(m_users.m_elements.size())
 {
   compute_user_potential();
@@ -38,9 +40,11 @@ Internal_t::Internal_t(
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
+  m_best_candidate_pot(0),
   m_received_heartbit(0),
   m_compute_local_potential(compute_pot),
   m_tollerance(tollerance),
+  m_best_candidate(m_current_user_index),
   m_vote_info(m_users.m_elements.size())
 {
   compute_user_potential();
@@ -56,12 +60,6 @@ bool Internal_t::leader(void) const noexcept
 bool Internal_t::election_sent(void) const noexcept
 {
   return m_vote_info.election_sent();
-}
-
-bool Internal_t::strong_pot(void) const noexcept
-{
-  return 
-    user_pot() > m_leader_potential + m_tollerance;
 }
 
 bool Internal_t::voted(void) const noexcept
@@ -100,6 +98,24 @@ VirtualId_t Internal_t::user_id(void) const noexcept
 }
 
 //INFO: Modifiers
+
+bool Internal_t::user_valid_for_election(void) noexcept
+{
+  const auto heartbit = _consume_heartbit();
+  const auto user_is_best_candidate = m_users.m_elements[m_current_user_index] == m_best_candidate;
+  const auto pot_user_better_leader = user_pot() > m_leader_potential + m_tollerance;
+  const auto pot_user_better_candidate = user_pot() > m_best_candidate_pot + m_tollerance;
+
+  return 
+    !leader() && 
+    pot_user_better_leader && 
+    (
+     (heartbit && (pot_user_better_candidate || user_is_best_candidate))
+     ||
+     (pot_user_better_candidate || user_is_best_candidate)
+    )
+    ;
+}
 
 void Internal_t::new_election(void) noexcept
 {
@@ -171,14 +187,18 @@ void Internal_t::compute_user_potential(void) noexcept
   {
     m_leader_potential = m_user_potential;
   }
-  if(m_user_potential > m_best_candidate_pot + m_tollerance)
+  if(
+      (m_user_potential > m_best_candidate_pot + m_tollerance)
+      ||
+      (m_users.m_elements[m_current_user_index] == m_best_candidate)
+    )
   {
     m_best_candidate_pot = m_user_potential;
     m_best_candidate = m_users.m_elements[m_current_user_index];
   }
 }
 
-bool Internal_t::check_heartbit() noexcept
+bool Internal_t::_consume_heartbit() noexcept
 {
   if (m_received_heartbit)
   {
