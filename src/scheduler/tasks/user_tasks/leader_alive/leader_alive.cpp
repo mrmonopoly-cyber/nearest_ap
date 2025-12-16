@@ -37,8 +37,6 @@ void LeaderAliveTask_t::run(void) noexcept
 
   if (
       m_internal.leader() 
-      &&
-      m_internal.user_pot() >= m_internal.better_candidate_pot()
       )
   {
     msg_index.which_value = near_ap_MessageIndexV2_heartbit_tag;

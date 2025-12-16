@@ -55,7 +55,10 @@ Internal_t::Internal_t(
 
 bool Internal_t::leader(void) const noexcept
 {
-  return m_users.m_leader_index == m_current_user_index;
+  return 
+    m_users.m_leader_index == m_current_user_index &&
+    user_pot() >= better_candidate_pot()
+    ;
 }
 
 bool Internal_t::election_sent(void) const noexcept
