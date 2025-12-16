@@ -77,5 +77,8 @@ void VoteInfo_t::vote(const Round_t round, const bool leader) noexcept
 
 void VoteInfo_t::update_round(const Round_t round) noexcept
 {
-  m_round = round;
+  if (round > m_round)
+  {
+    m_round = round;
+  }
 }

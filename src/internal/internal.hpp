@@ -80,6 +80,8 @@ namespace nearest_ap
       bool support_check_wining(void) noexcept;
       void abort_election(const Round_t round, const VirtualId_t leader, const Potential_t leader_pot) noexcept;
       void compute_user_potential(void) noexcept;
+      void update_round(Round_t round) noexcept;
+      void maybe_new_best_candidate(const VirtualId_t candidate, const Potential_t pot) noexcept;
 
     private:
       bool _consume_heartbit() noexcept;

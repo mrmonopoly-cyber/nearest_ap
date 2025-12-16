@@ -207,3 +207,17 @@ bool Internal_t::_consume_heartbit() noexcept
 
   return m_received_heartbit;
 }
+
+void Internal_t::update_round(Round_t round) noexcept
+{
+  m_vote_info.update_round(round);
+}
+
+void Internal_t::maybe_new_best_candidate(const VirtualId_t candidate, const Potential_t pot) noexcept
+{
+  if (pot > m_best_candidate_pot)
+  {
+    m_best_candidate = candidate;
+    m_best_candidate_pot = pot;
+  }
+}

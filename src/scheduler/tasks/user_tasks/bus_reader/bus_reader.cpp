@@ -72,12 +72,13 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_pot = msg_index.value.new_election.potential;
         const auto new_leader = msg_index.value.new_election.id;
 
-
-
+        if(new_round >= m_internal.round())
+        {
+          m_internal.update_round(new_round);
+        }
 
         if (
             !m_internal.leader() &&
-            new_round >= m_internal.round() &&
             new_pot > m_internal.user_pot() &&
             new_pot > m_internal.better_candidate_pot()
            )
@@ -115,7 +116,7 @@ void BusReaderTask_t::run(void) noexcept
           msg_index.value.vote_response = 
           {
             .round = new_round,
-            .supporter = m_internal.user_id(),
+            .potential = new_pot,
             .new_leader = new_leader,
           };
 
@@ -144,6 +145,13 @@ void BusReaderTask_t::run(void) noexcept
         const auto leader_id = msg_index.value.vote_response.new_leader;
         const auto election_round = msg_index.value.vote_response.round;
 
+        if(election_round  >= m_internal.round())
+        {
+          m_internal.update_round(election_round);
+        }
+
+        m_internal.maybe_new_best_candidate(leader_id, msg_index.value.vote_response.potential);
+
         if (
             m_internal.election_sent() &&
             election_round == m_internal.round() &&
@@ -158,8 +166,8 @@ void BusReaderTask_t::run(void) noexcept
           log.append_msg(msg_index.value.vote_response.round);
           log.append_msg(" new_leader: ");
           log.append_msg(msg_index.value.vote_response.new_leader);
-          log.append_msg(" supporter: ");
-          log.append_msg(msg_index.value.vote_response.supporter);
+          log.append_msg(" potential: ");
+          log.append_msg(msg_index.value.vote_response.potential);
           log.append_msg(". Internal: ");
           log.append_msg(" round: ");
           log.append_msg(m_internal.round());

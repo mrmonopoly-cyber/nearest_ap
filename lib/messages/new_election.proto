@@ -10,6 +10,6 @@ message NewElection{
 
 message VoteRespone{
   uint32 round=1;
-  uint32 supporter=2;
+  uint32 potential=2;
   uint32 new_leader=3;
 };
