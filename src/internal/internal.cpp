@@ -106,13 +106,13 @@ bool Internal_t::user_valid_for_election(void) noexcept
   const auto pot_user_better_leader = user_pot() > m_leader_potential + m_tollerance;
   const auto pot_user_better_candidate = user_pot() > m_best_candidate_pot + m_tollerance;
 
+  (void) heartbit; //FIX: ignoring leader heartbit
+
   return 
     !leader() && 
     pot_user_better_leader && 
     (
-     (heartbit && (pot_user_better_candidate || user_is_best_candidate))
-     ||
-     (pot_user_better_candidate || user_is_best_candidate)
+     pot_user_better_candidate || user_is_best_candidate
     )
     ;
 }
@@ -134,23 +134,28 @@ bool Internal_t::recv_heartbit(
 
   m_vote_info.update_round(leader_round);
 
-  if (leader_pot >= m_best_candidate_pot)
+
+  if (leader_id == m_best_candidate || leader_pot >= m_best_candidate_pot)
   {
    m_best_candidate_pot = leader_pot;
    m_best_candidate = leader_id;
   }
 
-  if (leader_pot >= user_pot())
+  if (leader_pot >= user_pot() && leader_pot >= m_best_candidate_pot)
   {
     m_leader_potential = leader_pot;
     m_vote_info.renunce();
     m_received_heartbit++;
     m_users.update_leader(leader_id);
+  }
+
+  if (leader_id == m_users.leader())
+  {
+    m_leader_potential = leader_pot;
     return true;
   }
 
   return false;
-
 }
 
 bool Internal_t::support_check_wining(void) noexcept
@@ -183,12 +188,14 @@ void Internal_t::abort_election(const Round_t round, const VirtualId_t leader_id
 void Internal_t::compute_user_potential(void) noexcept
 {
   m_user_potential = m_compute_local_potential();
+
   if (leader())
   {
     m_leader_potential = m_user_potential;
   }
+
   if(
-      (m_user_potential > m_best_candidate_pot + m_tollerance)
+      (user_pot() > m_best_candidate_pot + m_tollerance)
       ||
       (m_users.m_elements[m_current_user_index] == m_best_candidate)
     )

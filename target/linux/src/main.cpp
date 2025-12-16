@@ -1,3 +1,4 @@
+#include <array>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -75,16 +76,23 @@ int main(int argc, char **argv)
   (void) alive_t_freq;
 
   int j=0;
+  std::vector<std::uint32_t> base{};
+  base.resize(num_clients);
 
-    drones.push_back(std::make_unique<Node_t>(
+  for(auto& cell: base)
+  {
+    cell=num_clients*2;
+  }
+
+  drones.push_back(std::make_unique<Node_t>(
         *clients[0],
         SpawnerLinux_t{},
         topology,
         0,
-        [&j]{return 12 + j;}, 
+        [&base, &j]{return base[0] + j;}, 
         leader_f, 
         0,
-        bus_t_freq,
+        bus_t_freq + (std::rand() % 10),
         pot_t_freq + (std::rand() % 100),
         alive_t_freq
         ));
@@ -96,7 +104,7 @@ int main(int argc, char **argv)
         SpawnerLinux_t{},
         topology,
         i,
-        [i]{return 12 + i;}, 
+        [&base, i]{return base[i] + i;}, 
         leader_f, 
         0,
         bus_t_freq,
@@ -106,8 +114,11 @@ int main(int argc, char **argv)
   }
 
   std::this_thread::sleep_for(std::chrono::seconds(30));
-  static_log(nearest_ap::logger::Level::Warning, "NODE 0 WILL INCREASE POTENTIAL");
-  j=88;
+  static_log(nearest_ap::logger::Level::Warning, "ALL NODES WILL DECREASE THEIR POTENTIAL");
+  for (int i=0; i<num_clients ; i++)
+  {
+    base[i] = num_clients*2 - 2*i;
+  }
 
   std::this_thread::sleep_for(std::chrono::hours(99));
 

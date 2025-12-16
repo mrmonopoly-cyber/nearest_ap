@@ -36,7 +36,8 @@ void LeaderAliveTask_t::run(void) noexcept
   ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());
 
   if (
-      m_internal.leader() &&
+      m_internal.leader() 
+      &&
       m_internal.user_pot() >= m_internal.better_candidate_pot()
       )
   {

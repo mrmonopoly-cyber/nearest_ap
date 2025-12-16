@@ -80,7 +80,7 @@ void BusReaderTask_t::run(void) noexcept
         if (
             !m_internal.leader() &&
             new_pot > m_internal.user_pot() &&
-            new_pot > m_internal.better_candidate_pot()
+            new_pot >= m_internal.better_candidate_pot()
            )
         {
 
