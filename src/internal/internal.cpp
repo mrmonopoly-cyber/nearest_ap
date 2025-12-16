@@ -1,5 +1,6 @@
 #include "internal.hpp"
 #include <cstdint>
+#include <nearest_ap/logger/logger.hpp>
 
 using namespace nearest_ap;
 
@@ -106,7 +107,17 @@ bool Internal_t::user_valid_for_election(void) noexcept
   const auto pot_user_better_leader = user_pot() > m_leader_potential + m_tollerance;
   const auto pot_user_better_candidate = user_pot() > m_best_candidate_pot + m_tollerance;
 
-  (void) heartbit; //FIX: ignoring leader heartbit
+  if(!leader() && !heartbit)
+  {
+    logger::UserLog<64>log{};
+    log.append_msg("node: ");
+    log.append_msg(user_id());
+    log.append_msg(" NO HEARTBIT FROM LEADER: ");
+    log.append_msg(m_users.leader());
+    static_log(logger::Level::Warning, log);
+
+    return true;
+  }
 
   return 
     !leader() && 
@@ -145,13 +156,13 @@ bool Internal_t::recv_heartbit(
   {
     m_leader_potential = leader_pot;
     m_vote_info.renunce();
-    m_received_heartbit++;
     m_users.update_leader(leader_id);
   }
 
   if (leader_id == m_users.leader())
   {
     m_leader_potential = leader_pot;
+    m_received_heartbit++;
     return true;
   }
 
