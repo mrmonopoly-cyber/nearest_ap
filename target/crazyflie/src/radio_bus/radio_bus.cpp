@@ -31,8 +31,6 @@ RadioBus::RadioBus()
 
 std::optional<Msg_t> RadioBus::Read() noexcept
 {
-  //INFO: const TickType_t xDelay = 500 / portTICK_PERIOD_MS;  //from task.h
-
   if(g_recv_messages.empty())
   {
     return {};
@@ -41,9 +39,15 @@ std::optional<Msg_t> RadioBus::Read() noexcept
   Msg_t m{};
   P2PPacket& packet = g_recv_messages.front();
 
-  for (std::uint8_t i=0; i<Bus_t::m_payload_max_size; i++)
+
+  memcpy(&m.m_msg_size, packet.data, sizeof(m.m_msg_size));
+  if (sizeof(packet.data) - sizeof(m.m_msg_size) < m.m_msg_size)
   {
-    m.m_payload[i] = packet.data[i]; 
+    memcpy(m.m_payload.data(), packet.data + sizeof(m.m_msg_size), m.m_msg_size);
+  }
+  else
+  {
+    return {};
   }
 
   g_recv_messages.pop();
@@ -53,17 +57,14 @@ std::optional<Msg_t> RadioBus::Read() noexcept
 
 BusStatus_t RadioBus::Write(const Msg_t& msg) noexcept
 {
-  P2PPacket packet;
+  P2PPacket packet{};
   packet.size = static_cast<uint8_t>(msg.m_payload.size());
   packet.rssi =0;
   packet.port = 0x00;
 
-  const pb_byte_t* ptr_data = msg.m_payload.data();
 
-  for(uint8_t i=0; i<msg.m_payload.size();++i)
-  {
-    packet.data[i] = ptr_data[i];
-  }
+  memcpy(packet.data, &msg.m_msg_size, sizeof(msg.m_msg_size));
+  memcpy(packet.data + sizeof(msg.m_msg_size), msg.m_payload.data(), msg.m_msg_size);
 
   radiolinkSendP2PPacketBroadcast(&packet);
   return BusStatus_t::Ok;
