@@ -43,12 +43,17 @@ NO_INCLUDE_TARGETS := setup \
 											protobuf_setup \
 											clangd_update_compile_command
 
+NO_INCLUDE_PB_TARGETS := container_menuconfig
+
 ifeq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_INCLUDE_TARGETS)),)
 OOT_USES_CXX := 1
 include $(CRAZYFLIE_BASE)/tools/make/oot.mk
 endif
 
+ifneq ($(filter $(firstword $(MAKECMDGOALS)),$(NO_INCLUDE_PB_TARGETS)),)
 include $(PROTOBUF_MESSAGE_PATH)/Makefile
+endif
+
 
 clangd_update_compile_command:
 	sed -i 's/\"-fno-var-tracking-assignments\",//g' compile_commands.json
@@ -107,6 +112,15 @@ setup: $(UDEV_PATH) clean_setup
 
 	make clangd_setup
 	@echo you have to execute the following command: "source ./.venv/bin/activate"
+
+container_menuconfig:
+	docker run --rm -it \
+		-v .:/workspace \
+		-w /workspace \
+		ubuntu:24.04 \
+		bash -c "apt update && \
+		apt install -y build-essential libncurses5-dev gcc-arm-none-eabi make git && \
+		make menuconfig"
 
 clean_here:
 	rm -rf *.o
