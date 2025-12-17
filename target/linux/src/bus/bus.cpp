@@ -35,13 +35,13 @@ struct ClientConnectionData
 static void _decode(const std::uint8_t raw_buffer[64], Msg_t& msg)
 {
     memcpy(&msg.m_msg_size, raw_buffer, sizeof(msg.m_msg_size));
-    memcpy(msg.m_payload.data(), raw_buffer + sizeof(msg.m_msg_size), msg.m_payload.size());
+    memcpy(msg.m_payload.data(), raw_buffer + sizeof(msg.m_msg_size), msg.m_msg_size);
 }
 
 static void _encode(std::uint8_t raw_buffer[64], const Msg_t& msg)
 {
     memcpy(raw_buffer, &msg.m_msg_size, sizeof(msg.m_msg_size));
-    memcpy(raw_buffer + sizeof(msg.m_msg_size), msg.m_payload.data(), msg.m_payload.size());
+    memcpy(raw_buffer + sizeof(msg.m_msg_size), msg.m_payload.data(), msg.m_msg_size);
 }
 
 static void _client_connection(ClientConnectionData client_socket_data)
@@ -227,7 +227,7 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
     m_msg_queue.pop();
     m_msg_queue_lock.unlock();
 
-    const constexpr auto failure_percentage = 80;
+    const constexpr auto failure_percentage = 00;
 
     const auto percent_failure = rand() % 100;
 
