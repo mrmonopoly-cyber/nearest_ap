@@ -36,6 +36,7 @@ TaskCraziflieSpawner::TaskCraziflieSpawner()
 
 void TaskCraziflieSpawner::start_task(BaseTask_t* const task)
 {
+  return start_task(task, 0); //INFO: Maybe considering a minimum base frequency to do not surpass?
 }
 
 void TaskCraziflieSpawner::start_task(BaseTask_t* const task, Millis_t time)

@@ -53,26 +53,45 @@ void appMain()
   using Topology = Node_t::Topology;
 
   const constexpr uint8_t default_leader =0;
-
   const Topology topology{NETWORK_TOPOLOGY, default_leader};
+  std::uint8_t user_index =0;
+
   RadioBus bus{};
+
   Node_t::Tollercance_t tollerance = 10;
-  auto leader_f = [](){};
   auto compute_potential = []{return 42;};
-  std::uint16_t user_index =0;
-  uint8_t my_id = dtrGetSelfId();
+
+  auto leader_f = [](){
+    char buffer[32] = "i'm leader: ";
+    DEBUG_PRINT("%s%d",buffer, dtrGetSelfId());
+  };
 
   for (uint8_t i=0;i<topology.m_elements.size();i++)
   {
-    if (topology.m_elements[i]==my_id)
+    if (topology.m_elements[i] == dtrGetSelfId())
     {
-      my_id =i;
+      user_index = i;
       break;
     }
   }
 
-  Node node{bus, TaskCraziflieSpawner{}, topology,
-      user_index, compute_potential, leader_f, tollerance};
+  DEBUG_PRINT("my (id:index): %d, %d\n", dtrGetSelfId(), user_index);
+
+  Node node{
+      bus,
+      TaskCraziflieSpawner{},
+      std::move(topology),
+      user_index,
+      compute_potential,
+      leader_f,
+      tollerance
+  };
 
   DEBUG_PRINT("Starting Drone\n");
+
+  while(1)
+  {
+    vTaskDelay(99999);
+  }
+
 }

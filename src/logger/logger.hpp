@@ -80,17 +80,6 @@ namespace nearest_ap::logger
 #ifndef __linux__
         inline void append_msg(bool obj) noexcept
         {
-          std::uint8_t written=0;
-          if (obj)
-          {
-            written = snprintf(m_cursor, m_available_space, "true");
-          }
-          else
-          {
-            written = snprintf(m_cursor, m_available_space, "false");
-          }
-          m_cursor += written;
-          m_available_space -= written;
         }
 #endif // __linux__
 
