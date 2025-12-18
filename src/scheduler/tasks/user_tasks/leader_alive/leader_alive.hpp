@@ -30,12 +30,6 @@ namespace nearest_ap {
           const Internal_t& internal,
           const LeaderTask_f leader_task) noexcept;
 
-
-      LeaderAliveTask_t(
-          Bus_t& bus,
-          const Internal_t& internal,
-          const LeaderTask_f&& leader_task) noexcept;
-
       void run(void) noexcept override;
 
     private:

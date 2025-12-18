@@ -30,7 +30,7 @@ namespace nearest_ap
           m_spawner{std::move(spawner)},
           m_bus {bus},
           m_pot_election_task {bus, internal},
-          m_alive_task {bus, internal, leader_task_f},
+          m_alive_task {bus, internal, std::move(leader_task_f)},
           m_bus_reader_task {bus, internal}
         {
           _spawn_task();
@@ -39,7 +39,7 @@ namespace nearest_ap
         Scheduler(
             SpawnerType spawner,
             Bus_t& bus,
-            LeaderTaks_f && leader_task_f,
+            LeaderTaks_f leader_task_f,
             Internal_t& internal,
             const Millis_t bus_task_freq,
             const Millis_t pot_task_freq,
@@ -48,7 +48,7 @@ namespace nearest_ap
           m_spawner{std::move(spawner)},
           m_bus {bus},
           m_pot_election_task {bus, internal},
-          m_alive_task {bus, internal, leader_task_f},
+          m_alive_task {bus, internal, std::move(leader_task_f)},
           m_bus_reader_task {bus, internal}
         {
           _spawn_task(bus_task_freq, pot_task_freq, alive_task_freq);

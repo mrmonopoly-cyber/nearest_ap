@@ -13,17 +13,17 @@ using Topology = Internal_t::Topology;
 //INFO: Constructor
 
 Internal_t::Internal_t(
-    Topology&& topology,
+    Topology topology,
     const std::uint16_t current_user_index,
-    const ComputePot_f&& compute_pot
+    const ComputePot_f compute_pot
     ) noexcept
-: m_users(topology),
+: m_users(std::move(topology)),
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
   m_best_candidate_pot(0),
   m_received_heartbit_leader(0),
-  m_compute_local_potential(compute_pot),
+  m_compute_local_potential(std::move(compute_pot)),
   m_tollerance(0),
   m_best_candidate(m_current_user_index),
   m_vote_info(m_users.m_elements.size())
@@ -32,18 +32,18 @@ Internal_t::Internal_t(
 }
 
 Internal_t::Internal_t(
-    Topology&& topology,
+    Topology topology,
     const std::uint16_t current_user_index,
-    const ComputePot_f&& compute_pot,
+    const ComputePot_f compute_pot,
     const Tollerance_t tollerance
     ) noexcept
-: m_users(topology),
+: m_users(std::move(topology)),
   m_current_user_index(current_user_index),
   m_user_potential(0),
   m_leader_potential(0),
   m_best_candidate_pot(0),
   m_received_heartbit_leader(0),
-  m_compute_local_potential(compute_pot),
+  m_compute_local_potential(std::move(compute_pot)),
   m_tollerance(tollerance),
   m_best_candidate(m_current_user_index),
   m_vote_info(m_users.m_elements.size())

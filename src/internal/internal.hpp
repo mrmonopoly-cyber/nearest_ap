@@ -50,15 +50,15 @@ namespace nearest_ap
       Internal_t() = delete;
 
       Internal_t(
-          Topology&& topology,
+          Topology topology,
           const std::uint16_t current_user_index,
-          const ComputePot_f&& compute_pot
+          const ComputePot_f compute_pot
           ) noexcept;
 
       Internal_t(
-          Topology&& topology,
+          Topology topology,
           const std::uint16_t current_user_index,
-          const ComputePot_f&& compute_pot,
+          const ComputePot_f compute_pot,
           const Tollerance_t tollerance) noexcept;
 
       bool leader(void) const noexcept;

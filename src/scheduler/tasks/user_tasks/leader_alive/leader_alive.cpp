@@ -12,18 +12,7 @@ LeaderAliveTask_t::LeaderAliveTask_t(
         BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE)),
         m_bus(bus),
         m_internal(internal),
-        m_leader_task(leader_task) 
-    {
-    }
-
-LeaderAliveTask_t::LeaderAliveTask_t(
-          Bus_t& bus,
-          const Internal_t& internal,
-          const LeaderTask_f&& leader_task) noexcept:
-        BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE)),
-        m_bus(bus),
-        m_internal(internal),
-        m_leader_task(std::move(leader_task))
+        m_leader_task(std::move(leader_task)) 
     {
     }
 
