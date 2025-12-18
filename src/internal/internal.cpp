@@ -200,9 +200,12 @@ bool Internal_t::recv_heartbit(
 
 void Internal_t::recv_heartbit_best_candidate(const VirtualId_t leader_id, const Potential_t pot) noexcept
 {
-  if (leader_id == m_best_candidate && m_received_heartbit_best_candidate < 5)
+  if (leader_id == m_best_candidate)
   {
-    m_received_heartbit_best_candidate++;
+    if (m_received_heartbit_best_candidate < 5)
+    {
+      m_received_heartbit_best_candidate++;
+    }
     m_best_candidate_pot = pot;
   }
 }
