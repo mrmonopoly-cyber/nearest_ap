@@ -87,7 +87,7 @@ int main(int argc, char **argv)
   drones.push_back(std::make_unique<Node_t>(
         *clients[0],
         SpawnerLinux_t{},
-        topology,
+        std::move(topology),
         0,
         [&base, &j]{return base[0] + j;}, 
         leader_f, 
@@ -102,7 +102,7 @@ int main(int argc, char **argv)
     drones.push_back(std::make_unique<Node_t>(
         *clients[i],
         SpawnerLinux_t{},
-        topology,
+        std::move(topology),
         i,
         [&base, i]{return base[i] + i;}, 
         leader_f, 

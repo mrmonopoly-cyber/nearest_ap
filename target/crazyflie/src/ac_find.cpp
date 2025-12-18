@@ -53,7 +53,7 @@ void appMain()
   using Topology = Node_t::Topology;
 
   const constexpr uint8_t default_leader =0;
-  const Topology topology{NETWORK_TOPOLOGY, default_leader};
+  Topology topology{NETWORK_TOPOLOGY, default_leader};
   std::uint8_t user_index =0;
 
   RadioBus bus{};

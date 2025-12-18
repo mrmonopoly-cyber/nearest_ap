@@ -26,11 +26,11 @@ namespace nearest_ap {
 
       Node(
           Bus_t& bus,
-          SpawnerType&& spawner,
+          SpawnerType spawner,
           Topology topology,
           const std::uint16_t current_user_index,
-          ComputePot_f&& compute_pot_f,
-          LeaderTask_f&& leader_task_f) noexcept:
+          ComputePot_f compute_pot_f,
+          LeaderTask_f leader_task_f) noexcept:
         m_internal(
             std::move(topology),
             current_user_index,
@@ -41,11 +41,11 @@ namespace nearest_ap {
 
       Node(
           Bus_t& bus,
-          SpawnerType&& spawner,
+          SpawnerType spawner,
           Topology topology,
           const std::uint16_t current_user_index,
-          ComputePot_f&& compute_pot_f,
-          LeaderTask_f&& leader_task_f,
+          ComputePot_f compute_pot_f,
+          LeaderTask_f leader_task_f,
           Tollercance_t tollerance) noexcept:
         m_internal(
             std::move(topology),
@@ -58,11 +58,11 @@ namespace nearest_ap {
 
       Node(
           Bus_t& bus,
-          SpawnerType&& spawner,
+          SpawnerType spawner,
           Topology topology,
           const std::uint16_t current_user_index,
-          ComputePot_f&& compute_pot_f,
-          LeaderTask_f&& leader_task_f,
+          ComputePot_f compute_pot_f,
+          LeaderTask_f leader_task_f,
           Tollercance_t tollerance,
           const Millis_t bus_task_freq,
           const Millis_t pot_task_freq,
