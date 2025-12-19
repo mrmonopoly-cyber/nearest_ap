@@ -47,19 +47,16 @@ int main(int argc, char **argv)
 
   std::vector<std::unique_ptr<BusLinux_t>> clients{};
   std::vector<std::unique_ptr<Node_t>> drones{};
-  std::vector<Node_t::VirtualId_t> user_ids{};
 
-  user_ids.reserve(num_clients);
   clients.reserve(num_clients);
   drones.reserve(num_clients);
 
   for (uint i=0;i<num_clients; ++i)
   {
     clients.emplace_back(std::make_unique<BusLinux_t>());
-    user_ids.emplace_back(i);
   }
 
-  Topology topology{user_ids, static_cast<uint32_t>(leader)};
+  Topology topology{num_clients, static_cast<uint32_t>(leader)};
 
   for (auto& client : clients)
   {

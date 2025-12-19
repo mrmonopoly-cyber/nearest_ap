@@ -26,7 +26,7 @@ Internal_t::Internal_t(
   m_compute_local_potential(std::move(compute_pot)),
   m_tollerance(0),
   m_best_candidate(m_current_user_index),
-  m_vote_info(m_users.m_elements.size())
+  m_vote_info(m_users.m_num_elements)
 {
   compute_user_potential();
 }
@@ -46,7 +46,7 @@ Internal_t::Internal_t(
   m_compute_local_potential(std::move(compute_pot)),
   m_tollerance(tollerance),
   m_best_candidate(m_current_user_index),
-  m_vote_info(m_users.m_elements.size())
+  m_vote_info(m_users.m_num_elements)
 {
   compute_user_potential();
 }
@@ -56,7 +56,7 @@ Internal_t::Internal_t(
 bool Internal_t::leader(void) const noexcept
 {
   return 
-    m_users.m_leader_index == m_current_user_index &&
+    m_users.m_leader == m_current_user_index &&
     user_pot() >= better_candidate_pot()
     ;
 }
@@ -98,7 +98,7 @@ Potential_t Internal_t::leader_pot(void) const noexcept
 
 VirtualId_t Internal_t::user_id(void) const noexcept
 {
-  return m_users.m_elements[m_current_user_index];
+  return m_current_user_index;
 }
 
 //INFO: Modifiers
@@ -107,7 +107,7 @@ bool Internal_t::user_valid_for_election(void) noexcept
 {
   const auto heartbit = _consume_heartbit(m_received_heartbit_leader);
   const auto heartbit_best_candidate = _consume_heartbit(m_received_heartbit_best_candidate);
-  const auto user_is_best_candidate = m_users.m_elements[m_current_user_index] == m_best_candidate;
+  const auto user_is_best_candidate = m_current_user_index == m_best_candidate;
   const auto pot_user_better_leader = user_pot() > m_leader_potential + m_tollerance;
   const auto pot_user_better_candidate = user_pot() > m_best_candidate_pot + m_tollerance;
 
@@ -124,14 +124,14 @@ bool Internal_t::user_valid_for_election(void) noexcept
       log.append_msg(" NO HEARTBIT FROM BEST CANDIDATE: ");
       log.append_msg(m_best_candidate);
 
-      m_users.m_leader_index = m_users.leader();
+      m_users.m_leader = m_users.leader();
       m_leader_potential = m_user_potential;
-      m_best_candidate = m_users.m_elements[m_current_user_index];
+      m_best_candidate = m_current_user_index;
       m_best_candidate_pot = m_user_potential;
     }
     else
     {
-      m_users.m_leader_index = m_best_candidate;
+      m_users.m_leader = m_best_candidate;
       m_leader_potential = m_best_candidate_pot;
     }
 
@@ -219,11 +219,11 @@ bool Internal_t::support_check_wining(void) noexcept
   {
     logger::UserLog<32>log{};
     log.append_msg("node: ");
-    log.append_msg(m_users.m_elements[m_current_user_index]);
+    log.append_msg(m_current_user_index);
     log.append_msg(" won election");
     static_log(logger::Level::Warning, log);
     m_vote_info.end_election();
-    m_users.m_leader_index = m_current_user_index;
+    m_users.m_leader = m_current_user_index;
     m_leader_potential = m_user_potential;
   }
 
@@ -254,11 +254,11 @@ void Internal_t::compute_user_potential(void) noexcept
   if(
       (user_pot() > m_best_candidate_pot + m_tollerance)
       ||
-      (m_users.m_elements[m_current_user_index] == m_best_candidate)
+      (m_current_user_index == m_best_candidate)
     )
   {
     m_best_candidate_pot = m_user_potential;
-    m_best_candidate = m_users.m_elements[m_current_user_index];
+    m_best_candidate = m_current_user_index;
   }
 }
 

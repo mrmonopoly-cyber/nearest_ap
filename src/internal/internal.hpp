@@ -25,25 +25,21 @@ namespace nearest_ap
         public:
           VirtualId_t leader() const noexcept
           {
-            return m_elements[m_leader_index];
+            return m_leader;
           }
 
           bool update_leader(VirtualId_t leader) noexcept
           {
-            for (uint32_t i=0; i<m_elements.size(); i++)
+            if (leader<m_num_elements)
             {
-              if (m_elements[i] == leader)
-              {
-                m_leader_index = i;
-                return true;
-              }
+              m_leader = leader;
             }
             return false;
           }
 
         public:
-          const std::vector<VirtualId_t> m_elements;
-          std::uint32_t m_leader_index;
+          const std::uint32_t m_num_elements;
+          std::uint32_t m_leader;
       };
 
 

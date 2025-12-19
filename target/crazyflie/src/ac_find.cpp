@@ -44,8 +44,6 @@ extern "C"
 #include "token_ring.h"
 }
 
-#define NETWORK_TOPOLOGY {0, 1, 2, 3} // Maximum size of network is 20 by default
-
 void appMain()
 {
   using namespace nearest_ap;
@@ -53,8 +51,7 @@ void appMain()
   using Topology = Node_t::Topology;
 
   const constexpr uint8_t default_leader =0;
-  Topology topology{NETWORK_TOPOLOGY, default_leader};
-  std::uint8_t user_index =255;
+  Topology topology{4, default_leader};
   const uint8_t my_id = ((uint8_t)configblockGetRadioAddress()) & 0x0002;
 
 	vTaskDelay(4000);
@@ -69,29 +66,20 @@ void appMain()
     DEBUG_PRINT("%s%d\n",buffer, my_id);
   };
 
-  for (uint8_t i=0;i<topology.m_elements.size();i++)
-  {
-    if (topology.m_elements[i] == my_id)
-    {
-      user_index = i;
-      break;
-    }
-  }
-
-  if(user_index == 255)
+  if(my_id >= topology.m_num_elements)
   {
     DEBUG_PRINT("id not found in topology: %d\n", my_id);
     while(1){};
   }
 
 
-  DEBUG_PRINT("my (id:index): %d, %d\n", my_id, user_index);
+  DEBUG_PRINT("my (id:index): %d, %d\n", my_id, my_id);
 
   Node node{
       bus,
       TaskCraziflieSpawner{},
       std::move(topology),
-      user_index,
+      my_id,
       compute_potential,
       leader_f,
       tollerance,
