@@ -1,5 +1,5 @@
+#include <atomic>
 #include <cstdint>
-
 
 extern "C"
 {
@@ -11,17 +11,25 @@ extern "C"
 
 #include "radio_bus.hpp"
 
-#include <queue>
-
 using Msg_t = RadioBus::Msg_t;
 using namespace nearest_ap;
 
+static struct 
+{
+  std::array<P2PPacket, UINT8_MAX> msg_queue;
+  std::atomic_uint8_t free_cell =msg_queue.size();
+  std::atomic_uint8_t write_cursor;
+  std::atomic_uint8_t read_cursor;
+}g_radio_bus_metadata;
 
-static std::queue<P2PPacket> g_recv_messages;
 
 static void p2pcallbackHandler(P2PPacket* packet)
 {
-  g_recv_messages.emplace(*packet);
+  if (g_radio_bus_metadata.free_cell.load() > 0)
+  {
+    g_radio_bus_metadata.msg_queue[g_radio_bus_metadata.write_cursor++] = *packet;
+    g_radio_bus_metadata.free_cell--;
+  }
 }
 
 RadioBus::RadioBus()
@@ -31,17 +39,19 @@ RadioBus::RadioBus()
 
 std::optional<Msg_t> RadioBus::Read() noexcept
 {
-  if(g_recv_messages.empty())
+  Msg_t m{};
+  P2PPacket packet{};
+
+  if(g_radio_bus_metadata.free_cell.load() == g_radio_bus_metadata.msg_queue.size())
   {
     return {};
   }
 
-  Msg_t m{};
-  P2PPacket& packet = g_recv_messages.front();
-
+  packet = g_radio_bus_metadata.msg_queue[g_radio_bus_metadata.read_cursor++];
+  g_radio_bus_metadata.free_cell++;
 
   memcpy(&m.m_msg_size, packet.data, sizeof(m.m_msg_size));
-  if (sizeof(packet.data) - sizeof(m.m_msg_size) < m.m_msg_size)
+  if (m.m_msg_size < sizeof(packet.data) - m.m_msg_size)
   {
     memcpy(m.m_payload.data(), packet.data + sizeof(m.m_msg_size), m.m_msg_size);
   }
@@ -50,15 +60,13 @@ std::optional<Msg_t> RadioBus::Read() noexcept
     return {};
   }
 
-  g_recv_messages.pop();
-
   return m;
 }
 
 BusStatus_t RadioBus::Write(const Msg_t& msg) noexcept
 {
   P2PPacket packet{};
-  packet.size = static_cast<uint8_t>(msg.m_payload.size());
+  packet.size = msg.m_msg_size + sizeof(msg.m_msg_size);
   packet.rssi =0;
   packet.port = 0x00;
 
