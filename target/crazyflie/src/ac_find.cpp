@@ -54,28 +54,38 @@ void appMain()
 
   const constexpr uint8_t default_leader =0;
   Topology topology{NETWORK_TOPOLOGY, default_leader};
-  std::uint8_t user_index =0;
+  std::uint8_t user_index =255;
+  const uint8_t my_id = ((uint8_t)configblockGetRadioAddress()) & 0x0002;
+
+	vTaskDelay(4000);
 
   RadioBus bus{};
 
   Node_t::Tollercance_t tollerance = 10;
   auto compute_potential = []{return 42;};
 
-  auto leader_f = [](){
+  auto leader_f = [my_id](){
     char buffer[32] = "i'm leader: ";
-    DEBUG_PRINT("%s%d",buffer, dtrGetSelfId());
+    DEBUG_PRINT("%s%d\n",buffer, my_id);
   };
 
   for (uint8_t i=0;i<topology.m_elements.size();i++)
   {
-    if (topology.m_elements[i] == dtrGetSelfId())
+    if (topology.m_elements[i] == my_id)
     {
       user_index = i;
       break;
     }
   }
 
-  DEBUG_PRINT("my (id:index): %d, %d\n", dtrGetSelfId(), user_index);
+  if(user_index == 255)
+  {
+    DEBUG_PRINT("id not found in topology: %d\n", my_id);
+    while(1){};
+  }
+
+
+  DEBUG_PRINT("my (id:index): %d, %d\n", my_id, user_index);
 
   Node node{
       bus,
@@ -84,7 +94,10 @@ void appMain()
       user_index,
       compute_potential,
       leader_f,
-      tollerance
+      tollerance,
+      200,
+      7000,
+      1000
   };
 
   DEBUG_PRINT("Starting Drone\n");
