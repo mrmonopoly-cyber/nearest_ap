@@ -19,6 +19,7 @@ namespace nearest_ap::logger
   };
 
   template <uint32_t size>
+#ifdef __linux__
     class UserLog 
     {
       public:
@@ -50,46 +51,85 @@ namespace nearest_ap::logger
         {
           if (obj.length() <m_available_space)
           {
-#ifdef __linux__
             const std::uint32_t written = snprintf(m_cursor, m_available_space,
                 "%.*s", static_cast<int>(obj.size()),obj.data());
             m_cursor += written;
             m_available_space -= written;
-#endif // __linux__
           }
         }
 
         inline void append_msg(std::int32_t obj) noexcept
         {
-#ifdef __linux__
           const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
           m_cursor += written;
           m_available_space -= written;
-#endif // __linux__
         }
 
         inline void append_msg(std::uint32_t obj) noexcept
         {
-#ifdef __linux__
           const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);
           m_cursor += written;
           m_available_space -= written;
-#endif // __linux__
         }
 
-#ifndef __linux__
-        inline void append_msg(bool obj) noexcept
-        {
-        }
-#endif // __linux__
-
-        template<typename T>
-          void append_msg(char* buffer, std::size_t buffer_size, T obj) noexcept = delete;
       private:
         char m_buffer[size]{};
         char* m_cursor = m_buffer;
         uint32_t m_available_space = size;
     };
+#else
+    class UserLog 
+    {
+      public:
+        UserLog() = default;
+
+#ifdef __linux__
+        UserLog(std::string_view str) noexcept
+          :m_buffer(str)
+        {
+        }
+#endif // __linux__
+
+        inline std::string_view raw() const noexcept
+        {
+#ifdef __linux__
+          return m_buffer;
+#else
+          return {};
+#endif // __linux__
+        }
+
+        inline uint32_t original_size() const noexcept
+        {
+          return size;
+        }
+
+        inline void reset() noexcept
+        {
+        }
+
+        inline void append_msg(const std::string_view) noexcept
+        {
+        }
+
+        inline void append_msg(std::int32_t) noexcept
+        {
+        }
+
+        inline void append_msg(std::uint32_t) noexcept
+        {
+        }
+
+        inline void append_msg(bool) noexcept
+        {
+        }
+
+      private:
+        uint32_t m_available_space = size;
+    };
+
+#endif // __linux__
+
 
   class StaticLog;
 

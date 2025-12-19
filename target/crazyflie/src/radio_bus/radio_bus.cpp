@@ -1,13 +1,14 @@
-#include <atomic>
-#include <cstdint>
-
 extern "C"
 {
 #include "radiolink.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "portmacro.h"
+
+#include "debug.h"
 }
+
+#include <cstdint>
 
 #include "radio_bus.hpp"
 
@@ -17,15 +18,16 @@ using namespace nearest_ap;
 static struct 
 {
   std::array<P2PPacket, UINT8_MAX> msg_queue;
-  std::atomic_uint8_t free_cell =msg_queue.size();
-  std::atomic_uint8_t write_cursor;
-  std::atomic_uint8_t read_cursor;
+  std::uint8_t free_cell =msg_queue.size();
+  std::uint8_t write_cursor;
+  std::uint8_t read_cursor;
 }g_radio_bus_metadata;
 
 
 static void p2pcallbackHandler(P2PPacket* packet)
 {
-  if (g_radio_bus_metadata.free_cell.load() > 0)
+  DEBUG_PRINT("recv mex\n");
+  if (g_radio_bus_metadata.free_cell > 0)
   {
     g_radio_bus_metadata.msg_queue[g_radio_bus_metadata.write_cursor++] = *packet;
     g_radio_bus_metadata.free_cell--;
@@ -42,7 +44,7 @@ std::optional<Msg_t> RadioBus::Read() noexcept
   Msg_t m{};
   P2PPacket packet{};
 
-  if(g_radio_bus_metadata.free_cell.load() == g_radio_bus_metadata.msg_queue.size())
+  if(g_radio_bus_metadata.free_cell == g_radio_bus_metadata.msg_queue.size())
   {
     return {};
   }

@@ -41,7 +41,7 @@ extern "C"
 #include "task.h"
 
 #include "debug.h"
-#include "token_ring.h"
+#include "configblock.h"
 }
 
 void appMain()
@@ -51,15 +51,17 @@ void appMain()
   using Topology = Node_t::Topology;
 
   const constexpr uint8_t default_leader =0;
-  Topology topology{4, default_leader};
-  const uint8_t my_id = ((uint8_t)configblockGetRadioAddress()) & 0x0002;
+  const constexpr uint8_t num_nodes =2;
+
+  Topology topology{num_nodes, default_leader};
+  const uint8_t my_id = (configblockGetRadioAddress() & 3);
 
 	vTaskDelay(4000);
 
   RadioBus bus{};
 
   Node_t::Tollercance_t tollerance = 10;
-  auto compute_potential = []{return 42;};
+  auto compute_potential = [my_id]{return 42 + my_id;};
 
   auto leader_f = [my_id](){
     char buffer[32] = "i'm leader: ";
@@ -73,7 +75,7 @@ void appMain()
   }
 
 
-  DEBUG_PRINT("my (id:index): %d, %d\n", my_id, my_id);
+  DEBUG_PRINT("my id: %d\n", my_id);
 
   Node node{
       bus,
