@@ -16,16 +16,16 @@ using namespace nearest_ap;
 struct TaskWrapper
 {
   TickType_t freq;
-  BaseTask_t& task;
+  BaseTask_t* task;
 };
 
 void task_runner(void* data)
 {
-  TaskWrapper* task  = reinterpret_cast<TaskWrapper*>(data);
+  TaskWrapper task  = *reinterpret_cast<TaskWrapper*>(data);
   while(1)
   {
-    task->task.run();
-    vTaskDelay(task->freq);
+    task.task->run();
+    vTaskDelay(task.freq);
   }
 }
 
@@ -41,9 +41,9 @@ void TaskCraziflieSpawner::start_task(BaseTask_t* const task)
 
 void TaskCraziflieSpawner::start_task(BaseTask_t* const task, Millis_t time)
 {
-  const constexpr uint16_t stack_size = 200;
+  const uint16_t stack_size = 200;
   const TickType_t tick_delay =  time/ portTICK_PERIOD_MS;
-  TaskWrapper full_task{tick_delay, *task};
+  TaskWrapper full_task{tick_delay, task};
   TaskHandle_t* p_handler = m_tasks[task->id()];
 
   BaseType_t error = xTaskCreate(task_runner, "hh", stack_size, &full_task, tskIDLE_PRIORITY, p_handler);
@@ -51,4 +51,6 @@ void TaskCraziflieSpawner::start_task(BaseTask_t* const task, Millis_t time)
   {
     //TODO: add error handling
   }
+  vTaskDelay(10/ portTICK_PERIOD_MS);
+
 }
