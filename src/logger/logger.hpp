@@ -83,20 +83,9 @@ namespace nearest_ap::logger
       public:
         UserLog() = default;
 
-#ifdef __linux__
-        UserLog(std::string_view str) noexcept
-          :m_buffer(str)
-        {
-        }
-#endif // __linux__
-
         inline std::string_view raw() const noexcept
         {
-#ifdef __linux__
-          return m_buffer;
-#else
           return {};
-#endif // __linux__
         }
 
         inline uint32_t original_size() const noexcept
@@ -123,9 +112,6 @@ namespace nearest_ap::logger
         inline void append_msg(bool) noexcept
         {
         }
-
-      private:
-        uint32_t m_available_space = size;
     };
 
 #endif // __linux__

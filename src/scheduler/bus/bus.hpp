@@ -24,7 +24,7 @@ namespace nearest_ap {
 
       struct Msg_t
       {
-        std::uint32_t m_msg_size;
+        std::uint8_t m_msg_size;
         std::array<pb_byte_t, m_payload_max_size> m_payload; 
 
         void reset() noexcept

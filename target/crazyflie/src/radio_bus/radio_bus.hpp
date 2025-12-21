@@ -29,7 +29,6 @@
  */
 
 #include <nearest_ap/scheduler/bus/bus.hpp>
-#include <optional>
 
 class RadioBus : public nearest_ap::Bus_t
 {
@@ -38,6 +37,10 @@ class RadioBus : public nearest_ap::Bus_t
 
     std::optional<Msg_t> Read() noexcept;
     nearest_ap::BusStatus_t Write(const Msg_t&) noexcept;
+    
+  private:
+      uint8_t _next(const uint8_t v) const noexcept;
 
   private:
+      static const constexpr uint32_t s_queue_size = 128;
 };

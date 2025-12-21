@@ -1,11 +1,8 @@
 #pragma once
 
+#include "bus/fake_radio_bus/fake_radio_bus.hpp"
 #include <atomic>
-#include <array>
-#include <mutex>
-#include <queue>
-#include <sys/socket.h>
-
+#include <cstdint>
 #include <nearest_ap/nearest_ap.hpp>
 
 namespace nearest_ap
@@ -13,9 +10,6 @@ namespace nearest_ap
   class BusLinux_t : public Bus_t
   {
     public:
-      using socket_t = int;
-      using Id = uint;
-
       BusLinux_t() noexcept;
 
       BusLinux_t(const BusLinux_t&) = delete;
@@ -24,26 +18,31 @@ namespace nearest_ap
       BusLinux_t(BusLinux_t&&) = delete;
       BusLinux_t& operator=(BusLinux_t&&) = delete;
 
-
-      void enstablis_connection(void) noexcept;
+      inline void enstablis_connection(void) noexcept
+      {
+        m_radio_bus.enstablis_connection();
+      }
 
       std::optional<Msg_t> Read(void) noexcept override;
       BusStatus_t Write(const Msg_t&) noexcept override;
 
-    public:
-      static constexpr std::size_t m_max_clients = 25;
+    private:
+      void p2pcallbackHandler(P2PPacket* packet) noexcept;
+
+      static void _p2pcallbackHandler(void* obj, P2PPacket* packet) noexcept
+      {
+        BusLinux_t* self = reinterpret_cast<BusLinux_t*>(obj);
+        self->p2pcallbackHandler(packet);
+      }
+
+      uint8_t _next(const uint8_t v) const noexcept;
 
     private:
-      static void _Accept(BusLinux_t* const self) noexcept;
-      void _socket_setup(void) noexcept;
-
-    private:
-      const Id m_id;
-      socket_t m_socket;
-      std::array<std::optional<socket_t>, m_max_clients> m_clients;
-      std::queue<Msg_t> m_msg_queue;
-      std::mutex m_msg_queue_lock;
-      std::atomic_uint8_t m_client_connected;
+      RadioBus m_radio_bus;
+      static const constexpr uint32_t s_queue_size = 128;
+      std::array<P2PPacket, s_queue_size> m_msg_queue{};
+      std::atomic_uint8_t m_write_cursor=0;
+      std::atomic_uint8_t m_read_cursor=0;
   };
 };
 
