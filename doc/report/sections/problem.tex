@@ -3,8 +3,26 @@
 Before explaining how the protocol behaves it's better to spend a few words explaining what is the
 problem I'm trying to solve and context in which it has to be solved.
 
-I have been assigned the following problem: \textbf{given a bunch o drones connected to an access
-point determine the best one based on the quality of the signal and the power level of the battery.}
-I will highlight an aspect of the problem, the drones are real and in particular are the
-Crazyflie 2.1 \cite{1}
+I have been assigned the following problem: \textbf
+{
+  given a bunch o drones connected to an access
+  point determine the best one based on the quality of the signal and the power level of the
+  battery.
+}
+I want highlight an aspect of the problem, the drones are real and in particular they are the
+Crazyflie 2.1 \cite{1}. They can connect to a wireless access point but to communicate between them
+they use a radio (2.4GHz ISM band radio) connection with no \textbf{Quality Of Service}.
+Since the aim of the problem was to design a protocol which would allow the drones to determine, 
+autonomously, which of them is the best one to be considered as the loader of the storm,
+i had to use the radio medium to exchange information between them.
 
+The drivers of the drones do not offer way to send a message to a specific drone, outside of a
+token ring which is too fragile for my use case. The only feature they offer is sending a message
+in  broadcast to all the reachable nodes. 
+
+This is why i designed the protocol in such a way that i does not rely on any connection oriented
+protocol like \textbf{TCP} or \textbf{QUICK}. Also i could port \textbf{TCP} in the drones with a
+custom driver but i was scared that the overhead of the messages for the connection would cause an
+excessive amount of interference between the drones. On the other hand by designing the all stack
+to reduce the number of messages sent by each drone the problem was much easier to manage and
+control.
