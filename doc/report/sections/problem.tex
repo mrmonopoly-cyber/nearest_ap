@@ -21,8 +21,8 @@ token ring which is too fragile for my use case. The only feature they offer is 
 in  broadcast to all the reachable nodes. 
 
 This is why i designed the protocol in such a way that i does not rely on any connection oriented
-protocol like \textbf{TCP} or \textbf{QUICK}. Also i could port \textbf{TCP} in the drones with a
-custom driver but i was scared that the overhead of the messages for the connection would cause an
-excessive amount of interference between the drones. On the other hand by designing the all stack
-to reduce the number of messages sent by each drone the problem was much easier to manage and
-control.
+protocol like \textbf{TCP}\cite{2} or \textbf{QUIC}\cite{3}. Also i could port \textbf{TCP}\cite{2}
+in the drones with a custom driver but i was scared that the overhead of the messages for the
+connection would cause an excessive amount of interference between the drones. On the other hand
+by designing the all stack to reduce the number of messages sent by each drone the problem was much
+easier to manage and control.
