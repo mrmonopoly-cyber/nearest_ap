@@ -1,0 +1,29 @@
+\section{Ideal Solution}
+
+The leader election problem defined in Section~\ref{prob:leader_election} is well studied in
+the context of distributed systems. A widely adopted solution is the \textbf{Raft} consensus
+algorithm~\cite{4}, which provides strong guarantees of safety and liveness by electing a leader
+as part of a replicated state machine protocol.
+
+Raft assumes a partially synchronous system, reliable point-to-point communication channels,
+and stable node membership. Leader election in Raft is tightly coupled with log replication and
+quorum-based agreement, resulting in well-defined behavior even in the presence of failures.
+From a theoretical standpoint, Raft represents an ideal solution for achieving consistent
+leadership and consensus in distributed systems.
+
+However, these guarantees come at the cost of significant protocol complexity and communication
+overhead. Raft relies on frequent heartbeat exchanges, persistent state, and multiple rounds of
+message exchanges per election. Moreover, it assumes the availability of reliable,
+connection-oriented communication channels between nodes.
+
+In the context considered in this work—characterized by unreliable broadcast communication,
+high message loss, lack of direct addressing, and severely constrained embedded
+platforms—the assumptions required by Raft do not hold. As a result, while Raft can be considered
+an ideal reference solution in terms of correctness guarantees, it is impractical for the target
+environment addressed by this protocol.
+
+
+% \section{Ideal Solution}
+% This problem is not new and there already exists a good solution which is \textbf{RAFT}\cite{4}
+% but it has some problem for my use case. First of all it's really an overkill, second it can be
+% pretty heavy on the number of message sent.

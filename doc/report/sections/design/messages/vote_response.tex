@@ -1,0 +1,26 @@
+\subsubsection{VoteResponse}\label{message:vote_response}
+
+\textbf{VoteResponse}$(new\_leader, potential, round)$ is a message broadcast by a node to endorse
+a candidate that has initiated a leader election. The message carries the following fields:
+
+\begin{itemize}
+  \item \textbf{new\_leader}: the identifier of the candidate node being endorsed;
+  \item \textbf{potential}: the potential of the endorsed candidate;
+  \item \textbf{round}: the election round associated with the corresponding \textbf{NewElection}
+    message.
+\end{itemize}
+
+Vote response messages are sent only when a node decides to support a candidate. They serve both to
+notify the candidate of received support and to propagate information about the endorsed node to
+the rest of the network.
+
+
+% \subsubsection{VoteResponse}\label{message:vote_response}
+% VoteResponse(new\_leader, potential, round): a \textbf{positive} response to a
+% \textbf{NewElection}[\ref{message:new_election}] where:
+% \begin{itemize}
+%   \item new\_leader: id of the node who sends the \textbf{NewElection}[\ref{message:new_election}]
+%   \item potential: potential of the node who sends
+%     the \textbf{NewElection}[\ref{message:new_election}]
+%   \item round: round of the \textbf{NewElection}[\ref{message:new_election}]
+% \end{itemize}

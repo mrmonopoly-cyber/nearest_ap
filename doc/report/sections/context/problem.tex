@@ -1,0 +1,74 @@
+\section{Context}
+
+Before describing the behavior of the protocol, it is necessary to clarify the problem being
+addressed and the constraints under which the solution operates.
+
+The target application consists of a group of autonomous drones that must collectively determine
+which node should act as a leader. Leader selection is based on locally measurable properties,
+such as the quality of the wireless signal to an access point and the remaining battery level.
+The selected leader is intended to act as the reference node for the swarm.
+
+The physical platform used in this work is the \textbf{Crazyflie~2.1} quadcopter~\cite{1}.
+While each drone can independently connect to a wireless access point, inter-drone communication
+is performed exclusively through a shared radio channel operating in the 2.4\,GHz ISM band.
+This communication medium provides no guarantees in terms of delivery, ordering, or Quality of
+Service, and supports only broadcast transmission.
+
+The available radio drivers do not allow addressing individual nodes directly, except through a
+token-ring mechanism that proved too fragile for the intended use case. As a consequence, all
+inter-node communication must be performed through unreliable broadcast messages delivered to all
+reachable nodes.
+
+These constraints motivated the design of a protocol that does not rely on any connection-oriented
+communication mechanism, such as TCP~\cite{2} or QUIC~\cite{3}. While it would be theoretically
+possible to port a connection-oriented protocol to the platform using custom drivers, the
+additional control traffic required to maintain connections was deemed unsuitable for a dense and
+interference-prone wireless environment. Instead, the protocol was designed to minimize
+communication overhead and tolerate high message loss by construction.
+
+Finally, it is important to note that the number of physical drones available for experimentation
+is limited to a maximum of four units. As a result, large-scale behavior cannot be validated
+directly on hardware. To address this limitation, the protocol was designed to be
+platform-independent and was evaluated through simulation in a Linux-based environment,
+allowing experiments with a significantly larger number of nodes.
+
+
+% \section{Context}
+%
+% Before explaining how the protocol behaves it is better to spend a few words explaining what is the
+% problem I'm trying to solve and context in which it has to be solved.
+%
+% I have been assigned the following problem: \textbf
+% {
+%   given a bunch o drones connected to an access
+%   point determine the best one based on the quality of the signal and the power level of the
+%   battery.
+% }
+% I want to highlight an aspect of the problem, the drones are real and in particular they are the
+% \textbf
+% {
+%   Crazyflie 2.1
+% }
+% \cite{1}. They can connect to a wireless access point but to communicate
+% between them they use a radio (2.4GHz ISM band radio) connection with no \textbf
+% {
+%   Quality Of Service
+% }.
+% Since the aim of the problem was to design a protocol which would allow the drones to determine, 
+% autonomously, which of them is the best one to be considered as the loader of the storm,
+% I had to use the radio medium to exchange information between them.
+%
+% The drivers of the drones do not offer way to send a message to a specific drone, outside a
+% token ring which is too fragile for my use case. The only feature they offer is sending a message
+% in  broadcast to all the reachable nodes. 
+%
+% This is why I designed the protocol in such a way that I does not rely on any connection oriented
+% protocol like \textbf{TCP}\cite{2} or \textbf{QUIC}\cite{3}. Also, I could port \textbf{TCP}\cite{2}
+% in the drones with a custom driver, but I was scared that the overhead of the messages for the
+% connection would cause an excessive amount of interference between the drones. On the other hand
+% by designing the all stack to reduce the number of messages sent by each drone the problem was much
+% easier to manage and control.
+%
+% Last and not least the number of drones at my disposal is limited to a maximum of \textbf{4}.
+% That's probably the biggest of all the problems since it means that if I develop something that
+% works with these drones is not guaranteed to work with much greater numbers.

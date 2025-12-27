@@ -1,0 +1,78 @@
+\section{Useful Definitions}
+
+Before describing the protocol in detail, several terms used throughout this work are formally
+defined.
+
+\begin{definition}[Potential]\label{def:potential}
+  The \textbf{potential} of a node is a non-negative integer $p \in \mathbb{N}$ computed locally by
+  each node. It represents an application-dependent measure of the node's suitability to act as
+  leader (e.g., remaining battery level, signal quality, or a combination thereof).
+  The objective of the protocol is to select a node with maximal potential.
+\end{definition}
+
+\begin{definition}[Tolerance]\label{def:tolerance}
+  The \textbf{tolerance} is a non-negative integer $t \in \mathbb{N}$ used when comparing node
+  potentials. A node is considered strictly better than another only if its potential exceeds the
+  other's potential by more than $t$. The tolerance parameter is introduced to reduce oscillations
+  and excessive leader re-elections. A tolerance value of zero disables this mechanism.
+\end{definition}
+
+\begin{definition}[Best Candidate]\label{def:best_candidate}
+  The \textbf{best candidate} is the node currently known to have the highest potential among all
+  observed nodes. This notion is based on locally available information and may differ across
+  nodes due to message loss or delays.
+\end{definition}
+
+\begin{definition}[Heartbeat]\label{def:heartbeat}
+  A \textbf{heartbeat} is a periodically refreshed counter used to infer the continued activity
+  of a node, particularly the current leader. If the counter is not refreshed within a given time
+  window, the corresponding node is assumed to be unreachable or inactive for the purposes of
+  leader election.
+\end{definition}
+
+\begin{definition}[Leader Check]\label{def:leader_check}
+  A node declares itself leader if the following conditions hold:
+  \begin{itemize}
+    \item the node has won the most recent election round;
+    \item the node's potential is greater than or equal to the potential of the current best
+      candidate.
+  \end{itemize}
+\end{definition}
+
+
+% \section{Useful Definition}
+% Before jumping to the solution let's define some useful definition that will be used from now on:
+%
+% \begin{definition}[Potential]\label{def:potential}
+%   The potential is an integer $\in \N$ which is computed by each node and represent the current
+%   power of a node. Ideally the leader is the node with the greatest potential.
+% \end{definition}
+%
+% \begin{definition}[Tolerance]\label{def:tollerance}
+%   The tolerance is an integral $\in \N$ that is used when comparing the current potential of a node
+%   with the stored potential of the leader. It's added to prevent too many elections and give
+%   stability to the system. It's possible that because of the tolerance the leader is not the best
+%   node between all the possible node. The default value is 0.
+% \end{definition}
+%
+% \begin{definition}[Best candidate]\label{def:best_candidate}
+%   The \textbf{best candidate} in a graph is the node with the greatest
+%   \textbf{potential}[\ref{def:potential}].
+% \end{definition}
+%
+% \begin{definition}[Hearbit]\label{def:heartbit}
+%   A counter $\in \N$ which is used to determine if a certain node is still alive.
+%   If the $\textbf{heartbit} = 0$ the node is considered dead.
+%   Else the node is considered alive.
+% \end{definition}
+%
+% \begin{definition}[Leader check]\label{def:leader_check}
+%   A node define himself as leader if the following conditions are met:
+%   \begin{itemize}
+%     \item node won the election
+%     \item node potential >= best candidate[\ref{def:best_candidate}]
+%       potential [\ref{def:potential}]
+%   \end{itemize}
+%   
+% \end{definition}
+%

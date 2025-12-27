@@ -1,0 +1,148 @@
+\subsubsection{Bus Reader}
+
+The \textbf{Bus Reader} task is responsible for processing all incoming messages and updating the
+local node state accordingly. For each received message, the node applies message-specific rules
+based on the message type and its current internal state.
+
+\paragraph{LeaderHeartbit}
+Upon receiving a \textbf{LeaderHeartbit} message, the node evaluates the information carried by
+the message to update its view of the leader and the best candidate:
+\begin{itemize}
+  \item If the heartbeat round is greater than the local round, the node updates its round and
+    adopts the heartbeat sender as the current best candidate, updating the associated potential.
+  \item If the heartbeat sender is already known as the best candidate, or if its potential is
+    greater than or equal to the locally known best candidate potential, the node updates its
+    best candidate information accordingly.
+  \item If the heartbeat sender has a potential greater than or equal to both the local node
+    potential and the current best candidate potential, the node adopts the heartbeat sender as
+    the current leader and aborts any ongoing election by resetting election-related state
+    (sent election flag, vote flag, and supporter count).
+  \item If the heartbeat sender matches the current leader, the node refreshes the leader
+    heartbeat counter and updates the stored leader potential.
+\end{itemize}
+
+\paragraph{NewElection}
+Upon receiving a \textbf{NewElection} message, the node evaluates whether the proposing candidate
+should be supported or suppressed. The node responds only if all the following conditions hold:
+\begin{enumerate}
+  \item the candidate potential is greater than the local node potential;
+  \item the candidate potential is greater than or equal to the locally known best candidate
+    potential.
+\end{enumerate}
+Notably, this rule also applies to the current leader, allowing a leader to voluntarily endorse a
+stronger candidate without requiring leader failure or timeout.
+
+
+If these conditions are satisfied:
+\begin{itemize}
+  \item the node abandons any ongoing election attempt by resetting its election state;
+  \item the candidate is adopted as the new best candidate and its potential is stored;
+  \item a \textbf{VoteResponse} message endorsing the candidate is broadcast.
+\end{itemize}
+
+During a single election round, a node may emit multiple vote responses, but only when endorsing
+candidates with strictly increasing potential\footnote
+{
+  This allows nodes to revise their support as better candidates are discovered.
+}.
+
+\paragraph{VoteResponse}
+Upon receiving a \textbf{VoteResponse} message, a node increments its local supporter
+count only if:
+\begin{enumerate}
+  \item it has previously initiated an election;
+  \item the response round matches the local election round;
+  \item the endorsed candidate identifier matches the local node identifier.
+\end{enumerate}
+
+If the number of collected endorsements exceeds half of the total number of nodes in the network,
+the node declares itself leader and updates its internal state accordingly by advancing the round,
+resetting election-related flags, and clearing the supporter count.
+
+
+% \subsubsection{Bus Reader}
+% This tasks is responsible for reading all the messages from the bus and act according to the type
+% of the message:
+% \begin{itemize}
+%   \item \textbf{LeaderHeartbit}[\ref{message:leader_heartbit}]:
+%     here many things are evaluated:
+%     \begin{enumerate}
+%       \item If node round is < heartbit round then:
+%         \begin{itemize}
+%           \item update current round to heartbit round
+%           \item set the heartbit leader as the \textbf{best candidate} [\ref{def:best_candidate}]
+%             and update the leader \textbf{potential}[\ref{def:potential}].
+%         \end{itemize}
+%       \item If heartbit leader is the the \textbf{best candidate} [\ref{def:best_candidate}]
+%         \textbf{or} heartbit \textbf{potential}[\ref{def:potential}] >=
+%         \textbf{best candidate} [\ref{def:best_candidate}] \textbf{potential}[\ref{def:potential}]
+%         then set the current leader as the \textbf{best candidate} [\ref{def:best_candidate}]
+%       \item If
+%         heartbit \textbf{potential}[\ref{def:potential}] >=
+%         current node \textbf{potential}[\ref{def:potential}] \textbf{and}
+%         heartbit \textbf{potential}[\ref{def:potential}] >=
+%         \textbf{best candidate} [\ref{def:best_candidate}] \textbf{potential}[\ref{def:potential}]
+%         then set the heartbit leader as the current \textbf{leader} [\ref{def:best_candidate}]
+%         and abort ongoing election by updating the state in the following way:
+%         \begin{itemize}
+%           \item set flag \textbf{election sent}[\ref{state:election_sent}] to false
+%           \item set flag \textbf{voted}[\ref{state:voted}] to false
+%           \item set the \textbf{number of positive} vote[\ref{state:consent}] to 0
+%         \end{itemize}
+%       \item At the end If heartbit leader == current leader then
+%         set the leader \textbf{potential}[\ref{def:potential}] to the
+%         heartbit \textbf{potential}[\ref{def:potential}] and increase the 
+%         current leader heartbit[\ref{def:leader_heartbit}] by one
+%     \end{enumerate}
+%
+%   \item \textbf{NewElection}[\ref{message:new_election}]: if all the following conditions are met
+%     the node does the following things:
+%     \begin{itemize}
+%       \item If \textbf{best candidate} \textbf{potential} >= \textbf{leader} \textbf{potential}
+%         renounce its own election, if any, by updating the state in the following way:
+%         \begin{enumerate}
+%           \item set the \textbf{election sent}[\ref{state:election_sent}] flag to false 
+%           \item set the \textbf{number of supporters}[\ref{state:consent}] to 0
+%           \item set the \textbf{best candidate} as the leader of the
+%             \textbf{NewElection}[\ref{message:new_election}] and also update the
+%             \textbf{best candidate} \textbf{potential} accordingly
+%         \end{enumerate}
+%       \item Respond with a \textbf{VoteResponse}[\ref{message:vote_response}] and save in its
+%         internal state the fact that it has already voted\footnote
+%         {
+%           During a single election round a node can vote multiple time but each time
+%           it will vote for a better candidate.
+%         }.
+%     \end{itemize}
+%       The conditions are:
+%       \begin{enumerate}
+%         \item \textbf{the node is not leader}
+%         \item \textbf{potential}[\ref{def:potential}] >  node potential[\ref{def:potential}]
+%         \item \textbf{potential}[\ref{def:potential}] >= best candidate[\ref{def:best_candidate}]
+%           potential[\ref{def:potential}]
+%       \end{enumerate}
+%
+%   \item \textbf{VoteResponse}[\ref{message:vote_response}]: if the following conditions are met
+%     the node increments the \textbf{number of supporters}[\ref{state:consent}] and if the
+%     \textbf{number of supporters}[\ref{state:consent}] >
+%     \textbf{total number of nodes in the network}[\ref{state:node_network}] then it promotes
+%     itself to \textbf{leader}. The conditions are:
+%     \begin{enumerate}
+%       \item the node has sent an election
+%       \item round == node round
+%       \item new\_leader === node id
+%     \end{enumerate}
+%     After that the node checks if he won the election by comparing the
+%     \textbf{number of supporters}[\ref{state:consent}] with
+%     \textbf{total number of nodes in the network}[\ref{state:node_network}].
+%     If they are more than half then the nodes won the election and update the internal state
+%     in the following way:
+%     \begin{enumerate}
+%       \item increment \textbf{Round}[\ref{state:round}] by one
+%       \item set the \textbf{number of supporters}[\ref{state:consent}] to 0
+%       \item set the \textbf{leader}[\ref{state:leader}] to himself
+%       \item set the \textbf{election sent}[\ref{state:election_sent}] flag to false 
+%       \item set the \textbf{voted}[\ref{state:voted}] flag to false 
+%     \end{enumerate}
+%
+% \end{itemize}

@@ -1,0 +1,24 @@
+\subsubsection{NewElection}\label{message:new_election}
+
+\textbf{NewElection}$(id, potential, round)$ is a message broadcast by a node that intends to
+initiate a new leader election. The message carries the following fields:
+
+\begin{itemize}
+  \item \textbf{id}: the identifier of the candidate node initiating the election;
+  \item \textbf{potential}: the current potential of the candidate;
+  \item \textbf{round}: the election round associated with this election attempt.
+\end{itemize}
+
+Upon receiving a \textbf{NewElection} message, nodes compare the candidate’s potential with their
+local state and decide whether to support the election or suppress it in favor of a stronger known
+candidate.
+
+
+% \subsubsection{NewElection}\label{message:new_election}
+% NewElection(id, potential, round): a message to any node which wants to
+% become leader where:
+% \begin{itemize}
+%   \item id: node id
+%   \item potential: node potential
+%   \item round: when the message has been sent
+% \end{itemize}

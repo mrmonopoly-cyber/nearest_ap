@@ -1,0 +1,24 @@
+\subsubsection{LeaderHeartbeat}\label{message:leader_heartbeat}
+
+\textbf{LeaderHeartbeat}$(id, potential, round)$ is a message periodically broadcast by the
+current leader to advertise its presence and propagate leadership information.
+The message carries the following fields:
+
+\begin{itemize}
+  \item \textbf{id}: the identifier of the leader node;
+  \item \textbf{potential}: the current potential of the leader;
+  \item \textbf{round}: the election round associated with the leader’s current leadership.
+\end{itemize}
+
+Upon reception of a valid leader heartbeat, nodes update their local view of the leader state,
+refresh the leader heartbeat counter, and suppress election attempts if the leader’s potential
+remains competitive.
+
+
+% \subsubsection{LeaderHeartbit}\label{message:leader_heartbit}
+% LeaderHeartbit(id, potential, round): a message sent by the leader where:
+% \begin{itemize}
+%   \item id: leader id
+%   \item potential: leader potential
+%   \item round: when the message has been sent
+% \end{itemize}

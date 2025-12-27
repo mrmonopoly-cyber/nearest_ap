@@ -1,0 +1,47 @@
+\subsection{Messages}
+
+The protocol operates through a small set of message types exchanged using unreliable broadcast.
+While the specific semantics of each message type are described in the following subsections,
+all incoming messages are subject to a common set of preliminary checks.
+
+Upon reception of any message, a node performs the following operations:
+
+\begin{itemize}
+  \item \textbf{Best candidate update}: the message is examined to determine whether it refers to
+    a node that should be considered as the current best candidate
+    (Definition~\ref{def:best_candidate}). In particular:
+    \begin{enumerate}
+      \item if the potential carried in the message is greater than the locally stored best
+        candidate potential, the best candidate is updated accordingly;
+      \item if the identifier carried in the message matches the current best candidate
+        identifier, the corresponding heartbeat counter is refreshed.
+    \end{enumerate}
+
+  \item \textbf{Round consistency check}: if the message carries an election round number greater
+    than or equal to the node's current round, the local round is updated if necessary.
+    Messages referring to older rounds are ignored with respect to election state updates.
+\end{itemize}
+
+All message types include a logical \textbf{round} number $r \in \mathbb{N}$, which is used to
+order election attempts and prevent obsolete information from influencing the current election
+state.
+
+
+% \subsection{Messages}
+% The protocol work around the following message that each node can send.
+% The following checks are executed for each message:
+% \begin{itemize}
+%   \item check if the message comes from the best candidate[\ref{def:best_candidate}]
+%     in the network by checking if:
+%     \begin{enumerate}
+%       \item \textbf{potential}[\ref{def:potential}] is >= than
+%         \textbf{current best candidate potential}[\ref{def:potential}].
+%       \item id == current \textbf{best candidate}[\ref{def:best_candidate}] id.
+%     \end{enumerate}
+%     In both the cases the infos of the \textbf{best candidate} are updated and the 
+%     \textbf{heartbit}[\ref{def:heartbit}] for the \textbf{best candidate}[\ref{def:best_candidate}] is increased.
+%   \item Check if the \textbf{round} is greater or equal than its round.
+%     If the message round < its round the heartbit[\ref{def:heartbit}] is discarded Else 
+%     the node update its own \textbf{round.}
+% \end{itemize}
+% Each of them uses the \textbf{round} $\in \N$ to measure time.

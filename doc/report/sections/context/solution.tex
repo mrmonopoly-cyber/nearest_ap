@@ -1,0 +1,66 @@
+\section{Solution}
+
+To address the constraints described in the previous section, the original application-specific
+problem was abstracted into a more general and formal model. In particular, the swarm of drones
+is represented as a \textbf{complete directed graph}, where each node corresponds to a drone and
+each directed edge represents the possibility of transmitting a message from one node to another.
+
+The graph is assumed to be complete in order to model the broadcast nature of the underlying radio
+medium: every node may transmit messages that can potentially be received by all other nodes.
+Directionality is preserved to allow asymmetric communication behavior, such as message loss or
+reception failure at specific nodes.
+
+This abstraction enables several extensions without modifying the core protocol, including but
+not limited to:
+\begin{itemize}
+  \item \textbf{Message loss modeling}: node-specific or edge-specific weights can be used to
+    represent probabilistic message loss during reception.
+  \item \textbf{Partial reachability}: removing edges from the graph allows modeling
+    non-complete topologies, which can be used to study routing extensions or network partitioning.
+\end{itemize}
+
+An additional advantage of this formulation is that it allows the protocol to be evaluated in a
+general-purpose computing environment. The graph-based model can be directly implemented in a
+simulation running on a standard operating system, enabling rapid development, debugging, and
+evaluation before deployment on physical hardware. This approach also allows experiments to be
+conducted with a significantly larger number of nodes than those available in the real system.
+
+To support both simulation and deployment, an abstract logging interface was introduced. During
+simulation, where memory and computational constraints are relaxed, detailed execution traces can
+be collected and stored. Most of the empirical data presented in this work is derived from logs
+produced in the simulation environment, rather than from on-device execution.
+
+
+% \section{Solution}
+%
+% To face all the mentioned issued I reduced the specific problem to a bigger and more general 
+% problem. In particular the storm of drones has been reduced with: \textbf
+% {
+%   A complete directional graph
+% }
+% where each node is a drone and every arch indicates that the node a message can be sent from a 
+% source to a destination.
+% The graph is complete to indicate that every node can communicate with each other, both sending 
+% and receiving messages.
+%
+% Generally speaking using this type of models allow for all sort of expansions including, but not
+% limiting:
+% \begin{itemize}
+%   \item percentage of message lost per node: using weight in the node to indicate the percentage of
+%   failures in reading
+%   \item Node reachability: if an arch is missing (non-complete graph) than a node is not directly
+%   reachable. (Useful to define and implement a routing extension of the protocol)
+% \end{itemize}
+%
+% Another big advantage is that a graph problem can be easily modeled in a general program on an OS 
+% to create a \textbf{simulation} and only after that make a porting for the drones. Removing
+% in this way the need to debug on the physical drones and still leaving the possibility the 
+% test the protocol with a much greater number of \textbf{nodes}. Giving at the end better data, 
+% faster development and multi-target deployment for different systems even outside the specific
+% context of the drones.
+%
+% In the end an abstract logger has been added to simplify the development giving also the
+% possibility to store logs for future analyze.
+%
+% In fact most of the data used in this paper comes from the logger obtained in the simulations
+% where the constraint in memory and clock speed are not a problem.

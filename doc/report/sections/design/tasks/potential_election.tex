@@ -1,0 +1,74 @@
+\subsubsection{Potential Election}
+
+The \textbf{Potential Election} task is responsible for periodically recomputing the local node
+\textbf{potential}[\ref{def:potential}] and determining whether a new leader election should be
+initiated.
+
+A node initiates a new election when at least one of the following conditions holds:
+\begin{enumerate}
+  \item the leader heartbeat[\ref{def:heartbeat}] has expired;
+  \item the local node potential exceeds the stored leader potential by more than the configured
+    tolerance[\ref{def:tolerance}], and no known candidate has a strictly higher potential.
+\end{enumerate}
+
+When an election is initiated, the node updates its internal election state as follows:
+\begin{itemize}
+  \item the number of positive votes is initialized to 1 (self-vote);
+  \item the \textbf{election sent} flag is set to true;
+  \item the \textbf{voted} flag is set to true;
+  \item a \textbf{NewElection}[\ref{message:new_election}] message is broadcast, carrying the node
+    identifier, current potential, and current round.
+\end{itemize}
+
+In addition, the following state updates are applied:
+\begin{itemize}
+  \item if the node is currently the leader, both the stored leader and local node potentials are
+    updated to the newly computed value;
+  \item if the node is the current best candidate[\ref{def:best_candidate}], the stored best
+    candidate potential is updated accordingly;
+  \item if the best candidate heartbeat[\ref{def:heartbeat}] has expired at the time of election
+    initiation, the node adopts itself as the new best candidate.
+\end{itemize}
+
+
+% \subsubsection{Potential Election}
+% This tasks is responsible to update the internal \textbf{potential}[\ref{def:potential}]
+% of the node.
+% Then if node is not leader \textbf{and} and
+% \textbf{one of the following} conditions hold the nodes starts the procedure for a new election:
+% \begin{enumerate}
+%   \item leader heartbit[\ref{def:heartbit}] is 0
+%   \item user potential[\ref{def:potential}] > leader potential[\ref{def:potential}] +
+%     tollerance[\ref{def:tollerance}]
+%     \textbf{and}
+%     user potential[\ref{def:potential}] > best candidate[\ref{def:best_candidate}]
+%     potential[\ref{def:potential}] + tollerance[\ref{def:tollerance}]
+%   \item User potential[\ref{def:potential}] > leader potential[\ref{def:potential}] +
+%     tollerance[\ref{def:tollerance}] \textbf{and}
+%     current user is the best candidate[\ref{def:best_candidate}]
+%
+%     In particular:
+%     \begin{enumerate}
+%       \item set the number of positive vote[\ref{state:consent}] to 1
+%       \item set the flag election sent[\ref{state:election_sent}] to true
+%       \item set the flag voted[\ref{state:voted}] to true
+%       \item send a \textbf{NewElection}[\ref{message:new_election}] to the other nodes using
+%         its id, potential and round.
+%     \end{enumerate}
+%     Also, there are a few extra rules:
+%     \begin{itemize}
+%       \item If The node is leader update the internal state by setting both stored user
+%         and leader potential to the new computed potential[\ref{def:potential}].
+%       \item If The node is the \textbf{best candidate}[\ref{def:best_candidate}] update the
+%         internal state by updating the \textbf{best candidate}[\ref{def:best_candidate}]
+%         \textbf{potential}[\ref{def:potential}] to the new computed potential[\ref{def:potential}].
+%       \item If the node has to send an election it also checks the
+%         \textbf{best candidate}[\ref{def:best_candidate}]
+%         \textbf{heartbit}[\ref{def:heartbit}] and if it is 0 than set himself as
+%         the \textbf{best candidate}[\ref{def:best_candidate}].
+%     \end{itemize}
+%
+%
+%
+% \end{enumerate}
+%

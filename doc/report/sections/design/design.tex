@@ -1,0 +1,27 @@
+\section{Protocol Design Overview}
+
+This section provides a high-level overview of the NearestAP protocol architecture.
+The protocol is structured around three main elements: internal node state, message types,
+and scheduled tasks. Together, these components implement a decentralized leader election
+mechanism over unreliable broadcast communication.
+
+Each node maintains a local internal state containing information about its own potential,
+the currently known leader, the best candidate observed so far, and the status of any ongoing
+election. This state is updated both periodically and in response to incoming messages.
+
+Communication between nodes occurs through a small set of message types, each carrying information
+relevant to leader election, such as node identifiers, potentials, and election rounds. Messages
+are exchanged using unreliable broadcast, and no assumptions are made regarding delivery
+guarantees or ordering.
+
+Protocol logic is executed through a set of periodic and reactive tasks. Periodic tasks are
+responsible for broadcasting leader heartbeats and initiating elections when appropriate, while a
+reactive task processes incoming messages and updates the internal state accordingly.
+The interaction between these tasks allows nodes to infer leadership information and suppress
+unnecessary elections.
+
+The following subsections describe these components in detail, starting with the internal state
+representation, followed by message formats and task behavior.
+
+
+% \section{Design}

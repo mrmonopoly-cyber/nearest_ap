@@ -1,0 +1,114 @@
+\documentclass[sigconf,natbib=true]{acmart}
+
+\AtBeginDocument{%
+  \providecommand\BibTeX{{%
+    Bib\TeX}}}
+
+%%
+%% These commands are for a JOURNAL article.
+
+%\citestyle{acmauthoryear}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{stmaryrd}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{amsfonts} % for "\mathbb" macro
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+
+\newtheorem{problem}{Problem}[section]
+
+\newtheorem{definition}{Definition}[section]
+
+
+\setcitestyle{numbers}
+
+\title{NearestAP: a Leader Convergence Protocol for Broadcast-Only Clusters}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Alberto Damo}
+\email{alberto.damo@studenti.unipd.it}
+\affiliation{%
+  \institution{Università degli Studi di Padova}
+  \city{Padova}
+  \state{Veneto}
+  \country{Italia}
+}
+
+%%
+%% By default, the full list of authors will be used in the page
+%% headers. Often, this list is too long, and will overlap
+%% other information printed in the page headers. This command allows
+%% the author to define a more concise list
+%% of authors' names for this purpose.
+\renewcommand{\shortauthors}{Damo}
+
+%%
+%% The abstract is a short summary of the work to be presented in the
+%% article.
+\begin{abstract}
+This work presents NearestAP, a distributed protocol for eventual leader convergence in clusters
+composed of autonomous nodes communicating exclusively through unreliable broadcast channels.
+The protocol does not rely on any connection-oriented mechanism at any layer, making it suitable
+for embedded and cyber-physical systems operating over non-conventional or lossy buses.
+
+NearestAP enables a group of nodes to converge toward the selection of a single dominant leader
+based on a locally defined potential metric. The protocol is resilient to extreme message loss
+and does not assume synchronized clocks, reliable delivery, or bidirectional links. Experimental
+evaluation through a Linux-based simulation framework shows that leader convergence is achieved
+even when up to 90\% of messages are independently dropped at each node.
+
+By favoring suppression and information diffusion over explicit coordination, NearestAP trades
+optimal convergence time for robustness and simplicity, providing a practical solution for
+leader selection in highly unreliable distributed environments.
+\end{abstract}
+
+% \begin{abstract}
+%  This work presents NearestAP, a novel approach to determine the distributed consensus in a storm
+%   of drones which do not rely on any form of connection-oriented protocol at any level. As I will show 
+%   the protocol is able to eventually successfully determine the best drone in a group even if 90\% of the 
+%   messages are lost for each drone. Since the protocol does not rely on any form of 
+%   connection-oriented protocol it's particularly suited for the embedded world with non-conventional
+%   bus.
+% \end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\maketitle
+
+\input{sections/context/problem}
+\input{sections/context/solution}
+
+\input{sections/problem/definition}
+\input{sections/problem/useful_definitions}
+\input{sections/problem/ideal_solution}
+\input{sections/problem/actual_solution}
+
+\input{sections/design/design}
+
+\input{sections/design/state/internal_state}
+
+\input{sections/design/messages/messages}
+\input{sections/design/messages/leader_heartbit}
+\input{sections/design/messages/new_election}
+\input{sections/design/messages/vote_response}
+
+\input{sections/design/tasks/tasks}
+\input{sections/design/tasks/leader_alive}
+\input{sections/design/tasks/bus_reader}
+\input{sections/design/tasks/potential_election}
+
+
+\input{bib}
+
+\end{document}

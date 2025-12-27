@@ -1,0 +1,23 @@
+\subsection{Tasks}
+
+The last major components of the protocol are the \textbf{tasks}, which define the local behavior
+of each node. Tasks are executed independently on every node and are responsible for periodically
+evaluating the node state, sending messages, and reacting to changes observed in the network.
+
+Each task operates at a configurable execution frequency\footnote
+{
+  All task frequencies are configurable in the protocol implementation\cite{5}.
+}, allowing the protocol to be tuned for different environments and hardware constraints.
+Tasks do not communicate directly with each other; instead, they interact solely through the
+node’s internal state and the exchange of protocol messages.
+
+The following subsections describe the tasks that collectively implement leader monitoring,
+message processing, and election initiation.
+
+
+% \subsection{Tasks}
+% The last major components of the protocol are the tasks that organize the actions and the
+% responses of each node and each of them has its own fixed frequency\footnote
+% {
+%   all the frequency are configurable in the protocol implementation\cite{5} 
+% }.

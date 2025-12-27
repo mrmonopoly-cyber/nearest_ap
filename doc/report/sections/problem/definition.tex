@@ -1,0 +1,35 @@
+\section{Problem Definition}
+
+Based on the context introduced above, the problem addressed by this work can now be defined
+formally.
+
+\begin{problem}[Leader Election]\label{prob:leader_election}
+  Let $G = (V, E)$ be a complete-directed graph, where each node $n \in V$ is associated with a
+  scalar \textbf{potential} $p(n)$ (see Definition~\ref{def:potential}).
+  Communication between nodes occurs by exchanging messages along directed edges. Message delivery is unreliable: each transmitted message may be lost with non-zero probability.
+
+  The objective is to determine a \textbf{leader} node $n^\ast \in V$ such that
+  \[
+    n^\ast \in \arg\max_{n \in V} p(n).
+  \]
+\end{problem}
+
+The problem must be solved in a continuous and dynamic manner, as node potentials may change
+over time. Consequently, the protocol is required to adapt to variations in potentials and
+re-elect a leader when necessary.
+
+
+% \section{Problem Definition}
+% With the above context now let's properly define what is the problem that has to be solved:
+% \begin{problem}[Leader Election]
+%   Let $G=(V,E)$ a complete directed graph where each \textbf{node} n has
+%   \textbf{potential}[\ref{def:potential}] p
+%   and each node can send messages to the other nodes through the arch.
+%   Each message has a certain probability $k$ of not being received.
+%   Determine the \textbf{leader} p as follows:
+%   \begin{center}
+%     leader node = $\max_{n \in V}(n.p >= m.p | m \in V)$
+%   \end{center}
+% \end{problem}
+% It's important to point out that the protocol has to dynamically continuously solve the problem
+% since the potentials[\ref{def:potential}] can change.
