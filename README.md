@@ -20,3 +20,24 @@ Here a list of the current supported targets with links to documentation of each
 | Linux     | [README](target/linux/README.md)      |
 | Crazyflie | [README](target/crazyflie/README.md)  |
 
+# Documentation
+
+To generate all the docs of the project run:
+```sh
+make all_doc
+```
+
+This will generate:
+
+- a [doxygen](https://www.doxygen.nl/) documentation in ```doc/doxygen```
+- a [latex](https://www.latex-project.org/) report in ```doc/report```
+
+To clean the doc:
+```sh
+make clean
+```
+
+For helper and extra commands run:
+```sh
+make help
+```
