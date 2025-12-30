@@ -19,26 +19,24 @@ int main(int argc, char **argv)
   using Node_t = Node<SpawnerLinux_t>;
   using Topology = Node_t::Topology;
 
-  std::uint16_t num_clients = 2;
-  auto prob_drop_packet = 0;
-
-  std::vector<std::unique_ptr<BusLinux_t>> clients{};
-  std::vector<std::unique_ptr<Node_t>> drones{};
-  std::vector<std::uint32_t> base{};
-
-  volatile int stop =20;
-
   const auto bus_t_freq = 20;
   const auto pot_t_freq = 700;
   const auto alive_t_freq = 100;
   const auto leader_f = [](){};
 
+  std::vector<std::unique_ptr<BusLinux_t>> clients{};
+  std::vector<std::unique_ptr<Node_t>> drones{};
+  std::vector<std::uint32_t> base{};
+
+  std::uint16_t num_clients = 2;
+  auto prob_drop_packet = 0;
   testOut out_test{std::chrono::hours{1}};
+  volatile int stop =20;
 
   LinuxLogger logger{};
   logger::StaticLog{&logger};
-
   logger::StaticLog::set_level(logger::Level::Debug);
+
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
@@ -59,11 +57,11 @@ int main(int argc, char **argv)
   }
 #pragma GCC diagnostic pop
 
-  if (argc > 3)
+  if (argc > 4)
   {
     std::cout 
-      << "starting simulation with:" 
-      << "num nodes" << num_clients
+      << "num arguments: " << argc
+      << " starting simulation with num nodes: " << num_clients
       << " error proability: " << prob_drop_packet
       << " out file: " << argv[3]
       << " no_log: " << argv[4]
@@ -72,12 +70,12 @@ int main(int argc, char **argv)
   else
   {
     std::cout 
+      << "num arguments: " << argc
       << "starting simulation with:" 
       << "num nodes" << num_clients
       << "error proability: " << prob_drop_packet
       << std::endl;
   }
-
 
   clients.reserve(num_clients);
   drones.reserve(num_clients);
@@ -103,7 +101,7 @@ int main(int argc, char **argv)
 
   if (!out_test.is_ready())
   {
-    std::cerr << "out file not given" << std::endl;
+    std::cout << "out file not given" << std::endl;
     return 0;
   }
 
