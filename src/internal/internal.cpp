@@ -71,6 +71,11 @@ bool Internal_t::voted(void) const noexcept
   return m_vote_info.voted();
 }
 
+bool Internal_t::is_best_candidate(void) const noexcept
+{
+  return m_best_candidate == m_current_user_index;
+}
+
 VirtualId_t Internal_t::better_candidate(void) const noexcept
 {
   return m_best_candidate;
@@ -128,6 +133,7 @@ bool Internal_t::user_valid_for_election(void) noexcept
       m_leader_potential = m_user_potential;
       m_best_candidate = m_current_user_index;
       m_best_candidate_pot = m_user_potential;
+      m_potential_election_time_scale.reset();
     }
     else
     {

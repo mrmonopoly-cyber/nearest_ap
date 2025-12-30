@@ -28,7 +28,7 @@ void BusLinux_t::p2pcallbackHandler(P2PPacket* packet) noexcept
 {
   const uint8_t write_cursor = m_write_cursor.load();
 
-  if (rand() % 100 < 90)
+  if (static_cast<uint32_t>(rand() % 100) < m_prob_drop_packet)
   {
     return;
   }
@@ -75,8 +75,8 @@ static inline void _encode(P2PPacket& raw_packet, const Msg_t& msg)
   memcpy(raw_packet.data, msg.m_payload.data(), msg.m_msg_size);
 }
 
-BusLinux_t::BusLinux_t() noexcept :
-m_radio_bus()
+BusLinux_t::BusLinux_t(const uint32_t prob) noexcept :
+m_radio_bus(),m_prob_drop_packet(prob)
 {
   srand(time(NULL));
   m_radio_bus.p2pRegisterCB(this, _p2pcallbackHandler);

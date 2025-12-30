@@ -10,7 +10,7 @@ namespace nearest_ap
   class BusLinux_t : public Bus_t
   {
     public:
-      BusLinux_t() noexcept;
+      BusLinux_t(const uint32_t prob=0) noexcept;
 
       BusLinux_t(const BusLinux_t&) = delete;
       BusLinux_t& operator=(const BusLinux_t&) = delete;
@@ -43,6 +43,7 @@ namespace nearest_ap
       std::array<P2PPacket, s_queue_size> m_msg_queue{};
       std::atomic_uint8_t m_write_cursor=0;
       std::atomic_uint8_t m_read_cursor=0;
+      uint32_t m_prob_drop_packet=0;
   };
 };
 

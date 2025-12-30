@@ -58,6 +58,11 @@ void BusReaderTask_t::run(void) noexcept
         const auto new_leader_pot = msg_index.value.heartbit.potential;
         const auto new_leader_round = msg_index.value.heartbit.round;
 
+        if (m_internal.m_potential_election_time_scale.get()>0)
+        {
+          --m_internal.m_potential_election_time_scale;
+        }
+
         m_internal.recv_heartbit_best_candidate(new_leader_id, new_leader_pot);
 
         if(m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round))

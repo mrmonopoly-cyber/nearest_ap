@@ -17,27 +17,29 @@ int main(int argc, char **argv)
   using Node_t = Node<SpawnerLinux_t>;
   using Topology = Node_t::Topology;
 
-  LinuxLogger logger{};
-  logger::StaticLog{&logger};
-  auto leader_f = [](){};
-
-  logger::StaticLog::set_level(logger::Level::Debug);
-
   std::uint16_t num_clients = 2;
-  auto leader = num_clients-1;
+  auto prob_drop_packet = 0;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
   switch (argc)
   {
     case 3:
-      leader = std::atoi(argv[2]);
+      prob_drop_packet = std::atoi(argv[2]);
     case 2:
       num_clients= std::atoi(argv[1]);
     default:
       break;
   }
 #pragma GCC diagnostic pop
+
+  LinuxLogger logger{};
+  logger::StaticLog{&logger};
+  auto leader_f = [](){};
+
+  logger::StaticLog::set_level(logger::Level::Debug);
+
+
 
   if (argc >=2)
   {
@@ -53,10 +55,10 @@ int main(int argc, char **argv)
 
   for (uint i=0;i<num_clients; ++i)
   {
-    clients.emplace_back(std::make_unique<BusLinux_t>());
+    clients.emplace_back(std::make_unique<BusLinux_t>(prob_drop_packet));
   }
 
-  Topology topology{num_clients, static_cast<uint32_t>(leader)};
+  Topology topology{num_clients, 0};
 
   for (auto& client : clients)
   {
@@ -64,9 +66,9 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
-  auto bus_t_freq = 200;
-  auto pot_t_freq = 7000;
-  auto alive_t_freq = 1000;
+  auto bus_t_freq = 20;
+  auto pot_t_freq = 700;
+  auto alive_t_freq = 100;
 
   (void) bus_t_freq;
   (void) pot_t_freq;

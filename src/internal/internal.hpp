@@ -2,6 +2,7 @@
 
 //Copyright (c) 2025 Alberto Damo. All Rights Reserved.
 
+#include "time_scale/time_scale.hpp"
 #include <atomic>
 #include <functional>
 #include <cstdint>
@@ -60,6 +61,7 @@ namespace nearest_ap
       bool leader(void) const noexcept;
       bool election_sent(void) const noexcept;
       bool voted(void) const noexcept;
+      bool is_best_candidate(void) const noexcept;
       Round_t round(void) const noexcept;
       Potential_t user_pot(void) const noexcept;
       Potential_t leader_pot(void) const noexcept;
@@ -82,6 +84,9 @@ namespace nearest_ap
 
     private:
       bool _consume_heartbit(std::atomic_uint32_t& who) noexcept;
+
+    public:
+      TimeScale m_potential_election_time_scale{};
 
     private:
       struct UserData_t
@@ -117,7 +122,6 @@ namespace nearest_ap
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
       VirtualId_t m_best_candidate;
-      const uint32_t m_time_scale_factor=1;
 
       VoteInfo_t m_vote_info;
   };
