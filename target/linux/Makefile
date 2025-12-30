@@ -62,10 +62,11 @@ RANGE_PROB_ERR := $(shell seq 0 90)
 DIR_SIM_FILE := log_simulations
 
 simulations: build
+	@rm -rf $(DIR_SIM_FILE)
 	@mkdir -p $(DIR_SIM_FILE)
 	@for node in $(RANGE_NODE_NUM); do \
 		for prob in $(RANGE_PROB_ERR); do \
-		./$(OBIN) $$node $$prob $(DIR_SIM_FILE)/nodes_$(nodes)_prob_err$(prob).log "nolog"; \
+		./$(OBIN) $${node} $${prob} $(DIR_SIM_FILE)/nodes_$${node}__perr_$${prob}.log "nolog"; \
 		done; \
 	done; 
 
