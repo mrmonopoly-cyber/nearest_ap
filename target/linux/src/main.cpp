@@ -59,6 +59,26 @@ int main(int argc, char **argv)
   }
 #pragma GCC diagnostic pop
 
+  if (argc > 3)
+  {
+    std::cout 
+      << "starting simulation with:" 
+      << "num nodes" << num_clients
+      << " error proability: " << prob_drop_packet
+      << " out file: " << argv[3]
+      << " no_log: " << argv[4]
+      << std::endl;
+  }
+  else
+  {
+    std::cout 
+      << "starting simulation with:" 
+      << "num nodes" << num_clients
+      << "error proability: " << prob_drop_packet
+      << std::endl;
+  }
+
+
   clients.reserve(num_clients);
   drones.reserve(num_clients);
   base.resize(num_clients);
