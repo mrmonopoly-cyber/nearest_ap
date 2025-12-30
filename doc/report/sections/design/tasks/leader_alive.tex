@@ -3,12 +3,7 @@
 The \textbf{Leader Alive} task is executed periodically by each node. Upon execution,
 the node performs a \textbf{Leader check}[\ref{def:leader_check}] on its local state.
 If the node determines itself to be the current leader, it broadcasts a
-\textbf{LeaderHeartbit}[\ref{message:leader_heartbeat}] message to all other nodes.
+\textbf{LeaderHeartbeat}[\ref{message:leader_heartbeat}] message to all other nodes.
 
 This task does not participate in leader election; its sole purpose is to advertise the continued
 presence and validity of the current leader.
-
-
-% \subsubsection{Leader Alive}
-% It perform a \textbf{Leader check}[\ref{def:leader_check}] on himself and if it is a leader
-% sends a \textbf{LeaderHeartbit}[\ref{message:leader_heartbit}] message to all the other nodes.

@@ -4,6 +4,10 @@ The \textbf{Potential Election} task is responsible for periodically recomputing
 \textbf{potential}[\ref{def:potential}] and determining whether a new leader election should be
 initiated.
 
+The task is executed at a frequency derived from a user-defined base value, multiplied by a
+node-local \textbf{election time scale factor}[\ref{def:time_scale}]. This factor allows each node
+to dynamically adjust the aggressiveness of election attempts based on observed network conditions.
+
 A node initiates a new election when at least one of the following conditions holds:
 \begin{enumerate}
   \item the leader heartbeat[\ref{def:heartbeat}] has expired;
@@ -20,6 +24,11 @@ When an election is initiated, the node updates its internal election state as f
     identifier, current potential, and current round.
 \end{itemize}
 
+If the node initiating the election is \emph{not} the current best candidate[\ref{def:best_candidate}],
+the election time scale factor is increased, thereby reducing the frequency of subsequent election
+attempts. This mechanism suppresses redundant elections from nodes that are unlikely to win, reducing
+network traffic under contention.
+
 In addition, the following state updates are applied:
 \begin{itemize}
   \item if the node is currently the leader, both the stored leader and local node potentials are
@@ -27,48 +36,10 @@ In addition, the following state updates are applied:
   \item if the node is the current best candidate[\ref{def:best_candidate}], the stored best
     candidate potential is updated accordingly;
   \item if the best candidate heartbeat[\ref{def:heartbeat}] has expired at the time of election
-    initiation, the node adopts itself as the new best candidate.
+    initiation, the node adopts itself as the new best candidate and resets the election time scale
+    factor to its minimum value.
+  \item If neither leader nor best-candidate heartbeats are observed,
+    the node resets the election time scale factor to its minimum value.
+    This silence-driven reset ensures that election activity resumes aggressively after
+    prolonged message loss or leader disappearance, preventing permanent suppression.
 \end{itemize}
-
-
-% \subsubsection{Potential Election}
-% This tasks is responsible to update the internal \textbf{potential}[\ref{def:potential}]
-% of the node.
-% Then if node is not leader \textbf{and} and
-% \textbf{one of the following} conditions hold the nodes starts the procedure for a new election:
-% \begin{enumerate}
-%   \item leader heartbit[\ref{def:heartbit}] is 0
-%   \item user potential[\ref{def:potential}] > leader potential[\ref{def:potential}] +
-%     tollerance[\ref{def:tollerance}]
-%     \textbf{and}
-%     user potential[\ref{def:potential}] > best candidate[\ref{def:best_candidate}]
-%     potential[\ref{def:potential}] + tollerance[\ref{def:tollerance}]
-%   \item User potential[\ref{def:potential}] > leader potential[\ref{def:potential}] +
-%     tollerance[\ref{def:tollerance}] \textbf{and}
-%     current user is the best candidate[\ref{def:best_candidate}]
-%
-%     In particular:
-%     \begin{enumerate}
-%       \item set the number of positive vote[\ref{state:consent}] to 1
-%       \item set the flag election sent[\ref{state:election_sent}] to true
-%       \item set the flag voted[\ref{state:voted}] to true
-%       \item send a \textbf{NewElection}[\ref{message:new_election}] to the other nodes using
-%         its id, potential and round.
-%     \end{enumerate}
-%     Also, there are a few extra rules:
-%     \begin{itemize}
-%       \item If The node is leader update the internal state by setting both stored user
-%         and leader potential to the new computed potential[\ref{def:potential}].
-%       \item If The node is the \textbf{best candidate}[\ref{def:best_candidate}] update the
-%         internal state by updating the \textbf{best candidate}[\ref{def:best_candidate}]
-%         \textbf{potential}[\ref{def:potential}] to the new computed potential[\ref{def:potential}].
-%       \item If the node has to send an election it also checks the
-%         \textbf{best candidate}[\ref{def:best_candidate}]
-%         \textbf{heartbit}[\ref{def:heartbit}] and if it is 0 than set himself as
-%         the \textbf{best candidate}[\ref{def:best_candidate}].
-%     \end{itemize}
-%
-%
-%
-% \end{enumerate}
-%

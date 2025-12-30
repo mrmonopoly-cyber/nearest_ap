@@ -1,0 +1,12 @@
+\section{Protocol Validation}
+
+To validate the design data from the simulations has been collected. The simulations has been 
+created by analyzing the time for the best candidate to become the actual leader. To model
+the lost of the message each a node has a fixed probability to drop the message before passing it
+to the protocol API. The data has been gathered by repeating the experiments with different
+probabilities and number of nodes using the following network configuration.
+All the nodes has different static potential and the initial default leader is the node
+with lower potential (the worst possible leader). Then the simulations starts and it ends
+when the node with the greatest potential became leader.
+All the nodes uses the same frequency for their tasks plus a minor random time unique to each node.
+

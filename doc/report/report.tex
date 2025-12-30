@@ -54,20 +54,14 @@
 %% The abstract is a short summary of the work to be presented in the
 %% article.
 \begin{abstract}
-This work presents NearestAP, a distributed protocol for eventual leader convergence in clusters
-composed of autonomous nodes communicating exclusively through unreliable broadcast channels.
-The protocol does not rely on any connection-oriented mechanism at any layer, making it suitable
-for embedded and cyber-physical systems operating over non-conventional or lossy buses.
-
-NearestAP enables a group of nodes to converge toward the selection of a single dominant leader
-based on a locally defined potential metric. The protocol is resilient to extreme message loss
-and does not assume synchronized clocks, reliable delivery, or bidirectional links. Experimental
-evaluation through a Linux-based simulation framework shows that leader convergence is achieved
-even when up to 90\% of messages are independently dropped at each node.
-
-By favoring suppression and information diffusion over explicit coordination, NearestAP trades
-optimal convergence time for robustness and simplicity, providing a practical solution for
-leader selection in highly unreliable distributed environments.
+  This work presents NearestAP, a distributed leader election protocol designed for clusters
+  operating over unreliable, connectionless broadcast media. The protocol enables a group of
+  autonomous drones to dynamically agree on a leader based on locally computed node potential,
+  even under extreme message loss. NearestAP avoids connection-oriented communication and instead
+  relies on probabilistic information dissemination, adaptive election timing, and silence-driven
+  recovery mechanisms. Experimental evaluation in a simulated environment shows successful
+  convergence even when up to 90\% of messages are lost per node, making the protocol
+  particularly suitable for embedded systems operating over non-conventional buses.
 \end{abstract}
 
 % \begin{abstract}
@@ -107,6 +101,8 @@ leader selection in highly unreliable distributed environments.
 \input{sections/design/tasks/leader_alive}
 \input{sections/design/tasks/bus_reader}
 \input{sections/design/tasks/potential_election}
+
+\input{sections/validation/validation}
 
 
 \input{bib}

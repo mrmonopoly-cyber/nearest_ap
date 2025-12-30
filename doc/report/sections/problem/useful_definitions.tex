@@ -28,6 +28,8 @@ defined.
   of a node, particularly the current leader. If the counter is not refreshed within a given time
   window, the corresponding node is assumed to be unreachable or inactive for the purposes of
   leader election.
+  Heartbeats are consumed by local tasks and may expire independently for the leader and the best
+  candidate.
 \end{definition}
 
 \begin{definition}[Leader Check]\label{def:leader_check}
@@ -39,40 +41,17 @@ defined.
   \end{itemize}
 \end{definition}
 
+\begin{definition}[Election Time Scale Factor]\label{def:time_scale}
+  The election time scale factor is a local, positive integer associated with each node.
+  It multiplicatively scales the execution frequency of the Potential Election task.
+  The factor has a minimum value of 1.
 
-% \section{Useful Definition}
-% Before jumping to the solution let's define some useful definition that will be used from now on:
-%
-% \begin{definition}[Potential]\label{def:potential}
-%   The potential is an integer $\in \N$ which is computed by each node and represent the current
-%   power of a node. Ideally the leader is the node with the greatest potential.
-% \end{definition}
-%
-% \begin{definition}[Tolerance]\label{def:tollerance}
-%   The tolerance is an integral $\in \N$ that is used when comparing the current potential of a node
-%   with the stored potential of the leader. It's added to prevent too many elections and give
-%   stability to the system. It's possible that because of the tolerance the leader is not the best
-%   node between all the possible node. The default value is 0.
-% \end{definition}
-%
-% \begin{definition}[Best candidate]\label{def:best_candidate}
-%   The \textbf{best candidate} in a graph is the node with the greatest
-%   \textbf{potential}[\ref{def:potential}].
-% \end{definition}
-%
-% \begin{definition}[Hearbit]\label{def:heartbit}
-%   A counter $\in \N$ which is used to determine if a certain node is still alive.
-%   If the $\textbf{heartbit} = 0$ the node is considered dead.
-%   Else the node is considered alive.
-% \end{definition}
-%
-% \begin{definition}[Leader check]\label{def:leader_check}
-%   A node define himself as leader if the following conditions are met:
-%   \begin{itemize}
-%     \item node won the election
-%     \item node potential >= best candidate[\ref{def:best_candidate}]
-%       potential [\ref{def:potential}]
-%   \end{itemize}
-%   
-% \end{definition}
-%
+  The factor is \textbf
+  {
+    increased when a node initiates an election while not being the best candidate,
+    decreased upon reception of valid leader heartbeats
+  }, and \textbf
+  {
+    reset to its minimum value when both leader and best-candidate heartbeats expire
+  }, enabling fast recovery after silence.
+\end{definition}

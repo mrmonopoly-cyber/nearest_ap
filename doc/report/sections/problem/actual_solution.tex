@@ -1,41 +1,27 @@
 \section{Actual Solution}
 
-The protocol implemented in \textbf{NearestAP} is inspired by classical leader election mechanisms,
-including those employed by Raft~\cite{4}, but is specifically designed to operate under
-unreliable broadcast communication and high message loss. Rather than replicating the full Raft
-election procedure, the protocol adopts a lightweight, best-effort approach that minimizes
-communication overhead and relaxes consistency guarantees.
+The solution implemented in \textbf{NearestAP} is inspired by the leader election mechanism of
+\textbf{RAFT}\cite{4}, but is adapted to operate over unreliable broadcast media without any
+connection-oriented guarantees.
 
-The central idea of the protocol is to reduce the number of election attempts by allowing nodes
-to infer the most likely leader based on information opportunistically gathered from the network.
-Each node maintains a locally observed \textbf{best candidate}, defined as the node with the
-highest known potential according to messages received so far.
+Each node maintains a local view of the network, including the current leader and the
+\textbf{best candidate}(see Definition~\ref{def:best_candidate}). Nodes infer leadership
+by observing the continuous dissemination of identifiers, potentials, and election-related messages,
+rather than relying on direct acknowledgments.
 
-To support this inference mechanism, every message exchanged in the system carries the identifier
-and potential of a \emph{candidate} node.
-In leader heartbeats and election messages, this candidate corresponds to the sender itself,
-while in vote response messages it corresponds to the node being endorsed.
+To prevent persistent election conflicts and excessive message traffic, NearestAP introduces an
+adaptive election timing mechanism. Election attempts are not performed at a fixed rate; instead,
+each node dynamically adjusts the frequency of election initiation based on observed leader
+stability, candidate dominance, and network silence. Nodes that are unlikely to win an election
+progressively suppress their own election activity, while the most promising candidate retains a
+higher election rate.
 
-Upon receiving any message, a node
-updates its local view of the best candidate and suppresses its own election attempts if it
-becomes aware of another node with a strictly higher potential.
+Adaptive timing is implemented through a local election time scale factor.
+Nodes that repeatedly attempt elections without being the strongest known candidate progressively
+reduce their election frequency, allowing dominant candidates to emerge without continuous
+contention. Conversely, prolonged silence from both the leader and the best candidate causes
+nodes to restore aggressive election behavior, ensuring recovery from message loss or network
+partitions.
 
-Leader recognition is therefore conditional and local: a node considers another node to be the
-leader only if that node has won the most recent election round and is also the current best
-candidate according to the node’s locally available information. This design allows leadership
-information to propagate implicitly through the network, even in the presence of message loss,
-without requiring reliable delivery or explicit acknowledgments.
-
-
-% \section{Actual Solution}
-% The real solution that I implemented in \textbf{Nearest AP} is a variation of the election
-% protocol of \textbf{RAFT}\cite{4}.
-% The protocol aim to minimize the message sent on the bus by making the nodes infer who should 
-% probably be the leader.
-% Each node that using the \textbf{best candidate} which is the node with the greatest potential
-% in the node knowledge obtained by reading the messages in the network.
-% Every time a node reads a message it checks if the sender is the \textbf{best candidate}
-% or if it can be a new one. For this reason \textbf{every message} has an id of a node and the
-% potential of that node.
-% Using this extra data a node p recognize a node l as a leader only if l won the election and if 
-% the \textbf{best candidate} for p.
+In the absence of both leader and best-candidate signals, nodes autonomously recover by resetting
+their election timing, ensuring continued progress even under severe message loss.

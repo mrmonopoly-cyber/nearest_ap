@@ -18,18 +18,5 @@ The problem must be solved in a continuous and dynamic manner, as node potential
 over time. Consequently, the protocol is required to adapt to variations in potentials and
 re-elect a leader when necessary.
 
-
-% \section{Problem Definition}
-% With the above context now let's properly define what is the problem that has to be solved:
-% \begin{problem}[Leader Election]
-%   Let $G=(V,E)$ a complete directed graph where each \textbf{node} n has
-%   \textbf{potential}[\ref{def:potential}] p
-%   and each node can send messages to the other nodes through the arch.
-%   Each message has a certain probability $k$ of not being received.
-%   Determine the \textbf{leader} p as follows:
-%   \begin{center}
-%     leader node = $\max_{n \in V}(n.p >= m.p | m \in V)$
-%   \end{center}
-% \end{problem}
-% It's important to point out that the protocol has to dynamically continuously solve the problem
-% since the potentials[\ref{def:potential}] can change.
+The protocol is not required to guarantee immediate convergence; instead, it aims for eventual
+leader convergence under probabilistic message delivery and adaptive timing constraints.

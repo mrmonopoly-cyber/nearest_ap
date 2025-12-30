@@ -1,83 +1,33 @@
 \subsection{Node Internal State}
 
-Each node maintains a local internal state composed of several logically distinct components:
-
+Each node maintains an internal state divided into the following components:
 \begin{itemize}
-  \item \textbf{Topology}: describes the assumed network configuration, including the total number
-    of nodes.
-    \footnote{
-      In the current version of the protocol, the network topology is static and cannot change at
-      runtime.
-      Nodes may become temporarily unreachable due to message loss, but they are still considered
-      members of the network.
-    }
-
-  \item \textbf{Node Potentials} (Definition~\ref{def:potential}): the node stores the potential
-    values of:
+  \item \textbf{Topology}: describes the static network configuration, including the total number
+    of nodes\footnote{
+      At the current state of the protocol the network configuration is static. Nodes may be
+      unreachable, but they are still considered members of the network.
+    }.
+  \item \textbf{Node Potentials}[\ref{def:potential}]: stored potentials for:
     \begin{enumerate}
-      \item the local node;
-      \item the current leader;
-      \item the current best candidate (Definition~\ref{def:best_candidate}).
+      \item the current node
+      \item the current leader
+      \item the current best candidate[\ref{def:best_candidate}]
     \end{enumerate}
-
-  \item \textbf{Heartbeat Counters}: two counters used to infer node activity:
+  \item \textbf{Leader Heartbeat}[\ref{def:heartbeat}]
+  \item \textbf{Best Candidate Heartbeat}[\ref{def:heartbeat}]
+  \item \textbf{Leader Identifier}: identifier of the current leader
+  \item \textbf{Best Candidate Identifier}: identifier of the current best candidate
+  \item \textbf{Election Time Scale Factor}[\ref{def:time_scale}]: a local factor used to modulate
+    the execution frequency of the election task. It dynamically
+    modulates how frequently a node may initiate elections, increasing under contention and
+    decreasing in the presence of stable leadership signals.
+  \item \textbf{Vote Info}: election-related metadata, including:
     \begin{enumerate}
-      \item a leader heartbeat counter, refreshed upon reception of valid leader heartbeat
-        messages;
-      \item a best candidate heartbeat counter, refreshed upon reception of messages referring to
-        the current best candidate.
-    \end{enumerate}
-
-  \item \textbf{Node Identifiers}:
-    \begin{enumerate}
-      \item the identifier of the current leader;
-      \item the identifier of the current best candidate.
-    \end{enumerate}
-
-  \item \textbf{Vote Information}: election-related state, including:
-    \begin{enumerate}
-      \item the total number of nodes in the network;
-      \item the number of positive votes received during the current election;
-      \item the current election round;
-      \item two boolean flags indicating:
-        \begin{itemize}
-          \item whether the node has already initiated an election in the current round;
-          \item whether the node has already voted in the current round.
-        \end{itemize}
+      \item total number of nodes
+      \item number of positive votes
+      \item current election round
+      \item flags indicating whether an election was initiated or a vote was cast
     \end{enumerate}
 \end{itemize}
-
-
-% \subsection{Node Internal State}
-% Each node has an internal state which is divided in 4 categories:
-% \begin{itemize}
-%   \item Topology: tells the node the current network configuration
-%     \footnote
-%     {
-%       At the current state of the protocol the network configuration is static and cannot alter.
-%       Nodes can be unreachable, but they will still be considered as a valid member of the 
-%       network.
-%     }
-%   \item Node Potentials[\ref{def:potential}]: contain the Potentials of:
-%     \begin{enumerate}
-%       \item current node
-%       \item leader\label{state:leader}
-%       \item best candidate[\ref{def:best_candidate}]
-%     \end{enumerate}
-%   \item \textbf{Leader heartbit} \label{def:laeder_heartbit}
-%   \item \textbf{Best candidate[\label{def:best_candidate}] heartbit}\label{def:best_candidate_heartbit}
-%   \item \textbf{Leader} id: the current leader node
-%   \item \textbf{Best candidate}[\label{def:best_candidate}] id: the current best candidate node
-%   \item Vote Info: the info regarding the elections. It contains:
-%     \begin{enumerate}
-%       \item the total number of nodes in the network\label{state:node_network}
-%       \item the number of positive vote that the node has received\label{state:consent}
-%       \item the current round\label{state:round}
-%       \item two flags which indicates:
-%         \begin{itemize}
-%           \item if the node already sent an election in the current election\label{state:election_sent}
-%           \item if the node already voted in the round current election\label{state:voted}
-%         \end{itemize}
-%         \label{state:flags}
-%     \end{enumerate}
-% \end{itemize}
+Separate heartbeat counters are maintained for the leader and the best candidate to distinguish
+between leadership stability and candidate dominance under message loss.

@@ -13,12 +13,3 @@ The message carries the following fields:
 Upon reception of a valid leader heartbeat, nodes update their local view of the leader state,
 refresh the leader heartbeat counter, and suppress election attempts if the leader’s potential
 remains competitive.
-
-
-% \subsubsection{LeaderHeartbit}\label{message:leader_heartbit}
-% LeaderHeartbit(id, potential, round): a message sent by the leader where:
-% \begin{itemize}
-%   \item id: leader id
-%   \item potential: leader potential
-%   \item round: when the message has been sent
-% \end{itemize}

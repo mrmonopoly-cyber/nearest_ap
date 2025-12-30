@@ -1,13 +1,12 @@
 \section{Protocol Design Overview}
 
-This section provides a high-level overview of the NearestAP protocol architecture.
-The protocol is structured around three main elements: internal node state, message types,
-and scheduled tasks. Together, these components implement a decentralized leader election
-mechanism over unreliable broadcast communication.
+The design of NearestAP follows a decentralized and event-driven approach. Each node operates
+independently and maintains its own internal state, reacting to messages received from the network
+and periodically executing local tasks.
 
-Each node maintains a local internal state containing information about its own potential,
-the currently known leader, the best candidate observed so far, and the status of any ongoing
-election. This state is updated both periodically and in response to incoming messages.
+The protocol is structured around three main components: internal state management, message
+exchange, and scheduled tasks. Adaptive timing is treated as a first-class design concern, allowing
+the protocol to balance responsiveness and stability under varying network conditions.
 
 Communication between nodes occurs through a small set of message types, each carrying information
 relevant to leader election, such as node identifiers, potentials, and election rounds. Messages

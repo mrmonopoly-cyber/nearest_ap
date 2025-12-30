@@ -26,6 +26,9 @@ All message types include a logical \textbf{round} number $r \in \mathbb{N}$, wh
 order election attempts and prevent obsolete information from influencing the current election
 state.
 
+In addition to updating logical state, the reception of heartbeats directly influences the
+election timing mechanism by reducing the local election time scale factor.
+
 
 % \subsection{Messages}
 % The protocol work around the following message that each node can send.
