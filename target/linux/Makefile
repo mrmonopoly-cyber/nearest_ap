@@ -7,6 +7,7 @@ BDIR := build
 SDIR := src
 LDIR := lib
 PROTOBUF_MESSAGE_PATH := $(LDIR)/messages
+OBIN := main
 
 # Compiler flags (optional, add as needed)
 CC_FLAGS := -Wall -Wextra -g -O0
@@ -35,7 +36,6 @@ CC_INCLUDE += -I$(LDIR)/messages/nanopb_src
 CC_INCLUDE +=	-I$(SDIR)
 CC_INCLUDE +=	-I$(LDIR)
 
-
 CXX_INCLUDE :=
 CXX_INCLUDE += $(CC_INCLUDE)
 
@@ -55,19 +55,19 @@ include $(PROTOBUF_MESSAGE_PATH)/Makefile
 # Build target
 build: $(OBJ)
 	@mkdir -p $(BDIR)  # Create the build directory if it doesn't exist
-	$(CXX) $(CXX_INCLUDE) $(CXX_FLAGS) $(OBJ) -o main
+	$(CXX) $(CXX_INCLUDE) $(CXX_FLAGS) $(OBJ) -o $(OBIN)
 
-# Rule to compile each .cpp file into an object (.o)
-$(BDIR)/%.o: %.cpp
-	$(info cpp compiling $<)
-	@mkdir -p $(dir $@)  # Create the target directory for the object file
-	$(CXX) -c $(CXX_INCLUDE) $(CXX_FLAGS) -o $@ $<
+RANGE_NODE_NUM := $(shell seq 4 25)
+RANGE_PROB_ERR := $(shell seq 0 90)
+DIR_SIM_FILE := log_simulations
 
-# Rule to compile each .c file into an object (.o)
-$(BDIR)/%.o: %.c
-	$(info c compiling $<)
-	@mkdir -p $(dir $@)  # Create the target directory for the object file
-	$(CC) -c $(CC_INCLUDE) $(CC_FLAGS) -o $@ $<
+simulations: build
+	@mkdir -p $(DIR_SIM_FILE)
+	@for node in $(RANGE_NODE_NUM); do \
+		for prob in $(RANGE_PROB_ERR); do \
+		./$(OBIN) $$node $$prob $(DIR_SIM_FILE)/nodes_$(nodes)_prob_err$(prob).log "nolog"; \
+		done; \
+	done; 
 
 clean:
 	rm -f main
@@ -81,3 +81,15 @@ clean_all_linux:
 	make clean_setup
 
 clean_all: clean_all_linux
+
+# Rule to compile each .cpp file into an object (.o)
+$(BDIR)/%.o: %.cpp
+	$(info cpp compiling $<)
+	@mkdir -p $(dir $@)  # Create the target directory for the object file
+	$(CXX) -c $(CXX_INCLUDE) $(CXX_FLAGS) -o $@ $<
+
+# Rule to compile each .c file into an object (.o)
+$(BDIR)/%.o: %.c
+	$(info c compiling $<)
+	@mkdir -p $(dir $@)  # Create the target directory for the object file
+	$(CC) -c $(CC_INCLUDE) $(CC_FLAGS) -o $@ $<

@@ -33,7 +33,7 @@ int main(int argc, char **argv)
   const auto alive_t_freq = 100;
   const auto leader_f = [](){};
 
-  testOut out_test{};
+  testOut out_test{std::chrono::hours{1}};
 
   LinuxLogger logger{};
   logger::StaticLog{&logger};
@@ -122,6 +122,11 @@ int main(int argc, char **argv)
 
   while(stop > 0){
     std::this_thread::sleep_for(std::chrono::seconds(1));
+    if (out_test.max_time_excedeed())
+    {
+      stop = 0;
+      static_log(logger::Level::Error, "TIMEOUT exceded");
+    }
   };
 
   out_test.end_test();
