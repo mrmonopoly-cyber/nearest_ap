@@ -3,6 +3,7 @@
 #include "bus/fake_radio_bus/fake_radio_bus.hpp"
 #include <atomic>
 #include <cstdint>
+#include <zmq.hpp>
 #include <nearest_ap/nearest_ap.hpp>
 
 namespace nearest_ap
@@ -18,9 +19,9 @@ namespace nearest_ap
       BusLinux_t(BusLinux_t&&) = delete;
       BusLinux_t& operator=(BusLinux_t&&) = delete;
 
-      inline void enstablis_connection(void) noexcept
+      inline void enstablis_connection(int num_clients) noexcept
       {
-        m_radio_bus.enstablis_connection();
+        m_radio_bus.enstablis_connection(num_clients);
       }
 
       std::optional<Msg_t> Read(void) noexcept override;

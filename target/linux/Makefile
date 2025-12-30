@@ -35,6 +35,7 @@ CC_INCLUDE :=
 CC_INCLUDE += -I$(LDIR)/messages/nanopb_src
 CC_INCLUDE +=	-I$(SDIR)
 CC_INCLUDE +=	-I$(LDIR)
+CC_INCLUDE +=	-lzmq
 
 CXX_INCLUDE :=
 CXX_INCLUDE += $(CC_INCLUDE)
@@ -58,7 +59,7 @@ build: $(OBJ)
 	$(CXX) $(CXX_INCLUDE) $(CXX_FLAGS) $(OBJ) -o $(OBIN)
 
 RANGE_NODE_NUM := $(shell seq 4 25)
-RANGE_PROB_ERR := $(shell seq 0 90)
+RANGE_PROB_ERR := $(shell seq 0 9)
 RANGE_NUM_REPETITION := $(shell seq 0 32)
 DIR_SIM_FILE := log_simulations
 
@@ -68,8 +69,10 @@ simulations: build
 	@for node in $(RANGE_NODE_NUM); do \
 		for prob in $(RANGE_PROB_ERR); do \
 			for rep in $(RANGE_NUM_REPETITION); do \
-				echo "info simulation: nodes: $${node}  err: $${prob}, rep: $${rep}"; \
-				./$(OBIN) $${node} $${prob} $(DIR_SIM_FILE)/nodes_$${node}__perr_$${prob}.log "nolog"; \
+				err_p=$$((prob * 10)); \
+				echo "info simulation: nodes: $${node}  err: $${err_p}, rep: $${rep}"; \
+				./$(OBIN) $${node} $${err_p} $(DIR_SIM_FILE)/nodes_$${node}__perr_$${err_p}.log "nolog"; \
+				sleep 1;\
 				done; \
 			done; \
 		done; 

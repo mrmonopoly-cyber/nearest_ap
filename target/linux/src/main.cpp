@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <nearest_ap/nearest_ap.hpp>
+#include <string>
 #include <sys/types.h>
 #include <thread>
 
@@ -28,6 +29,7 @@ int main(int argc, char **argv)
   std::vector<std::unique_ptr<Node_t>> drones{};
   std::vector<std::uint32_t> base{};
 
+  char* out_file = nullptr;
   std::uint16_t num_clients = 2;
   auto prob_drop_packet = 0;
   testOut out_test{std::chrono::hours{1}};
@@ -48,7 +50,8 @@ int main(int argc, char **argv)
         logger::StaticLog::set_level(nearest_ap::logger::Level::Error);
       }
     case 4:
-      out_test.open(argv[3]);
+      out_file = argv[3];
+      out_test.open(out_file);
     case 3:
       prob_drop_packet = std::atoi(argv[2]);
     case 2:
@@ -57,14 +60,13 @@ int main(int argc, char **argv)
   }
 #pragma GCC diagnostic pop
 
-  if (argc > 4)
+  if (out_file)
   {
     std::cout 
       << "num arguments: " << argc
       << " starting simulation with num nodes: " << num_clients
       << " error proability: " << prob_drop_packet
-      << " out file: " << argv[3]
-      << " no_log: " << argv[4]
+      << " out file: " << out_file
       << std::endl;
   }
   else
@@ -77,6 +79,8 @@ int main(int argc, char **argv)
       << std::endl;
   }
 
+  Topology topology{num_clients, 0};
+
   clients.reserve(num_clients);
   drones.reserve(num_clients);
   base.resize(num_clients);
@@ -86,14 +90,12 @@ int main(int argc, char **argv)
     clients.emplace_back(std::make_unique<BusLinux_t>(prob_drop_packet));
   }
 
-  Topology topology{num_clients, 0};
 
-  for (auto& client : clients)
-  {
-    client->enstablis_connection();
-    std::this_thread::sleep_for(std::chrono::milliseconds{10});
+  // clients[0]->enstablis_connection(num_clients);
+  for (auto& client : clients) {
+    client->enstablis_connection(num_clients);
   }
-
+  
   for(auto& cell: base)
   {
     cell=num_clients*2;
@@ -105,6 +107,7 @@ int main(int argc, char **argv)
     return 0;
   }
 
+  // std::this_thread::sleep_for(std::chrono::hours{10});
   out_test.start_test();
 
   std::uint16_t i=0;
@@ -146,6 +149,8 @@ int main(int argc, char **argv)
       static_log(logger::Level::Error, "TIMEOUT exceded");
     }
   };
+  
+  static_log(logger::Level::Error, "Simulation ended with success");
 
   out_test.end_test();
   return 0;

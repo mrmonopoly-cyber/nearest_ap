@@ -1,9 +1,9 @@
 #pragma once
 
 #include <atomic>
-#include <array>
+#include <thread>
+#include <zmq.hpp>
 #include <cstdint>
-#include <optional>
 
 #define P2P_MAX_DATA_SIZE 60
 
@@ -32,24 +32,28 @@ class RadioBus
 
     Id id()const noexcept;
 
-    void enstablis_connection(void) noexcept;
+    void enstablis_connection(int num_clients) noexcept;
 
     bool radiolinkSendP2PPacketBroadcast(P2PPacket *p2pp) noexcept;
     void p2pRegisterCB(void* obj, P2PCallback cb) noexcept;
+
+    ~RadioBus() noexcept;
 
   private:
     void _socket_setup(void) noexcept;
     static void _Accept(RadioBus* const self) noexcept;
 
-  public:
-    static constexpr std::int32_t m_max_clients = 25;
-
   private:
     void* m_obj =nullptr;
     const Id m_id;
-    socket_t m_socket=0;
-    std::array<std::optional<socket_t>, m_max_clients> m_clients{};
-    std::atomic_uint8_t m_client_connected=0;
+    int num_clients=0;
     P2PCallback m_callback = nullptr;
+
+    std::thread receiver;
+    std::atomic_bool running{true};
+
+    zmq::context_t ctx{1};
+    zmq::socket_t pub;
+    zmq::socket_t sub;
 };
 
