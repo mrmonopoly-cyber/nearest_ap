@@ -82,7 +82,6 @@ void BusReaderTask_t::run(void) noexcept
         m_internal.recv_heartbit_best_candidate(new_leader,new_pot);
 
         if (
-            !m_internal.leader() &&
             new_pot > m_internal.user_pot() &&
             new_pot >= m_internal.better_candidate_pot()
            )
