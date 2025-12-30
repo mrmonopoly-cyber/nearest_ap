@@ -1,12 +1,62 @@
 \section{Protocol Validation}
 
-To validate the design data from the simulations has been collected. The simulations has been 
-created by analyzing the time for the best candidate to become the actual leader. To model
-the lost of the message each a node has a fixed probability to drop the message before passing it
-to the protocol API. The data has been gathered by repeating the experiments with different
-probabilities and number of nodes using the following network configuration.
-All the nodes has different static potential and the initial default leader is the node
-with lower potential (the worst possible leader). Then the simulations starts and it ends
-when the node with the greatest potential became leader.
-All the nodes uses the same frequency for their tasks plus a minor random time unique to each node.
+The protocol was validated through a set of controlled simulations executed on a Linux-based
+deployment. The goal of the validation was not to provide formal guarantees, but to empirically
+evaluate the convergence behavior of the protocol under varying levels of message loss and network
+sizes.
+
+\subsection{Simulation Model}
+
+Each simulated node runs as an independent operating system thread and communicates exclusively
+through a shared broadcast bus abstraction. The bus models unreliable communication by independently
+dropping messages at each node with a fixed probability.
+
+The simulated network corresponds to a complete directed graph, where all nodes are logically
+reachable. Message loss is modeled locally at each receiver rather than globally on the bus, allowing
+each node to experience independent packet loss.
+
+\subsection{Experimental Setup}
+
+All experiments start from an intentionally unfavorable configuration. Each node is assigned a
+static potential, and the initial leader is chosen as the node with the lowest potential. This
+represents the worst-case initial condition for leader election.
+
+All nodes execute the same set of protocol tasks with identical base frequencies. To avoid
+synchronization artifacts, a small random offset is added to the execution frequency of the
+Potential Election task for each node.
+
+The simulation terminates when the node with the highest potential successfully becomes the leader.
+The elapsed time from simulation start to convergence is recorded as the primary metric.
+
+\subsection{Metrics}
+
+The primary metric collected is the convergence time, defined as the wall-clock time elapsed between
+the start of the simulation and the moment the highest-potential node becomes leader.
+
+Each experiment is repeated for different numbers of nodes and different message drop probabilities.
+Experiments exceeding a predefined timeout are considered failed and recorded accordingly.
+
+\subsection{Results and Observations}
+
+The simulations show that the protocol is able to converge to the correct leader even under extreme
+message loss conditions. In particular, convergence was observed in configurations where up to 90\%
+of messages were dropped independently at each node.
+
+The adaptive election timing mechanism played a critical role in preventing persistent election
+conflicts. Nodes that were not the best candidate progressively reduced their election frequency,
+allowing the strongest candidate to dominate the election process without continuous contention.
+Conversely, prolonged absence of leader or candidate heartbeats caused nodes to restore aggressive
+election behavior, ensuring eventual progress.
+
+While convergence time increased with higher message loss and larger network sizes, no permanent
+livelock was observed within the tested configurations.
+
+\subsection{Limitations}
+
+The validation focuses exclusively on leader convergence under static node potentials and does not
+evaluate steady-state message overhead, leader churn, or dynamic potential changes. Furthermore, the
+results are empirical and do not provide worst-case convergence guarantees.
+
+Future work includes extending the simulation to dynamic scenarios and performing a more detailed
+quantitative analysis of message complexity.
 
