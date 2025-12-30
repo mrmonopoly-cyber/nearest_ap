@@ -9,7 +9,19 @@ LeaderAliveTask_t::LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
           const LeaderTask_f leader_task) noexcept:
-        BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE)),
+        BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), s_base_freq),
+        m_bus(bus),
+        m_internal(internal),
+        m_leader_task(std::move(leader_task)) 
+    {
+    }
+
+LeaderAliveTask_t::LeaderAliveTask_t(
+          Bus_t& bus,
+          const Internal_t& internal,
+          const LeaderTask_f leader_task,
+          const Millis_t freq) noexcept:
+        BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), freq),
         m_bus(bus),
         m_internal(internal),
         m_leader_task(std::move(leader_task)) 

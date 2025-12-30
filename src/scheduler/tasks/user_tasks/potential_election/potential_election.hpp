@@ -22,10 +22,13 @@ namespace nearest_ap {
     public:
       PotentialElectionTask_t() = delete;
       PotentialElectionTask_t(Bus_t& bus, Internal_t& internal) noexcept;
+      PotentialElectionTask_t(Bus_t& bus, Internal_t& internal, const Millis_t freq) noexcept;
 
       void run(void) noexcept override;
 
     private:
+      static constexpr Millis_t s_base_freq = 100;
+
       Bus_t& m_bus;
       Internal_t& m_internal;
   };

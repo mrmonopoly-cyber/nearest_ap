@@ -13,15 +13,26 @@ namespace nearest_ap {
     public:
       BaseTask_t() = delete;
 
-      BaseTask_t(const TaskId id) : m_id(id){}
+      BaseTask_t(const TaskId id, const Millis_t freq) : m_id(id), m_freq(freq){}
 
       virtual void run(void) = 0;
-      inline constexpr TaskId id() const
+      inline constexpr TaskId id() const noexcept
       {
         return m_id;
+      }
+      inline Millis_t freq() const noexcept
+      {
+        return m_freq;
+      }
+
+    protected:
+      void update_freq(Millis_t f) noexcept
+      {
+        m_freq = f;
       }
 
     private:
       const TaskId m_id;
+      Millis_t m_freq;
   };
 }

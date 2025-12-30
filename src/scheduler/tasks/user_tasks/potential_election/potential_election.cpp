@@ -6,9 +6,20 @@
 using namespace nearest_ap;
 using Msg_t = Bus_t::Msg_t;
 
-PotentialElectionTask_t::PotentialElectionTask_t(Bus_t& bus,
+PotentialElectionTask_t::PotentialElectionTask_t(
+    Bus_t& bus,
     Internal_t& internal) noexcept :
-BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION)),
+BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION),s_base_freq),
+  m_bus(bus),
+  m_internal(internal)
+{
+}
+
+PotentialElectionTask_t::PotentialElectionTask_t(
+    Bus_t& bus,
+    Internal_t& internal,
+    const Millis_t freq ) noexcept :
+BaseTask_t(static_cast<TaskId>(InteractibleTask::POTENTIAL_ELECTION),freq),
   m_bus(bus),
   m_internal(internal)
 {

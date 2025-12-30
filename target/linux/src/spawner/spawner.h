@@ -13,15 +13,11 @@ class SpawnerLinux_t : public Spawner_t
         public:
           TaskWrapper(
               const bool m_run=false,
-              const Millis_t freq=0,
               BaseTask_t *const m_base_task=nullptr) noexcept
-              : m_run(m_run), m_freq(freq), m_base_task(m_base_task) {}
+              : m_run(m_run), m_base_task(m_base_task) {}
 
           TaskWrapper(BaseTask_t *const m_base_task) noexcept
-              : m_run(true), m_freq(0), m_base_task(m_base_task) {}
-
-          TaskWrapper(BaseTask_t *const m_base_task, const Millis_t freq) noexcept
-              : m_run(true), m_freq(freq), m_base_task(m_base_task) {}
+              : m_run(true), m_base_task(m_base_task) {}
 
           TaskWrapper(TaskWrapper&&) =default;
           TaskWrapper& operator=(TaskWrapper&&) = default;
@@ -35,7 +31,6 @@ class SpawnerLinux_t : public Spawner_t
 
         private:
           bool m_run;
-          Millis_t m_freq;
           BaseTask_t* m_base_task;
       };
 
@@ -52,12 +47,11 @@ class SpawnerLinux_t : public Spawner_t
       SpawnerLinux_t& operator=(SpawnerLinux_t&& ) = delete;
 
       void start_task(BaseTask_t* t) noexcept override;
-      void start_task(BaseTask_t* t, Millis_t f) noexcept override;
 
       ~SpawnerLinux_t();
 
     private:
-      void _run_task(BaseTask_t*const t, const Millis_t freq) noexcept;
+      void _run_task(BaseTask_t*const t) noexcept;
 
     private:
       static constexpr TaskId s_num_tasks = static_cast<TaskId>(InteractibleTask::TASK_COUNT);

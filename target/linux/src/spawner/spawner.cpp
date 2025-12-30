@@ -1,6 +1,5 @@
 #include "spawner.h"
 #include <cstdint>
-#include <cstdio>
 #include <string_view>
 #include <thread>
 
@@ -9,12 +8,12 @@ using namespace nearest_ap;
 using namespace std::chrono;
 using namespace std::this_thread;
 
-void SpawnerLinux_t::_run_task(BaseTask_t*const t, const Millis_t freq) noexcept
+void SpawnerLinux_t::_run_task(BaseTask_t*const t) noexcept
 {
   const TaskId t_index = t->id();
   if (t_index < static_cast<TaskId>(InteractibleTask::TASK_COUNT))
   {
-    m_tasks[t_index] = TaskWrapper{t, freq};
+    m_tasks[t_index] = TaskWrapper{t};
     TaskWrapper& ref_task = m_tasks[t_index]; 
     std::thread th{s_runner_f, &ref_task};
     th.detach();
@@ -23,19 +22,14 @@ void SpawnerLinux_t::_run_task(BaseTask_t*const t, const Millis_t freq) noexcept
 
 void SpawnerLinux_t::start_task(BaseTask_t* t) noexcept 
 {
-  return start_task(t,0);
-}
-
-void SpawnerLinux_t::start_task(BaseTask_t* t, Millis_t f) noexcept
-{
   logger::UserLog<128>log{};
   log.append_msg("staring task: ");
   log.append_msg(t->id());
   log.append_msg(" with freq: ");
-  log.append_msg(static_cast<uint32_t>(f));
+  log.append_msg(static_cast<uint32_t>(t->freq()));
   static_log(logger::Level::Debug, log);
 
-  _run_task(t,f);
+  return _run_task(t);
 }
 
 SpawnerLinux_t::~SpawnerLinux_t()
@@ -80,5 +74,5 @@ void SpawnerLinux_t::TaskWrapper::stop() noexcept
 void SpawnerLinux_t::TaskWrapper::run() noexcept
 {
   m_base_task->run();
-  std::this_thread::sleep_for(std::chrono::milliseconds(m_freq));
+  std::this_thread::sleep_for(std::chrono::milliseconds(m_base_task->freq()));
 }

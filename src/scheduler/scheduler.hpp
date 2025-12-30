@@ -47,19 +47,19 @@ namespace nearest_ap
             ) noexcept:
           m_spawner{std::move(spawner)},
           m_bus {bus},
-          m_pot_election_task {bus, internal},
-          m_alive_task {bus, internal, std::move(leader_task_f)},
-          m_bus_reader_task {bus, internal}
+          m_pot_election_task {bus, internal, pot_task_freq},
+          m_alive_task {bus, internal, std::move(leader_task_f), alive_task_freq},
+          m_bus_reader_task {bus, internal, bus_task_freq}
         {
-          _spawn_task(bus_task_freq, pot_task_freq, alive_task_freq);
+          _spawn_task();
         }
 
       private:
-        void _spawn_task(Millis_t bus=9, Millis_t pot=100, Millis_t alive=11) noexcept
+        inline void _spawn_task(void) noexcept
         {
-          m_spawner.start_task(&m_bus_reader_task, bus);
-          m_spawner.start_task(&m_pot_election_task, pot);
-          m_spawner.start_task(&m_alive_task, alive);
+          m_spawner.start_task(&m_bus_reader_task);
+          m_spawner.start_task(&m_pot_election_task);
+          m_spawner.start_task(&m_alive_task);
         }
 
         SpawnerType m_spawner;

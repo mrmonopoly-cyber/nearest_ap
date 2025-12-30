@@ -8,7 +8,6 @@ namespace nearest_ap
   {
     public:
       virtual void start_task(BaseTask_t* const) =0;
-      virtual void start_task(BaseTask_t* const, const Millis_t) =0;
 
       virtual ~Spawner_t() = default;
   };

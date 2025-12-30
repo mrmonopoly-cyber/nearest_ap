@@ -117,6 +117,7 @@ namespace nearest_ap
       const ComputePot_f m_compute_local_potential;
       const Tollerance_t m_tollerance;
       VirtualId_t m_best_candidate;
+      const uint32_t m_time_scale_factor=1;
 
       VoteInfo_t m_vote_info;
   };

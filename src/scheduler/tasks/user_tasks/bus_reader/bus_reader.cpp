@@ -10,7 +10,17 @@ using Msg_t = typename Bus_t::Msg_t;
 BusReaderTask_t::BusReaderTask_t(
     Bus_t& bus,
     Internal_t& internal) noexcept:
-BaseTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER)),
+BaseTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER), s_base_freq),
+  m_bus(bus),
+  m_internal(internal)
+{
+}
+
+BusReaderTask_t::BusReaderTask_t(
+    Bus_t& bus,
+    Internal_t& internal,
+    const Millis_t freq) noexcept:
+BaseTask_t(static_cast<TaskId>(InteractibleTask::BUS_READER), freq),
   m_bus(bus),
   m_internal(internal)
 {

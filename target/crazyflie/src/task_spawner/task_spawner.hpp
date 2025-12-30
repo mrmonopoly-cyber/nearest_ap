@@ -20,7 +20,6 @@ class TaskCraziflieSpawner : public nearest_ap::Spawner_t
     TaskCraziflieSpawner();
 
     void start_task(BaseTask_t* const) override;
-    void start_task(BaseTask_t* const, const Millis_t) override;
 
   private:
     std::array<TaskHandle_t*,3> m_tasks;

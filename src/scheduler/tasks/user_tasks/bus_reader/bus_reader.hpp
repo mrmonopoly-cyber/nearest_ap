@@ -31,11 +31,14 @@ namespace nearest_ap {
   {
     public:
       BusReaderTask_t() = delete;
+      BusReaderTask_t(Bus_t& bus, Internal_t& internal, const Millis_t freq) noexcept;
       BusReaderTask_t(Bus_t& bus, Internal_t& internal) noexcept;
 
       void run(void) noexcept override;
 
     private:
+      static constexpr Millis_t s_base_freq = 9;
+
       Bus_t& m_bus;
       Internal_t& m_internal;
   };
