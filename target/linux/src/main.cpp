@@ -1,7 +1,8 @@
-#include <array>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include <memory>
 #include <nearest_ap/nearest_ap.hpp>
 #include <sys/types.h>
@@ -10,6 +11,7 @@
 #include "bus/bus.hpp"
 #include "logger/logger.hpp"
 #include "spawner/spawner.h"
+#include "test_output/test_output.hpp"
 
 int main(int argc, char **argv)
 {
@@ -20,38 +22,46 @@ int main(int argc, char **argv)
   std::uint16_t num_clients = 2;
   auto prob_drop_packet = 0;
 
+  std::vector<std::unique_ptr<BusLinux_t>> clients{};
+  std::vector<std::unique_ptr<Node_t>> drones{};
+  std::vector<std::uint32_t> base{};
+
+  volatile int stop =20;
+
+  const auto bus_t_freq = 20;
+  const auto pot_t_freq = 700;
+  const auto alive_t_freq = 100;
+  const auto leader_f = [](){};
+
+  testOut out_test{};
+
+  LinuxLogger logger{};
+  logger::StaticLog{&logger};
+
+  logger::StaticLog::set_level(logger::Level::Debug);
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
   switch (argc)
   {
+    case 5:
+      if (!strcmp(argv[4], "nolog"))
+      {
+        logger::StaticLog::set_level(nearest_ap::logger::Level::Error);
+      }
+    case 4:
+      out_test.open(argv[3]);
     case 3:
       prob_drop_packet = std::atoi(argv[2]);
     case 2:
       num_clients= std::atoi(argv[1]);
-    default:
       break;
   }
 #pragma GCC diagnostic pop
 
-  LinuxLogger logger{};
-  logger::StaticLog{&logger};
-  auto leader_f = [](){};
-
-  logger::StaticLog::set_level(logger::Level::Debug);
-
-
-
-  if (argc >=2)
-  {
-    num_clients= std::atoi(argv[1]);
-  }
-
-
-  std::vector<std::unique_ptr<BusLinux_t>> clients{};
-  std::vector<std::unique_ptr<Node_t>> drones{};
-
   clients.reserve(num_clients);
   drones.reserve(num_clients);
+  base.resize(num_clients);
 
   for (uint i=0;i<num_clients; ++i)
   {
@@ -66,37 +76,21 @@ int main(int argc, char **argv)
     std::this_thread::sleep_for(std::chrono::milliseconds{10});
   }
 
-  auto bus_t_freq = 20;
-  auto pot_t_freq = 700;
-  auto alive_t_freq = 100;
-
-  (void) bus_t_freq;
-  (void) pot_t_freq;
-  (void) alive_t_freq;
-
-  int j=0;
-  std::vector<std::uint32_t> base{};
-  base.resize(num_clients);
-
   for(auto& cell: base)
   {
     cell=num_clients*2;
   }
 
-  drones.push_back(std::make_unique<Node_t>(
-        *clients[0],
-        SpawnerLinux_t{},
-        std::move(topology),
-        0,
-        [&base, &j]{return base[0] + j;}, 
-        leader_f, 
-        0,
-        bus_t_freq + (std::rand() % 10),
-        pot_t_freq + (std::rand() % 100),
-        alive_t_freq
-        ));
+  if (!out_test.is_ready())
+  {
+    std::cerr << "out file not given" << std::endl;
+    return 0;
+  }
 
-  for (std::uint16_t i=1; i<num_clients; ++i)
+  out_test.start_test();
+
+  std::uint16_t i=0;
+  for (i=0; i<num_clients-1; ++i)
   {
     drones.push_back(std::make_unique<Node_t>(
         *clients[i],
@@ -112,16 +106,24 @@ int main(int argc, char **argv)
         ));
   }
 
-  // std::this_thread::sleep_for(std::chrono::seconds(70));
-  // static_log(nearest_ap::logger::Level::Warning, "ALL NODES WILL DECREASE THEIR POTENTIAL");
-  // base[0] = 0;
-  //
-  // for (int i=1; i<num_clients ; i++)
-  // {
-  //   base[i] = num_clients*2 - 2*i;
-  // }
-  //
-  std::this_thread::sleep_for(std::chrono::hours(99));
+  drones.push_back(std::make_unique<Node_t>(
+        *clients[i],
+        SpawnerLinux_t{},
+        std::move(topology),
+        i,
+        [&base, i]{return base[i] + i;}, 
+        [&stop]{stop--;}, 
+        0,
+        bus_t_freq,
+        pot_t_freq + (std::rand() % 100),
+        alive_t_freq
+        ));
 
+
+  while(stop > 0){
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  };
+
+  out_test.end_test();
   return 0;
 }
