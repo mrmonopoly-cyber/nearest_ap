@@ -58,6 +58,13 @@ namespace nearest_ap::logger
           }
         }
 
+        inline void append_msg(float obj) noexcept
+        {
+          const std::uint32_t written = snprintf(m_cursor, m_available_space, "%f", obj);
+          m_cursor += written;
+          m_available_space -= written;
+        }
+
         inline void append_msg(std::int32_t obj) noexcept
         {
           const std::uint32_t written = snprintf(m_cursor, m_available_space, "%d", obj);

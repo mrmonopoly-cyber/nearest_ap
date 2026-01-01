@@ -124,7 +124,7 @@ bool Internal_t::user_valid_for_election(void) noexcept
     log.append_msg(" NO HEARTBIT FROM LEADER: ");
     log.append_msg(m_users.leader());
 
-    if (!heartbit_best_candidate)
+    if (!heartbit_best_candidate && !is_best_candidate())
     {
       log.append_msg(" NO HEARTBIT FROM BEST CANDIDATE: ");
       log.append_msg(m_best_candidate);
@@ -176,28 +176,27 @@ bool Internal_t::recv_heartbit(
     m_best_candidate_pot = leader_pot;
     m_leader_potential = leader_pot;
     m_users.update_leader(leader_id);
-  }
-
-  m_vote_info.update_round(leader_round);
-
-
-  if (leader_id == m_best_candidate || leader_pot >= m_best_candidate_pot)
-  {
-   m_best_candidate_pot = leader_pot;
-   m_best_candidate = leader_id;
-  }
-
-  if (leader_pot >= user_pot() && leader_pot >= m_best_candidate_pot)
-  {
-    m_leader_potential = leader_pot;
-    m_vote_info.renunce();
-    m_users.update_leader(leader_id);
-  }
-
-  if (leader_id == m_users.leader())
-  {
-    m_leader_potential = leader_pot;
     m_received_heartbit_leader++;
+    m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
+    m_vote_info.update_round(leader_round);
+    m_potential_election_time_scale.reset();
+    return true;
+  }
+
+  if (
+      (leader_pot >= user_pot() && leader_pot >= m_best_candidate_pot)
+      ||
+      leader_id == m_users.leader()
+      ||
+      (leader_id == m_best_candidate || leader_pot >= m_best_candidate_pot)
+      )
+  {
+    m_best_candidate = leader_id;
+    m_leader_potential = leader_pot;
+    m_users.update_leader(leader_id);
+    m_vote_info.renunce();
+    m_received_heartbit_leader++;
+    m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
     return true;
   }
 
@@ -210,7 +209,7 @@ void Internal_t::recv_heartbit_best_candidate(const VirtualId_t leader_id, const
   {
     if (m_received_heartbit_best_candidate < 5)
     {
-      m_received_heartbit_best_candidate++;
+      m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
     }
     m_best_candidate_pot = pot;
   }

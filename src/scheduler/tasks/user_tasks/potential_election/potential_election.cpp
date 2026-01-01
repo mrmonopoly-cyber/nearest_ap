@@ -64,7 +64,7 @@ void PotentialElectionTask_t::run(void) noexcept
       log.append_msg(", current potential tasks freq: ");
       log.append_msg(static_cast<uint32_t>(freq()));
       static_log(logger::Level::Warning, log);
-      update_freq(freq() * m_internal.m_potential_election_time_scale.get());
+      update_freq_by_factor(m_internal.m_potential_election_time_scale.get());
     }
 
     m_internal.new_election();

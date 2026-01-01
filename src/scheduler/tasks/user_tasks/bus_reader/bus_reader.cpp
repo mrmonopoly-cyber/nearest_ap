@@ -63,13 +63,11 @@ void BusReaderTask_t::run(void) noexcept
           --m_internal.m_potential_election_time_scale;
         }
 
-        m_internal.recv_heartbit_best_candidate(new_leader_id, new_leader_pot);
-
-        if(m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round))
+        if (m_internal.leader())
         {
           log.append_msg("current node: ");
           log.append_msg(m_internal.user_id());
-          log.append_msg(", recevied valid leader_heartbit: ");
+          log.append_msg(", recevied new NON CHECKED leader_heartbit: ");
           log.append_msg("id:");
           log.append_msg(new_leader_id);
           log.append_msg(", pot: ");
@@ -80,6 +78,29 @@ void BusReaderTask_t::run(void) noexcept
           log.append_msg(" round: ");
           log.append_msg(m_internal.round());
           static_log(logger::Level::Debug, log);
+          log.reset();
+        }
+
+        m_internal.recv_heartbit_best_candidate(new_leader_id, new_leader_pot);
+
+        if(m_internal.recv_heartbit(new_leader_id, new_leader_pot, new_leader_round))
+        {
+          if (m_internal.leader())
+          {
+            log.append_msg("current node: ");
+            log.append_msg(m_internal.user_id());
+            log.append_msg(", recevied valid leader_heartbit: ");
+            log.append_msg("id:");
+            log.append_msg(new_leader_id);
+            log.append_msg(", pot: ");
+            log.append_msg(new_leader_pot);
+            log.append_msg(", round: ");
+            log.append_msg(new_leader_round);
+            log.append_msg("| internal>");
+            log.append_msg(" round: ");
+            log.append_msg(m_internal.round());
+            static_log(logger::Level::Debug, log);
+          }
         }
       }
       break;

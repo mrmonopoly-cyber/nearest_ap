@@ -22,8 +22,7 @@ int main(int argc, char **argv)
 
   const auto bus_t_freq = 20;
   const auto pot_t_freq = 700;
-  const auto alive_t_freq = 100;
-  const auto leader_f = [](){};
+  const auto alive_t_freq = 300;
 
   std::vector<std::unique_ptr<BusLinux_t>> clients{};
   std::vector<std::unique_ptr<Node_t>> drones{};
@@ -32,8 +31,9 @@ int main(int argc, char **argv)
   char* out_file = nullptr;
   std::uint16_t num_clients = 2;
   auto prob_drop_packet = 0;
-  testOut out_test{std::chrono::hours{1}};
+  testOut out_test{std::chrono::minutes{5}};
   volatile int stop =20;
+
 
   LinuxLogger logger{};
   logger::StaticLog{&logger};
@@ -91,7 +91,6 @@ int main(int argc, char **argv)
   }
 
 
-  // clients[0]->enstablis_connection(num_clients);
   for (auto& client : clients) {
     client->enstablis_connection(num_clients);
   }
@@ -101,14 +100,21 @@ int main(int argc, char **argv)
     cell=num_clients*2;
   }
 
-  if (!out_test.is_ready())
+  bool flag_out_file = false;
+  if (out_test.is_ready())
   {
-    std::cout << "out file not given" << std::endl;
-    return 0;
+    static_log(nearest_ap::logger::Level::Warning, "out file given");
+    flag_out_file = true;
+  }
+  else
+  {
+    static_log(nearest_ap::logger::Level::Warning, "out file not given");
+    flag_out_file = false;
   }
 
-  // std::this_thread::sleep_for(std::chrono::hours{10});
   out_test.start_test();
+
+  const auto leader_f = [&stop](){stop=20;};
 
   std::uint16_t i=0;
   for (i=0; i<num_clients-1; ++i)
@@ -152,6 +158,6 @@ int main(int argc, char **argv)
   
   static_log(logger::Level::Error, "Simulation ended with success");
 
-  out_test.end_test();
+  if(flag_out_file)out_test.end_test();
   return 0;
 }

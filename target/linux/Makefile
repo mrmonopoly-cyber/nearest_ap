@@ -58,24 +58,10 @@ build: $(OBJ)
 	@mkdir -p $(BDIR)  # Create the build directory if it doesn't exist
 	$(CXX) $(CXX_INCLUDE) $(CXX_FLAGS) $(OBJ) -o $(OBIN)
 
-RANGE_NODE_NUM := $(shell seq 4 25)
-RANGE_PROB_ERR := $(shell seq 0 9)
-RANGE_NUM_REPETITION := $(shell seq 0 32)
 DIR_SIM_FILE := log_simulations
 
 simulations: build
-	@rm -rf $(DIR_SIM_FILE)
-	@mkdir -p $(DIR_SIM_FILE)
-	@for node in $(RANGE_NODE_NUM); do \
-		for prob in $(RANGE_PROB_ERR); do \
-			for rep in $(RANGE_NUM_REPETITION); do \
-				err_p=$$((prob * 10)); \
-				echo "info simulation: nodes: $${node}  err: $${err_p}, rep: $${rep}"; \
-				./$(OBIN) $${node} $${err_p} $(DIR_SIM_FILE)/nodes_$${node}__perr_$${err_p}.log "nolog"; \
-				sleep 1;\
-				done; \
-			done; \
-		done; 
+	./run_simulations.sh $(OBIN) $(DIR_SIM_FILE)
 
 clean:
 	rm -f main

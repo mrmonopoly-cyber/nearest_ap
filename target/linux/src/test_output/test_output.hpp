@@ -55,7 +55,7 @@ class testOut
     {
       if (max_time_excedeed())
       {
-        std::string err = "out of bounds";
+        std::string err = "out of bounds\n";
         m_out_file.write(err.c_str(), err.length());
       }
       else

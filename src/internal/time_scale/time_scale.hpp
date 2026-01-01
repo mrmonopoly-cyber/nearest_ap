@@ -1,13 +1,11 @@
 #pragma once
 
-#include <cstdint>
-
 namespace nearest_ap
 {
   class TimeScale
   {
     public:
-      using Unit = std::uint32_t;
+      using Unit = float;
 
       inline constexpr Unit get(void) const noexcept
       {
@@ -26,7 +24,7 @@ namespace nearest_ap
 
       inline void decrement(void) noexcept
       {
-        if (m_time_scale_factor > 0 )
+        if (m_time_scale_factor>0)
         {
           m_time_scale_factor--;
         }
