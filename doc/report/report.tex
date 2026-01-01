@@ -15,13 +15,26 @@
 \usepackage{stmaryrd}
 \usepackage{listings}
 \usepackage{url}
+\usepackage{graphicx}
 \usepackage{amsfonts} % for "\mathbb" macro
+\usepackage{tikz}
+
+
 
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\C}{\mathbb{C}}
+
+\newcommand{\drawplot}[1]{
+  \begin{figure}
+    \centering
+    \resizebox{\columnwidth}{!}{\input{plot/latex_plot_#1}}
+    \caption{#1 nodes simulations}
+    \label{#1 nodes simulations}
+  \end{figure}
+  }
 
 \newtheorem{problem}{Problem}[section]
 
@@ -104,6 +117,11 @@
 
 \input{sections/validation/validation}
 
+\drawplot{4}
+\drawplot{8}
+\drawplot{12}
+\drawplot{16}
+\drawplot{20}
 
 \input{bib}
 
