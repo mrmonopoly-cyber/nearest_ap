@@ -32,6 +32,8 @@ This will generate:
 - a [doxygen](https://www.doxygen.nl/) documentation in ```doc/doxygen```
 - a [latex](https://www.latex-project.org/) report in ```doc/report``` with name **report.pdf**
 
+> To make the report [gnuplot](http://www.gnuplot.info/) is required
+
 To clean the doc:
 ```sh
 make clean

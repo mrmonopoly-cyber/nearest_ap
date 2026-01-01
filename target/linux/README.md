@@ -9,6 +9,7 @@ and find the best leader between them. Also a **console logger** is implemented 
 - [gcc](https://gcc.gnu.org/install/)
 - [make](https://www.gnu.org/software/make/)
 - [wget](https://www.gnu.org/software/wget/)
+- [cppzmq](https://github.com/zeromq/cppzmq)
 
 # Setup
 
