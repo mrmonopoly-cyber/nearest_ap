@@ -66,7 +66,11 @@ class testOut
         const std::string str{out.str() + '\n'};
         m_out_file.write(str.c_str(), str.length());
       }
+    }
 
+    ~testOut() noexcept
+    {
+      m_out_file.close();
     }
 
   private:
