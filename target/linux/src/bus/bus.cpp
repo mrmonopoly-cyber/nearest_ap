@@ -66,13 +66,13 @@ void BusLinux_t::p2pcallbackHandler(P2PPacket* packet) noexcept
 static inline void _decode(const P2PPacket& raw_packet, Msg_t& msg)
 {
   msg.m_msg_size = raw_packet.size;
-  memcpy(msg.m_payload.data(), raw_packet.data, raw_packet.size);
+  memcpy(msg.m_payload.data(), raw_packet.full_data.data, raw_packet.size);
 }
 
 static inline void _encode(P2PPacket& raw_packet, const Msg_t& msg)
 {
   raw_packet.size  = msg.m_msg_size;
-  memcpy(raw_packet.data, msg.m_payload.data(), msg.m_msg_size);
+  memcpy(raw_packet.full_data.data, msg.m_payload.data(), msg.m_msg_size);
 }
 
 BusLinux_t::BusLinux_t(const uint32_t prob) noexcept :
@@ -129,7 +129,7 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
   P2PPacket packet{};
   packet.size = msg.m_msg_size;
   packet.rssi =0;
-  packet.port = 0x00;
+  packet.full_data.port = 0x00;
 
   _encode(packet, msg);
 

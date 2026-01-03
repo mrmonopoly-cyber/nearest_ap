@@ -152,12 +152,9 @@ void BusReaderTask_t::run(void) noexcept
           m_internal.abort_election(new_round, new_leader, new_pot);
 
           msg_index.which_value = near_ap_MessageIndexV2_vote_response_tag,
-          msg_index.value.vote_response = 
-          {
-            .round = new_round,
-            .potential = new_pot,
-            .new_leader = new_leader,
-          };
+          msg_index.value.vote_response.round = new_round;
+          msg_index.value.vote_response.potential = new_pot;
+          msg_index.value.vote_response.new_leader = new_leader;
 
           static_log(logger::Level::Info, log);
 

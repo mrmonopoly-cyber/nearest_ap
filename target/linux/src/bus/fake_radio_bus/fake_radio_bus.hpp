@@ -15,7 +15,7 @@ typedef struct _P2PPacket
     struct {
       uint8_t port;                 //< Header selecting channel and port
       uint8_t data[P2P_MAX_DATA_SIZE]; //< Data
-    };
+    }full_data;
     uint8_t raw[P2P_MAX_DATA_SIZE+1];  //< The full packet "raw"
   };
 } __attribute__((packed)) P2PPacket;

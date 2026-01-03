@@ -10,7 +10,7 @@ PROTOBUF_MESSAGE_PATH := $(LDIR)/messages
 OBIN := main
 
 # Compiler flags (optional, add as needed)
-CC_FLAGS := -Wall -Wextra -g -O0
+CC_FLAGS := -Wall -Wextra -g -O0 --pedantic-errors
 CXX_FLAGS := $(CC_FLAGS) -std=c++17
 
 # Find all .cpp files in the src directory

@@ -41,12 +41,9 @@ void LeaderAliveTask_t::run(void) noexcept
       )
   {
     msg_index.which_value = near_ap_MessageIndexV2_heartbit_tag;
-    msg_index.value.heartbit =
-    {
-      .id = static_cast<std::uint32_t>(m_internal.user_id()),
-      .potential = m_internal.user_pot(),
-      .round = m_internal.round(),
-    };
+    msg_index.value.heartbit.id = static_cast<std::uint32_t>(m_internal.user_id());
+    msg_index.value.heartbit.potential = m_internal.user_pot();
+    msg_index.value.heartbit.round = m_internal.round();
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index))
     {

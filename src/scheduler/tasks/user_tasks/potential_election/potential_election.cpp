@@ -70,12 +70,10 @@ void PotentialElectionTask_t::run(void) noexcept
     m_internal.new_election();
   
     msg_index_v2.which_value = near_ap_MessageIndexV2_new_election_tag;
-    msg_index_v2.value.new_election = 
-    {
-      .round = m_internal.round(),
-      .id = m_internal.user_id(),
-      .potential = m_internal.user_pot(),
-    };
+    msg_index_v2.value.new_election.round = m_internal.round();
+    msg_index_v2.value.new_election.round = m_internal.round();
+    msg_index_v2.value.new_election.id = m_internal.user_id();
+    msg_index_v2.value.new_election.potential = m_internal.user_pot();
 
 
     if (!pb_encode(&ostream, near_ap_MessageIndexV2_fields, &msg_index_v2))
