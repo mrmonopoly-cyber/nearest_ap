@@ -104,6 +104,10 @@ namespace nearest_ap::logger
         {
         }
 
+        inline void append_msg(const float obj) noexcept
+        {
+        }
+
         inline void append_msg(const std::string_view) noexcept
         {
         }
