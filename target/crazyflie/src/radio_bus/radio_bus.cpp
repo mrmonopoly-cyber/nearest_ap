@@ -25,12 +25,19 @@ static struct
 }g_radio_bus_metadata;
 
 
-static void p2pcallbackHandler(P2PPacket* packet)
+uint8_t _next(const uint8_t v) noexcept
 {
-  if (g_radio_bus_metadata.free_cell > 0)
+  return (v+1) % g_radio_bus_metadata.msg_queue.size();
+}
+
+void  p2pcallbackHandler(P2PPacket* packet)
+{
+  const uint8_t write_cursor = g_radio_bus_metadata.write_cursor.load();
+
+  if (_next(write_cursor) != g_radio_bus_metadata.read_cursor.load())
   {
-    g_radio_bus_metadata.msg_queue[g_radio_bus_metadata.write_cursor++] = *packet;
-    g_radio_bus_metadata.free_cell--;
+    g_radio_bus_metadata.msg_queue[write_cursor] = *packet;
+    g_radio_bus_metadata.write_cursor.store(_next(write_cursor));
   }
 }
 
@@ -49,11 +56,6 @@ static inline void _encode(P2PPacket& raw_packet, const Msg_t& msg)
 RadioBus::RadioBus()
 {
   p2pRegisterCB(p2pcallbackHandler);
-}
-
-uint8_t RadioBus::_next(const uint8_t v) const noexcept
-{
-  return (v+1) % s_queue_size;
 }
 
 std::optional<Msg_t> RadioBus::Read() noexcept
