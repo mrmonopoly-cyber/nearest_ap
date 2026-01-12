@@ -51,7 +51,7 @@ void appMain()
   using Topology = Node_t::Topology;
 
   const constexpr uint8_t default_leader =0;
-  const constexpr uint8_t num_nodes =2;
+  const constexpr uint8_t num_nodes =3;
 
   Topology topology{num_nodes, default_leader};
   const uint8_t my_id = (configblockGetRadioAddress() & 3);
@@ -71,7 +71,10 @@ void appMain()
   if(my_id >= topology.m_num_elements)
   {
     DEBUG_PRINT("id not found in topology: %d\n", my_id);
-    while(1){};
+    while(1)
+    {
+	    vTaskDelay(4000);
+    };
   }
 
 

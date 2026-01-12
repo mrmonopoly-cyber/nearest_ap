@@ -88,6 +88,11 @@ std::optional<Msg_t> BusLinux_t::Read() noexcept
   Msg_t m{};
   P2PPacket packet{};
 
+  if (!m_enable)
+  {
+    return std::nullopt;
+  }
+
   const uint8_t read_cursor = m_read_cursor.load();
 
   if (read_cursor != m_write_cursor.load())
@@ -130,6 +135,11 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
   packet.size = msg.m_msg_size;
   packet.rssi =0;
   packet.full_data.port = 0x00;
+
+  if (!m_enable)
+  {
+    return BusStatus_t::Inactive;
+  }
 
   _encode(packet, msg);
 

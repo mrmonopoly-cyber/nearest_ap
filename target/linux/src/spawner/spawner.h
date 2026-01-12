@@ -22,15 +22,18 @@ class SpawnerLinux_t : public Spawner_t
           TaskWrapper(TaskWrapper&&) =default;
           TaskWrapper& operator=(TaskWrapper&&) = default;
 
-          bool can_execute() const noexcept;
-          bool still_valid() const noexcept;
-          TaskId id() const noexcept;
+          bool can_execute(void) const noexcept;
+          bool still_valid(void) const noexcept;
+          TaskId id(void) const noexcept;
 
-          void stop() noexcept;
-          void run() noexcept;
+          void stop(void) noexcept;
+          void run(void) noexcept;
+          void stopped(void) noexcept;
+          bool is_stopped(void) noexcept;
 
         private:
-          bool m_run;
+          bool m_run=false;
+          bool m_stopped=false;
           BaseTask_t* m_base_task;
       };
 
@@ -47,6 +50,7 @@ class SpawnerLinux_t : public Spawner_t
       SpawnerLinux_t& operator=(SpawnerLinux_t&& ) = delete;
 
       void start_task(BaseTask_t* t) noexcept override;
+      void stop_task(BaseTask_t* t) noexcept override;
 
       ~SpawnerLinux_t();
 
@@ -55,8 +59,6 @@ class SpawnerLinux_t : public Spawner_t
 
     private:
       static constexpr TaskId s_num_tasks = static_cast<TaskId>(InteractibleTask::TASK_COUNT);
-      static constexpr auto s_runner_f = 
-        [](TaskWrapper* r_task){while(r_task->can_execute())r_task->run();};
 
       std::array<TaskWrapper, s_num_tasks> m_tasks;
   };

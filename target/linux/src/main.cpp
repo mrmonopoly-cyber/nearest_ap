@@ -8,6 +8,7 @@
 #include <string>
 #include <sys/types.h>
 #include <thread>
+#include <unistd.h>
 
 #include "bus/bus.hpp"
 #include "logger/logger.hpp"
@@ -33,6 +34,7 @@ int main(int argc, char **argv)
   auto prob_drop_packet = 0;
   testOut out_test{std::chrono::minutes{5}};
   volatile int stop =20;
+  volatile int current_leader =0;
 
 
   LinuxLogger logger{};
@@ -114,9 +116,9 @@ int main(int argc, char **argv)
 
   out_test.start_test();
 
-  const auto leader_f = [&stop](){stop=20;};
 
   std::uint16_t i=0;
+
   for (i=0; i<num_clients-1; ++i)
   {
     drones.push_back(std::make_unique<Node_t>(
@@ -125,7 +127,7 @@ int main(int argc, char **argv)
         std::move(topology),
         i,
         [&base, i]{return base[i] + i;}, 
-        leader_f, 
+        [&stop,&current_leader,i](){stop=20;current_leader=i;},
         0,
         bus_t_freq,
         pot_t_freq + (std::rand() % 100),
@@ -139,7 +141,7 @@ int main(int argc, char **argv)
         std::move(topology),
         i,
         [&base, i]{return base[i] + i;}, 
-        [&stop]{stop--;}, 
+        [&stop,&current_leader,i]{stop--;current_leader=i;}, 
         0,
         bus_t_freq,
         pot_t_freq + (std::rand() % 100),
@@ -156,8 +158,27 @@ int main(int argc, char **argv)
     }
   };
   
-  static_log(logger::Level::Error, "Simulation ended with success");
+  static_log(logger::Level::Error, "Simulation part 1 ended with success");
+
+  drones[i]->stop();
+
+  int tries = 0;
+  while(tries < 5000 || current_leader != i-1)
+  {
+    if (current_leader == i-1)
+    {
+      tries++;
+    }
+    else
+    {
+      tries =0;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds{1});
+  }
+
+  static_log(logger::Level::Error, "Simulation part 2 ended with success");
 
   if(flag_out_file)out_test.end_test();
+
   return 0;
 }

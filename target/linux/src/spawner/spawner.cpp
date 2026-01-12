@@ -10,6 +10,16 @@ using namespace std::this_thread;
 
 void SpawnerLinux_t::_run_task(BaseTask_t*const t) noexcept
 {
+  constexpr auto s_runner_f = [](TaskWrapper* r_task)
+  {
+    while(r_task->can_execute())
+    {
+      r_task->run();
+    }
+
+    r_task->stopped();
+  };
+
   const TaskId t_index = t->id();
   if (t_index < static_cast<TaskId>(InteractibleTask::TASK_COUNT))
   {
@@ -32,6 +42,11 @@ void SpawnerLinux_t::start_task(BaseTask_t* t) noexcept
   return _run_task(t);
 }
 
+void SpawnerLinux_t::stop_task(BaseTask_t* t) noexcept
+{
+  m_tasks[t->id()].stop();
+}
+
 SpawnerLinux_t::~SpawnerLinux_t()
 {
   for(auto& task: m_tasks)
@@ -43,6 +58,8 @@ SpawnerLinux_t::~SpawnerLinux_t()
       log.append_msg(task.id());
       static_log(logger::Level::Debug, log);
       task.stop();
+      while(!task.is_stopped()){
+      }
     }
   }
 }
@@ -69,6 +86,16 @@ TaskId SpawnerLinux_t::TaskWrapper::id() const noexcept
 void SpawnerLinux_t::TaskWrapper::stop() noexcept
 {
   m_run = false;
+}
+
+void SpawnerLinux_t::TaskWrapper::stopped() noexcept
+{
+  m_stopped = true;
+}
+
+bool SpawnerLinux_t::TaskWrapper::is_stopped() noexcept
+{
+  return m_stopped;
 }
 
 void SpawnerLinux_t::TaskWrapper::run() noexcept

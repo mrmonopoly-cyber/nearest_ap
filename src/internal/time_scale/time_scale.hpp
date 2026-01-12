@@ -24,7 +24,7 @@ namespace nearest_ap
 
       inline void decrement(void) noexcept
       {
-        if (m_time_scale_factor>0)
+        if (m_time_scale_factor>1)
         {
           m_time_scale_factor--;
         }

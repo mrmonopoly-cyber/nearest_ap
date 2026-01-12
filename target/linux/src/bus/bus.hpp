@@ -24,6 +24,16 @@ namespace nearest_ap
         m_radio_bus.enstablis_connection(num_clients);
       }
 
+      inline void enable(void) noexcept
+      {
+        m_enable = true;
+      }
+
+      inline void disable(void) noexcept
+      {
+        m_enable = false;
+      }
+
       std::optional<Msg_t> Read(void) noexcept override;
       BusStatus_t Write(const Msg_t&) noexcept override;
 
@@ -45,6 +55,7 @@ namespace nearest_ap
       std::atomic_uint8_t m_write_cursor=0;
       std::atomic_uint8_t m_read_cursor=0;
       uint32_t m_prob_drop_packet=0;
+      bool m_enable =true;
   };
 };
 

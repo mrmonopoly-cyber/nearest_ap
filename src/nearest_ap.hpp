@@ -83,6 +83,11 @@ namespace nearest_ap {
         {
         }
 
+      inline void stop(void) noexcept
+      {
+        m_scheduler.stop();
+      }
+
     private:
       Internal_t m_internal;
       Scheduler_t m_scheduler;

@@ -54,18 +54,15 @@ void PotentialElectionTask_t::run(void) noexcept
     pb_ostream_t ostream = pb_ostream_from_buffer(msg.m_payload.data(), msg.m_payload.size());;
     _near_ap_MessageIndexV2 msg_index_v2 = near_ap_MessageIndexV2_init_default;
 
-    if (!m_internal.is_best_candidate())
-    {
-      logger::UserLog<128>log{};
-      log.append_msg("node: ");
-      log.append_msg(m_internal.user_id());
-      log.append_msg("increasing time_scale_factor: ");
-      log.append_msg(++m_internal.m_potential_election_time_scale);
-      log.append_msg(", current potential tasks freq: ");
-      log.append_msg(static_cast<uint32_t>(freq()));
-      static_log(logger::Level::Warning, log);
-      update_freq_by_factor(m_internal.m_potential_election_time_scale.get());
-    }
+    logger::UserLog<128>log{};
+    log.append_msg("node: ");
+    log.append_msg(m_internal.user_id());
+    log.append_msg("current time_scale_factor: ");
+    log.append_msg(m_internal.m_potential_election_time_scale.get());
+    log.append_msg(", current potential tasks freq: ");
+    log.append_msg(static_cast<uint32_t>(freq()));
+    static_log(logger::Level::Warning, log);
+    update_freq_by_factor(m_internal.m_potential_election_time_scale.get());
 
     m_internal.new_election();
   

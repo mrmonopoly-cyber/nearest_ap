@@ -1,6 +1,7 @@
 #include "internal.hpp"
 #include <cstdint>
 #include <nearest_ap/logger/logger.hpp>
+#include <utility>
 
 using namespace nearest_ap;
 
@@ -124,7 +125,7 @@ bool Internal_t::user_valid_for_election(void) noexcept
     log.append_msg(" NO HEARTBIT FROM LEADER: ");
     log.append_msg(m_users.leader());
 
-    if (!heartbit_best_candidate && !is_best_candidate())
+    if (!heartbit_best_candidate)
     {
       log.append_msg(" NO HEARTBIT FROM BEST CANDIDATE: ");
       log.append_msg(m_best_candidate);
@@ -134,9 +135,27 @@ bool Internal_t::user_valid_for_election(void) noexcept
       m_best_candidate = m_current_user_index;
       m_best_candidate_pot = m_user_potential;
       m_potential_election_time_scale.reset();
+
+      if(is_best_candidate())
+      {
+        m_users.update_leader(m_current_user_index);
+        m_leader_potential = m_user_potential;
+      }
+    }
+    else if(m_users.leader() == m_best_candidate)
+    {
+      if (m_received_heartbit_best_candidate> 2)
+      {
+        m_received_heartbit_best_candidate--;
+      }
     }
     else
     {
+
+      if (m_potential_election_time_scale.get()< 5)
+      {
+        ++m_potential_election_time_scale;
+      }
       m_users.m_leader = m_best_candidate;
       m_leader_potential = m_best_candidate_pot;
     }
@@ -146,13 +165,27 @@ bool Internal_t::user_valid_for_election(void) noexcept
     return true;
   }
 
-  return 
-    !leader() && 
-    pot_user_better_leader && 
-    (
-     pot_user_better_candidate || user_is_best_candidate
+  if( 
+      !leader() && 
+      pot_user_better_leader && 
+      (
+       pot_user_better_candidate || user_is_best_candidate
+      )
     )
-    ;
+  {
+    if (!is_best_candidate() && m_potential_election_time_scale.get()< 5)
+    {
+      ++m_potential_election_time_scale;
+    }
+    else if(is_best_candidate())
+    {
+      m_potential_election_time_scale.reset();
+    }
+
+    return true;
+  }
+
+  return false;
 }
 
 void Internal_t::new_election(void) noexcept
@@ -177,7 +210,9 @@ bool Internal_t::recv_heartbit(
     m_leader_potential = leader_pot;
     m_users.update_leader(leader_id);
     m_received_heartbit_leader++;
-    m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
+    if (m_received_heartbit_best_candidate < m_users.m_num_elements*2) {
+      m_received_heartbit_best_candidate+=2;
+    }
     m_vote_info.update_round(leader_round);
     m_potential_election_time_scale.reset();
     return true;
@@ -196,7 +231,9 @@ bool Internal_t::recv_heartbit(
     m_users.update_leader(leader_id);
     m_vote_info.renunce();
     m_received_heartbit_leader++;
-    m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
+    if (m_received_heartbit_best_candidate < m_users.m_num_elements*2) {
+      m_received_heartbit_best_candidate+=2;
+    }
     return true;
   }
 
@@ -207,12 +244,19 @@ void Internal_t::recv_heartbit_best_candidate(const VirtualId_t leader_id, const
 {
   if (leader_id == m_best_candidate)
   {
-    if (m_received_heartbit_best_candidate < 5)
+    if (m_received_heartbit_best_candidate < m_users.m_num_elements*2)
     {
-      m_received_heartbit_best_candidate+=m_users.m_num_elements/2;
+      m_received_heartbit_best_candidate+=2;
     }
     m_best_candidate_pot = pot;
   }
+  else if(pot > m_best_candidate_pot)
+  {
+    m_received_heartbit_best_candidate=2;
+    m_best_candidate = leader_id;
+    m_best_candidate_pot = pot;
+  }
+
 }
 
 bool Internal_t::support_check_wining(void) noexcept

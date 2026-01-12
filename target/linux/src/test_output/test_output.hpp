@@ -1,6 +1,8 @@
 #pragma once
 
+#include <array>
 #include <chrono>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
 #include <string_view>
@@ -46,13 +48,31 @@ class testOut
       m_out_file.open(path, std::fstream::ios_base::out | std::fstream::app);
     }
 
-    void start_test() noexcept
+    void start_test(void) noexcept
     {
       m_start = std::chrono::high_resolution_clock::now();
     }
 
+    void take_time(void) noexcept
+    {
+      const auto current_time = std::chrono::high_resolution_clock::now();
+
+      m_timestamps[m_cursor++] = (current_time - m_start);
+    }
+
     void end_test() noexcept
     {
+      const auto end_test = std::chrono::high_resolution_clock::now();
+      std::ostringstream out{};
+
+      for(int i =0; i<m_cursor;i++)
+      {
+        out.clear();
+        out << m_timestamps[i].count();
+        const std::string str{out.str() + ' '};
+        m_out_file.write(str.c_str(), str.length());
+      }
+
       if (max_time_excedeed())
       {
         std::string err = "out of bounds\n";
@@ -60,8 +80,6 @@ class testOut
       }
       else
       {
-        const auto end_test = std::chrono::high_resolution_clock::now();
-        std::ostringstream out{};
         out << std::chrono::duration<double>(end_test - m_start).count();
         const std::string str{out.str() + '\n'};
         m_out_file.write(str.c_str(), str.length());
@@ -74,7 +92,11 @@ class testOut
     }
 
   private:
+    using timestamp = std::chrono::duration<double>;
+
     Duration m_max_time_exceded;
     std::fstream m_out_file{};
+    std::array<timestamp, 20> m_timestamps;
+    uint8_t m_cursor = 0;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_start;
 };

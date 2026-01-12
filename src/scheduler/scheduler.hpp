@@ -54,6 +54,13 @@ namespace nearest_ap
           _spawn_task();
         }
 
+        inline void stop(void) noexcept
+        {
+          m_spawner.stop_task(&m_bus_reader_task);
+          m_spawner.stop_task(&m_pot_election_task);
+          m_spawner.stop_task(&m_alive_task);
+        }
+
       private:
         inline void _spawn_task(void) noexcept
         {
