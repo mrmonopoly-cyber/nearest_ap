@@ -14,7 +14,7 @@ namespace nearest_ap {
     public:
       using Scheduler_t = Scheduler<SpawnerType>;
       using ComputePot_f = typename Scheduler_t::ComputePot_f;
-      using LeaderTask_f = typename Scheduler_t::LeaderTaks_f;
+      using NodeTask_f = typename Scheduler_t::NodeTaks_f;
 
       using VirtualId_t = Internal_t::VirtualId_t;
       using Tollercance_t = Internal_t::Tollerance_t;
@@ -30,12 +30,13 @@ namespace nearest_ap {
           Topology topology,
           const std::uint16_t current_user_index,
           ComputePot_f compute_pot_f,
-          LeaderTask_f leader_task_f) noexcept:
+          NodeTask_f leader_task_f,
+          NodeTask_f slave_task_f) noexcept:
         m_internal(
             std::move(topology),
             current_user_index,
             std::move(compute_pot_f)),
-        m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
+        m_scheduler(std::move(spawner), bus, leader_task_f, slave_task_f, m_internal)
         {
         }
 
@@ -45,14 +46,15 @@ namespace nearest_ap {
           Topology topology,
           const std::uint16_t current_user_index,
           ComputePot_f compute_pot_f,
-          LeaderTask_f leader_task_f,
+          NodeTask_f leader_task_f,
+          NodeTask_f slave_task_f,
           Tollercance_t tollerance) noexcept:
         m_internal(
             std::move(topology),
             current_user_index,
             std::move(compute_pot_f),
             tollerance),
-        m_scheduler(std::move(spawner), bus, std::move(leader_task_f), m_internal)
+        m_scheduler(std::move(spawner), bus, leader_task_f, slave_task_f, m_internal)
         {
         }
 
@@ -62,7 +64,8 @@ namespace nearest_ap {
           Topology topology,
           const std::uint16_t current_user_index,
           ComputePot_f compute_pot_f,
-          LeaderTask_f leader_task_f,
+          NodeTask_f leader_task_f,
+          NodeTask_f slave_task_f,
           Tollercance_t tollerance,
           const Millis_t bus_task_freq,
           const Millis_t pot_task_freq,
@@ -75,7 +78,8 @@ namespace nearest_ap {
         m_scheduler(
             std::move(spawner),
             bus,
-            std::move(leader_task_f),
+            leader_task_f,
+            slave_task_f,
             m_internal,
             bus_task_freq, 
             pot_task_freq,

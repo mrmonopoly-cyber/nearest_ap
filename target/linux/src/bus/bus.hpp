@@ -37,6 +37,8 @@ namespace nearest_ap
       std::optional<Msg_t> Read(void) noexcept override;
       BusStatus_t Write(const Msg_t&) noexcept override;
 
+      ~BusLinux_t() noexcept;
+
     private:
       void p2pcallbackHandler(P2PPacket* packet) noexcept;
 

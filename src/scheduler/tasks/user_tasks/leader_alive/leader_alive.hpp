@@ -21,19 +21,21 @@ namespace nearest_ap {
   class LeaderAliveTask_t : public BaseTask_t
   {
     public:
-      using LeaderTask_f = std::function<void()>;
+      using NodeTask_f = std::function<void()>;
 
       LeaderAliveTask_t() = delete;
 
       LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f leader_task) noexcept;
+          const NodeTask_f leader_task,
+          const NodeTask_f slave_task) noexcept;
 
       LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f leader_task,
+          const NodeTask_f leader_task,
+          const NodeTask_f slave_task,
           const Millis_t freq) noexcept;
 
       void run(void) noexcept override;
@@ -43,6 +45,7 @@ namespace nearest_ap {
 
       Bus_t& m_bus;
       const Internal_t& m_internal;
-      const LeaderTask_f m_leader_task;
+      const NodeTask_f m_leader_task;
+      const NodeTask_f m_slave_task;
   };
 };

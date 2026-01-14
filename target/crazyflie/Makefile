@@ -41,7 +41,8 @@ NO_INCLUDE_TARGETS := setup \
 											clean \
 											clean_setup \
 											protobuf_setup \
-											clangd_update_compile_command
+											clangd_update_compile_command \
+											python_setup
 
 NO_INCLUDE_PB_TARGETS := container_menuconfig
 
@@ -86,17 +87,7 @@ clean_setup:
 protobuf_setup:
 	make -C $(PROTOBUF_MESSAGE_PATH) build_protobuf_messages
 
-setup: $(UDEV_PATH) clean_setup 
-	@echo "cloning basic firmware of crazyflie"
-	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git $(CRAZYFLIE_BASE);
-	make -C $(CRAZYFLIE_BASE) cf2_defconfig
-
-	@echo "copying udev rules in " $(UDEV_PATH)
-	sudo cp $(UDEV_FILE) $(UDEV_PATH)
-	@echo "refreshing udev rules"
-	sudo udevadm control --reload
-	sudo udevadm trigger
-
+python_setup:
 	@echo "creating python virtual env in .venv"
 	python -m venv .venv
 	source .venv/bin/activate && pip install --upgrade pip
@@ -107,6 +98,18 @@ setup: $(UDEV_PATH) clean_setup
 	source .venv/bin/activate && pip install cflib
 	@echo "installing in scan-build .venv"
 	source .venv/bin/activate && pip install scan-build
+
+setup: $(UDEV_PATH) clean_setup python_setup
+	@echo "cloning basic firmware of crazyflie"
+	git clone --recursive https://github.com/bitcraze/crazyflie-firmware.git $(CRAZYFLIE_BASE);
+	make -C $(CRAZYFLIE_BASE) cf2_defconfig
+
+	@echo "copying udev rules in " $(UDEV_PATH)
+	sudo cp $(UDEV_FILE) $(UDEV_PATH)
+	@echo "refreshing udev rules"
+	sudo udevadm control --reload
+	sudo udevadm trigger
+
 
 	make protobuf_setup
 

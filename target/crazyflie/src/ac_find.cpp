@@ -32,6 +32,9 @@
 #include "task_spawner/task_spawner.hpp"
 #include "radio_bus/radio_bus.hpp"
 
+#define IMPLEMENTATION
+#include "ac_config.hpp"
+
 
 extern "C"
 {
@@ -42,6 +45,8 @@ extern "C"
 
 #include "debug.h"
 #include "configblock.h"
+
+#include "motors.h"
 }
 
 void appMain()
@@ -50,9 +55,6 @@ void appMain()
   using Node_t = Node<TaskCraziflieSpawner>;
   using Topology = Node_t::Topology;
 
-  const constexpr uint8_t default_leader =0;
-  const constexpr uint8_t num_nodes =3;
-
   Topology topology{num_nodes, default_leader};
   const uint8_t my_id = (configblockGetRadioAddress() & 3);
 
@@ -60,12 +62,24 @@ void appMain()
 
   RadioBus bus{};
 
-  Node_t::Tollercance_t tollerance = 10;
   auto compute_potential = [my_id]{return 42 + my_id;};
 
   auto leader_f = [my_id](){
     char buffer[32] = "i'm leader: ";
     DEBUG_PRINT("%s%d\n",buffer, my_id);
+    for(uint8_t motor=0; motor<NBR_OF_MOTORS; motor++)
+    {
+      motorsSetRatio(motor, MOTORS_TEST_RATIO);
+    }
+  };
+
+  auto slave_f = [my_id](){
+    char buffer[32] = "i'm a slave: ";
+    DEBUG_PRINT("%s%d\n",buffer, my_id);
+    for(uint8_t motor=0; motor<NBR_OF_MOTORS; motor++)
+    {
+      motorsSetRatio(motor, 0);
+    }
   };
 
   if(my_id >= topology.m_num_elements)
@@ -87,10 +101,11 @@ void appMain()
       my_id,
       compute_potential,
       leader_f,
+      slave_f,
       tollerance,
-      200,
-      7000,
-      1000
+      task_bus_freq,
+      task_pot_alive_freq,
+      task_leader_alive_freq 
   };
 
   DEBUG_PRINT("Starting Drone\n");
@@ -99,5 +114,4 @@ void appMain()
   {
     vTaskDelay(99999);
   }
-
 }

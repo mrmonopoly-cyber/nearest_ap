@@ -33,6 +33,11 @@ void BusLinux_t::p2pcallbackHandler(P2PPacket* packet) noexcept
     return;
   }
 
+  if (!m_enable)
+  {
+    return;
+  }
+
   if (_next(write_cursor) != m_read_cursor.load())
   {
     m_msg_queue[write_cursor] = *packet;
@@ -145,4 +150,9 @@ BusStatus_t BusLinux_t::Write(const Msg_t& msg) noexcept
 
   m_radio_bus.radiolinkSendP2PPacketBroadcast(&packet);
   return BusStatus_t::Ok;
+}
+
+BusLinux_t::~BusLinux_t() noexcept
+{
+  disable();
 }

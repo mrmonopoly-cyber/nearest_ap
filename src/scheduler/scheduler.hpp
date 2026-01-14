@@ -13,7 +13,7 @@ namespace nearest_ap
       public:
         using ComputePot_f = typename Internal_t::ComputePot_f;
         using BusMsg_t = typename Bus_t::Msg_t;
-        using LeaderTaks_f = typename LeaderAliveTask_t::LeaderTask_f;
+        using NodeTaks_f = typename LeaderAliveTask_t::NodeTask_f;
 
 
         Scheduler() = delete;
@@ -25,12 +25,13 @@ namespace nearest_ap
         Scheduler(
             SpawnerType spawner,
             Bus_t& bus,
-            LeaderTaks_f leader_task_f,
+            NodeTaks_f leader_task_f,
+            NodeTaks_f slave_task_f,
             Internal_t& internal) noexcept:
           m_spawner{std::move(spawner)},
           m_bus {bus},
           m_pot_election_task {bus, internal},
-          m_alive_task {bus, internal, std::move(leader_task_f)},
+          m_alive_task {bus, internal, leader_task_f, slave_task_f},
           m_bus_reader_task {bus, internal}
         {
           _spawn_task();
@@ -39,7 +40,8 @@ namespace nearest_ap
         Scheduler(
             SpawnerType spawner,
             Bus_t& bus,
-            LeaderTaks_f leader_task_f,
+            NodeTaks_f leader_task_f,
+            NodeTaks_f slave_task_f,
             Internal_t& internal,
             const Millis_t bus_task_freq,
             const Millis_t pot_task_freq,
@@ -48,7 +50,7 @@ namespace nearest_ap
           m_spawner{std::move(spawner)},
           m_bus {bus},
           m_pot_election_task {bus, internal, pot_task_freq},
-          m_alive_task {bus, internal, std::move(leader_task_f), alive_task_freq},
+          m_alive_task {bus, internal, leader_task_f, slave_task_f, alive_task_freq},
           m_bus_reader_task {bus, internal, bus_task_freq}
         {
           _spawn_task();
@@ -59,6 +61,11 @@ namespace nearest_ap
           m_spawner.stop_task(&m_bus_reader_task);
           m_spawner.stop_task(&m_pot_election_task);
           m_spawner.stop_task(&m_alive_task);
+        }
+
+        ~Scheduler() noexcept
+        {
+          stop();
         }
 
       private:

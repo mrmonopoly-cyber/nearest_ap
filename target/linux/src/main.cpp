@@ -5,7 +5,6 @@
 #include <iostream>
 #include <memory>
 #include <nearest_ap/nearest_ap.hpp>
-#include <string>
 #include <sys/types.h>
 #include <thread>
 #include <unistd.h>
@@ -128,6 +127,7 @@ int main(int argc, char **argv)
         i,
         [&base, i]{return base[i] + i;}, 
         [&stop,&current_leader,i](){stop=20;current_leader=i;},
+        []{},
         0,
         bus_t_freq,
         pot_t_freq + (std::rand() % 100),
@@ -142,6 +142,7 @@ int main(int argc, char **argv)
         i,
         [&base, i]{return base[i] + i;}, 
         [&stop,&current_leader,i]{stop--;current_leader=i;}, 
+        []{},
         0,
         bus_t_freq,
         pot_t_freq + (std::rand() % 100),
@@ -161,6 +162,7 @@ int main(int argc, char **argv)
   static_log(logger::Level::Error, "Simulation part 1 ended with success");
 
   drones[i]->stop();
+  clients[i]->disable();
 
   int tries = 0;
   while(tries < 5000 || current_leader != i-1)
@@ -179,6 +181,14 @@ int main(int argc, char **argv)
   static_log(logger::Level::Error, "Simulation part 2 ended with success");
 
   if(flag_out_file)out_test.end_test();
+
+  for(auto& drone: drones){
+    drone->stop();
+  }
+
+  for (auto& bus : clients) {
+    bus->disable();
+  }
 
   return 0;
 }

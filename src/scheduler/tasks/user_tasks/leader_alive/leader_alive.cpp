@@ -1,4 +1,5 @@
 #include "leader_alive.hpp"
+#include <algorithm>
 #include <cstdint>
 #include <nearest_ap/logger/logger.hpp>
 
@@ -8,23 +9,27 @@ using Msg_t = Bus_t::Msg_t;
 LeaderAliveTask_t::LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f leader_task) noexcept:
+          const NodeTask_f leader_task,
+          const NodeTask_f slave_task) noexcept:
         BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), s_base_freq),
         m_bus(bus),
         m_internal(internal),
-        m_leader_task(std::move(leader_task)) 
+        m_leader_task(leader_task),
+        m_slave_task(slave_task)
     {
     }
 
 LeaderAliveTask_t::LeaderAliveTask_t(
           Bus_t& bus,
           const Internal_t& internal,
-          const LeaderTask_f leader_task,
+          const NodeTask_f leader_task,
+          const NodeTask_f slave_task,
           const Millis_t freq) noexcept:
         BaseTask_t(static_cast<TaskId>(InteractibleTask::LEADER_ALIVE), freq),
         m_bus(bus),
         m_internal(internal),
-        m_leader_task(std::move(leader_task)) 
+        m_leader_task(leader_task),
+        m_slave_task(slave_task)
     {
     }
 
@@ -73,5 +78,9 @@ void LeaderAliveTask_t::run(void) noexcept
     log.append_msg(msg_index.value.heartbit.round);
     static_log(logger::Level::Debug, log);
     m_leader_task();
+  }
+  else
+  {
+    m_slave_task();
   }
 }

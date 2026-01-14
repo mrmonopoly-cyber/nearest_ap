@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string_view>
 #include <thread>
+#include <unistd.h>
 
 using namespace nearest_ap;
 
@@ -54,12 +55,12 @@ SpawnerLinux_t::~SpawnerLinux_t()
     if (task.still_valid())
     {
       logger::UserLog<128>log{};
-      log.append_msg("stopping task: ");
+      log.append_msg("node: ");
+      log.append_msg(getpid());
+      log.append_msg(" stopping task: ");
       log.append_msg(task.id());
       static_log(logger::Level::Debug, log);
       task.stop();
-      while(!task.is_stopped()){
-      }
     }
   }
 }

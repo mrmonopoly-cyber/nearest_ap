@@ -4,22 +4,22 @@ extern "C"
 #include "portmacro.h"
 #include "projdefs.h"
 #include "task.h"
+#include "debug.h"
 }
 
 #include <cstdint>
-#include <task_spawner/task_spawner.hpp>
 
-#include "task_spawner.hpp"
+#include <task_spawner/task_spawner.hpp>
 
 using namespace nearest_ap;
 
-void task_runner(void* data)
+static void _task_runner(void* data)
 {
-  BaseTask_t* task  = reinterpret_cast<BaseTask_t*>(data);
-  while(1)
+  TaskCraziflieSpawner::TaskMetadata task  = *reinterpret_cast<TaskCraziflieSpawner::TaskMetadata*>(data);
+  while(task.run)
   {
-    task->run();
-    vTaskDelay(task->freq());
+    task.task->run();
+    vTaskDelay(task.task->freq());
   }
 }
 
@@ -30,14 +30,36 @@ TaskCraziflieSpawner::TaskCraziflieSpawner()
 
 void TaskCraziflieSpawner::start_task(BaseTask_t* const task)
 {
-  const uint16_t stack_size = 200;
-  TaskHandle_t* p_handler = m_tasks[task->id()];
-
-  BaseType_t error = xTaskCreate(task_runner, "hh", stack_size, task, tskIDLE_PRIORITY, p_handler);
-  if (error != pdPASS)
+  if (task->id() >= m_tasks.size())
   {
-    //TODO: add error handling
+    DEBUG_PRINT("%s:%d, %s. Invalid task id: %d", __FILE__, __LINE__, __func__, task->id());
+    return;
   }
-  vTaskDelay(10/ portTICK_PERIOD_MS);
 
+  BaseType_t error ={};
+  TaskMetadata& metadata = m_tasks[task->id()];
+  metadata.task = task;
+  metadata.run = true;
+  const uint16_t stack_size = 200;
+
+  error = xTaskCreate(_task_runner, "hh", stack_size, &metadata, tskIDLE_PRIORITY, metadata.handler);
+  while(error != pdPASS)
+  {
+    DEBUG_PRINT("failed starting task: %d\n", task->id());
+    vTaskDelay(50/ portTICK_PERIOD_MS);
+    error = xTaskCreate(_task_runner, "hh", stack_size, &metadata, tskIDLE_PRIORITY, metadata.handler);
+  }
+
+  vTaskDelay(10/ portTICK_PERIOD_MS);
+}
+
+void TaskCraziflieSpawner::stop_task(BaseTask_t* const task)
+{
+  if (task->id() >= m_tasks.size())
+  {
+    DEBUG_PRINT("%s:%d, %s. Invalid task id: %d", __FILE__, __LINE__, __func__, task->id());
+    return;
+  }
+
+  m_tasks[task->id()].run = false;
 }
