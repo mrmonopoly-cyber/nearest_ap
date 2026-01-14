@@ -49,6 +49,8 @@ extern "C"
 #include "motors.h"
 }
 
+#define FOR_EACH_ENGINE(engine) for(uint8_t engine=0; engine<NBR_OF_MOTORS; engine++)
+
 void appMain()
 {
   using namespace nearest_ap;
@@ -65,21 +67,13 @@ void appMain()
   auto compute_potential = [my_id]{return 42 + my_id;};
 
   auto leader_f = [my_id](){
-    char buffer[32] = "i'm leader: ";
-    DEBUG_PRINT("%s%d\n",buffer, my_id);
-    for(uint8_t motor=0; motor<NBR_OF_MOTORS; motor++)
-    {
-      motorsSetRatio(motor, MOTORS_TEST_RATIO);
-    }
+    DEBUG_PRINT("i'm leader: %d\n", my_id);
+    motorsSetRatio(MOTOR_M4, MOTORS_TEST_RATIO);
   };
 
   auto slave_f = [my_id](){
-    char buffer[32] = "i'm a slave: ";
-    DEBUG_PRINT("%s%d\n",buffer, my_id);
-    for(uint8_t motor=0; motor<NBR_OF_MOTORS; motor++)
-    {
-      motorsSetRatio(motor, 0);
-    }
+    DEBUG_PRINT("i'm a slave: %d\n", my_id);
+    motorsSetRatio(MOTOR_M4, 0);
   };
 
   if(my_id >= topology.m_num_elements)
@@ -92,7 +86,9 @@ void appMain()
   }
 
 
-  DEBUG_PRINT("my id: %d\n", my_id);
+  DEBUG_PRINT("my id: %d, tollerance: %ld\n", my_id, tollerance);
+  DEBUG_PRINT("freqs: read: %d, pot: %d, alive: %d\n",
+      task_bus_freq, task_pot_alive_freq, task_leader_alive_freq);
 
   Node node{
       bus,
