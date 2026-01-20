@@ -209,7 +209,9 @@ bool Internal_t::recv_heartbit(
     m_best_candidate_pot = leader_pot;
     m_leader_potential = leader_pot;
     m_users.update_leader(leader_id);
-    m_received_heartbit_leader++;
+    if (m_received_heartbit_leader < m_users.m_num_elements) {
+      m_received_heartbit_leader++;
+    }
     if (m_received_heartbit_best_candidate < m_users.m_num_elements*2) {
       m_received_heartbit_best_candidate+=2;
     }
@@ -230,7 +232,9 @@ bool Internal_t::recv_heartbit(
     m_leader_potential = leader_pot;
     m_users.update_leader(leader_id);
     m_vote_info.renunce();
-    m_received_heartbit_leader++;
+    if (m_received_heartbit_leader < m_users.m_num_elements) {
+      m_received_heartbit_leader++;
+    }
     if (m_received_heartbit_best_candidate < m_users.m_num_elements*2) {
       m_received_heartbit_best_candidate+=2;
     }

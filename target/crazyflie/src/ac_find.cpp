@@ -47,6 +47,7 @@ extern "C"
 #include "configblock.h"
 
 #include "motors.h"
+#include "pm.h"
 }
 
 #define FOR_EACH_ENGINE(engine) for(uint8_t engine=0; engine<NBR_OF_MOTORS; engine++)
@@ -64,7 +65,15 @@ void appMain()
 
   RadioBus bus{};
 
-  auto compute_potential = [my_id]{return 42 + my_id;};
+  auto compute_potential = [my_id]{
+    const float bat_voltage = pmGetBatteryVoltage();
+    const float batt_percentage = bat_voltage/pmGetBatteryVoltageMax();
+
+    DEBUG_PRINT("current volts: %f, max volts: %f, batt percentage: %f\n",
+        (double)bat_voltage, (double)pmGetBatteryVoltageMax(), (double)batt_percentage);
+
+    return bat_voltage/pmGetBatteryVoltageMax();
+  };
 
   auto leader_f = [my_id](){
     DEBUG_PRINT("i'm leader: %d\n", my_id);

@@ -11,7 +11,7 @@ using namespace nearest_ap;
 using Node_t = Node<TaskCraziflieSpawner>;
 
 const constexpr uint8_t default_leader =0;
-const constexpr uint8_t num_nodes =3;
+const constexpr uint8_t num_nodes =4;
 
 const constexpr Node_t::Tollercance_t tollerance = 0;
 
