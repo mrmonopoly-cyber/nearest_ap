@@ -60,3 +60,104 @@ results are empirical and do not provide worst-case convergence guarantees.
 Future work includes extending the simulation to dynamic scenarios and performing a more detailed
 quantitative analysis of message complexity.
 
+\drawplot{4}
+\drawplot{8}
+\drawplot{12}
+\drawplot{16}
+\drawplot{20}
+
+\subsection{Physical Deployment Validation}
+
+To complement the simulation-based validation, the NearestAP protocol was also evaluated on a
+small-scale physical deployment consisting of four autonomous aerial nodes. The objective of these
+experiments was not to derive statistically rigorous performance metrics, but to verify that the
+qualitative convergence properties observed in simulation also manifest under real-world operating
+conditions.
+
+The physical deployment introduces factors that are difficult to model accurately in simulation,
+including uncontrolled wireless interference, non-deterministic scheduling effects, clock drift,
+asymmetric connectivity, and environmental disturbances. Successful convergence under these
+conditions provides evidence that the observed protocol behavior is not an artifact of the
+simulation model.
+
+\subsubsection{Testbed Description}
+
+Each drone executed the same NearestAP implementation used in the simulated experiments, without any
+protocol-level modifications. Nodes communicated exclusively through broadcast wireless messages and
+operated without any form of global clock synchronization.
+
+The deployment consisted of four drones operating concurrently. Convergence time was measured
+manually using wall-clock timing, with an estimated resolution on the order of one second. Each
+experiment was repeated approximately three times. No experimental run resulted in a failure to
+converge.
+
+\subsubsection{Constant Potential Experiments}
+
+In the first set of experiments, all nodes were assigned a fixed and identical potential. These tests
+were designed to validate correct leader convergence and recovery behavior under different startup
+and disturbance scenarios.
+
+\paragraph{Simultaneous Startup}
+
+All four drones were powered on simultaneously, representing a worst-case initial condition with
+maximal election contention. Convergence times of 6.40~s, 6.70~s, and 6.45~s were observed across three
+runs. In all cases, the protocol converged rapidly to a single stable leader.
+
+\paragraph{Progressive Leader Removal}
+
+Starting from a converged configuration, drones were powered off sequentially, beginning with the
+current leader. This experiment resulted in significantly longer convergence times of 38.58~s,
+40.23~s, and 39.56~s.
+
+The increased convergence time is expected, as the node selected for shutdown at each step was the
+current leader. This configuration intentionally forces repeated leadership revocation and re-election,
+representing a highly adversarial scenario rather than a steady-state failure condition.
+
+\paragraph{Sequential Startup}
+
+Drones were powered on sequentially to evaluate whether late-joining nodes correctly recognize and
+defer to an already established leader. While precise convergence timings were not recorded for this
+scenario, all runs resulted in successful convergence without leadership instability.
+
+\paragraph{Leader Isolation}
+
+After convergence, the leader drone was physically displaced to a location more than approximately
+20~meters away from the other nodes, resulting in degraded and asymmetric connectivity. Despite this
+disturbance, the isolated leader remained stable for the full duration of a 10-minute observation
+period, with no leadership revocation or split-brain behavior observed.
+
+\subsubsection{Battery-Dependent Potential Experiment}
+
+To evaluate protocol behavior under heterogeneous and dynamic node conditions, an additional
+experiment was conducted in which node potential was influenced by battery state.
+
+One drone was intentionally kept at a lower battery level than the others while remaining
+continuously powered via a USB connection to a host computer. This configuration ensured that the
+drone operated under constrained energy conditions while remaining active throughout the experiment.
+
+Despite its reduced battery state, the low-energy drone eventually became leader. This confirms
+that leadership selection is governed by the protocol-defined potential mechanism rather than by
+startup order, hardware performance, or transient communication advantages.
+
+\subsubsection{Observations}
+
+Across all physical experiments, the protocol consistently converged to a single leader without
+manual coordination. No persistent split-brain conditions or permanent livelock scenarios were
+observed, even under repeated leader removal or physical isolation.
+
+While convergence times were generally longer and more variable than those observed in simulation,
+the qualitative dynamics of candidate dominance, leadership stabilization, and recovery closely
+matched those observed in the simulated environment. In particular, the protocol demonstrated robust
+behavior under adversarial conditions specifically designed to disrupt stable leadership.
+
+\subsubsection{Limitations}
+
+The physical validation was conducted on a limited number of nodes and with a small number of
+repetitions. Convergence times were measured manually and are therefore subject to observer error and
+limited temporal resolution.
+
+Furthermore, the experiments do not provide coverage of large-scale deployments or worst-case
+wireless interference patterns. As such, the physical validation should be interpreted as
+qualitative confirmation of protocol behavior rather than as a quantitative performance evaluation.
+
+
