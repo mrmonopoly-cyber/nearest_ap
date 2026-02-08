@@ -33,6 +33,10 @@ This will generate:
 - a [latex](https://www.latex-project.org/) report in ```doc/report``` with name **report.pdf**
 
 > To make the report [gnuplot](http://www.gnuplot.info/) is required
+> To create the report you also need to prepare the data from the simulations. 
+> To do that the simplest way is to unzip the data from a release into the **crazyflie_data_log**
+> directory and then launch make. Alternative you can run the simulations in the linux target
+> but that takes quite a lot of time due to a poor non parallel implementation of the simulator.
 
 To clean the doc:
 ```sh
